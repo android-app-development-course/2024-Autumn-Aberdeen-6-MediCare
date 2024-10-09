@@ -1,4 +1,5 @@
 # MediCare 呵药  
+- **Medi**cine + **Care** → **MediCare**  
 - 智能药品管理 & 提醒 App  
 - 2024 年秋季阿伯丁学院 第 6 组  
 ### 项目目录  
