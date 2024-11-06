@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#FDF9FC"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical|center_horizontal"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/buttonBackMain"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white"
+                android:contentDescription="返回"
+                android:padding="10dp"
+                android:src="@drawable/calendar_ic_arrow_left" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="添加药品信息"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white"
+                android:contentDescription="占位"
+                android:padding="10dp"
+                android:src="@drawable/calendar_ic_arrow_left"
+                android:visibility="invisible" />
+
+        </LinearLayout>
+
+        <!-- Medication Name -->
+        <EditText
+            android:id="@+id/editTextMedicationName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="药品名称"
+            android:inputType="text" />
+
+        <!-- Patient Name and Medical Record -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <!-- Patient Name -->
+            <EditText
+                android:id="@+id/editTextPatientName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="用药人"
+                android:inputType="textPersonName" />
+
+            <!-- Medical Record -->
+            <EditText
+                android:id="@+id/editTextMedicalRecord"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="诊籍"
+                android:inputType="text" />
+
+        </LinearLayout>
+
+        <!-- Dosage and Remaining Amount -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <!-- Dosage -->
+            <EditText
+                android:id="@+id/editTextDosage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="服用剂量(mg, ml等)"
+                android:inputType="text" />
+
+            <!-- Remaining Amount -->
+            <EditText
+                android:id="@+id/editTextRemainingAmount"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="余量"
+                android:inputType="number" />
+
+        </LinearLayout>
+
+        <!-- Daily Intake Frequency -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="一天服用次数"
+                android:textSize="20sp" />
+
+            <ImageButton
+                android:id="@+id/listButtonDailyIntakeFrequency"
+                style="?android:attr/buttonBarStyle"
+                android:layout_width="20sp"
+                android:layout_height="20sp"
+                android:layout_marginLeft="-10dp"
+                android:contentDescription="选择一天服用次数列表"
+                android:onClick="showDailyIntakeList"
+                android:padding="0dp"
+                android:src="@drawable/calendar_ic_arrow_right" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/timeSelectionLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+
+        <EditText
+            android:id="@+id/editTextDailyIntakeFrequency"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="每日服用次数"
+            android:inputType="number" />
+
+        <!-- Intake Interval (Days) -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="服用频率"
+            android:textSize="20sp" />
+
+        <EditText
+            android:id="@+id/editTextIntakeIntervalDays"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="服用频率（每几天）"
+            android:inputType="number" />
+
+        <!-- Reminder mode -->
+        <!-- 支持多选，选择无则全不选 -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="提醒方式"
+            android:textSize="20sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <CheckBox
+                android:id="@+id/checkboxCalendar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="日历"
+                android:textSize="16sp" />
+
+            <CheckBox
+                android:id="@+id/checkboxAlarm"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="闹钟"
+                android:textSize="16sp" />
+
+            <CheckBox
+                android:id="@+id/checkboxAppNotification"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="应用"
+                android:textSize="16sp" />
+
+            <CheckBox
+                android:id="@+id/checkboxNone"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="无"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+        <!-- Expiry Date with DatePicker -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="保质期" />
+
+        <EditText
+            android:id="@+id/editTextExpiryDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableEnd="@android:drawable/ic_menu_my_calendar"
+            android:focusable="false"
+            android:hint="选择保质期"
+            android:inputType="date"
+            android:onClick="showDatePicker" />
+
+        <!-- Submit Button -->
+        <Button
+            android:id="@+id/buttonSaveMedication"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="保存药品信息" />
+
+    </LinearLayout>
+</ScrollView>

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#80000000"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- 关闭按钮 -->
+        <ImageButton
+            android:id="@+id/dialog_buttonClose"
+            style="?android:attr/buttonBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|top"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="关闭"
+            android:src="@drawable/ic_close" />
+
+        <!-- 药品名称 -->
+        <TextView
+            android:id="@+id/dialog_textMedicationName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="药品名称"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginBottom="4dp" />
+
+        <!-- 用药人 -->
+        <TextView
+            android:id="@+id/dialog_textPatientName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="患者名称"
+            android:textSize="14sp"
+            android:layout_marginBottom="4dp" />
+
+        <!-- 剂量信息 -->
+        <TextView
+            android:id="@+id/dialog_textDosageInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="剂量信息"
+            android:textSize="14sp"
+            android:layout_marginBottom="4dp" />
+
+        <!-- 剩余数量 -->
+        <TextView
+            android:id="@+id/dialog_textRemainingAmount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="剩余数量"
+            android:textSize="14sp"
+            android:layout_marginBottom="4dp" />
+
+        <!-- 每日摄入频率 -->
+        <TextView
+            android:id="@+id/dialog_textDailyIntakeFrequency"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="每日摄入频率"
+            android:textSize="14sp"
+            android:layout_marginBottom="4dp" />
+
+        <!-- 摄入间隔天数 -->
+        <TextView
+            android:id="@+id/dialog_textIntakeIntervalDays"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="摄入间隔天数"
+            android:textSize="14sp"
+            android:layout_marginBottom="4dp" />
+
+        <!-- 过期日期 -->
+        <TextView
+            android:id="@+id/dialog_textExpiryDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="过期日期"
+            android:textSize="14sp"
+            android:layout_marginBottom="4dp" />
+    </LinearLayout>
+
+</LinearLayout>
