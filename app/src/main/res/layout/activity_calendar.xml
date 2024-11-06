@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Header to display the current month and year -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical|center_horizontal">
+
+        <ImageButton
+            style="?android:attr/buttonBarStyle"
+            android:id="@+id/buttonPreviousMonth"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="上一个月"
+            android:src="@drawable/calendar_ic_arrow_left"
+            android:padding="10dp"/>
+
+        <TextView
+            android:id="@+id/textMonthYear"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Month Year"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginBottom="10dp"/>
+
+        <ImageButton
+            style="?android:attr/buttonBarStyle"
+            android:id="@+id/buttonNextMonth"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="下一个月"
+            android:src="@drawable/calendar_ic_arrow_right"
+            android:padding="10dp"/>
+    </LinearLayout>
+
+    <!-- 星期标题栏 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="一"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="二"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="三"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="四"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="五"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="六"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="日"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"/>
+    </LinearLayout>
+
+    <!-- 灰色分割线 -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#CCCCCC" />
+
+    <!-- RecyclerView to display dates in a grid format -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewCalendar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:columnCount="7"
+        android:orientation="vertical" />
+<!--    设置自适应layout_height，当月份不足5行时，height应该适当减小-->
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/switchToggleMode"
+        android:layout_width="wrap_content"
+        android:layout_height="?listPreferredItemHeight"
+        android:text="切换选中模式"
+        android:textOn = "多选模式"
+        android:textOff = "单选模式"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="5dp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#CCCCCC" />
+
+    <!-- Section for displaying medication records -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="用药记录"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewMedication"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:columnCount="1"
+            android:nestedScrollingEnabled="false" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/buttonAddMedication"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right|bottom"
+            android:layout_margin="16dp"
+            android:clickable="true"
+            android:contentDescription="Add Medication"
+            app:fabCustomSize="48dp"
+            app:fabSize="auto"
+            app:srcCompat="@drawable/ic_add_circle" />
+
+    </LinearLayout>
+
+</LinearLayout>
