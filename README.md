@@ -5,8 +5,13 @@
 ### 项目目录  
 - [/doc](/doc/) - 项目文档  
     - [/01 商业计划书](/doc/01%20商业计划书.md)  
-    - [/02 MediCare 设计方案汇报](/doc/02%20MediCare%20设计方案汇报.pptx)
-
+    - [/02 MediCare 设计方案汇报（PPT）](/doc/02%20MediCare%20设计方案汇报.pptx)  
+    - [/03 MediCare 设计方案汇报（PDF）](/doc/03%20MediCare%20设计方案汇报%20PDF版.pdf)  
+    - [/04 MediCare UI设计汇报（PPT）](/doc/04%20MediCare%20UI设计汇报.pptx)  
+    - [/05 MediCare UI设计汇报（PDF）](/doc/05%20MediCare%20UI设计汇报%20PDF版.pdf)  
+    - [/06 MediCare UI演示视频](/doc/06%20MediCare%20UI演示.mp4)  
+    - [/07 MediCare 界面流程图](/doc/07%20MediCare%20界面流程图.png)  
+    - [/08 MediCare 界面流程图（draw.io存档）](/doc/08%20MediCare%20界面流程图（drawio存档）.xml)
 
 ### CalendarPage开发问题与解决
 
