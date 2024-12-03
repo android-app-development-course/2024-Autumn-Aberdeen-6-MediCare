@@ -3,6 +3,10 @@
     <style name="Base.Theme.MediCare" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="colorPrimary">@color/theme_primary</item>
+        <item name="colorPrimaryVariant">@color/theme_primary_variant</item>
+        <item name="colorSecondary">@color/theme_secondary</item>
+        <item name="colorSecondaryVariant">@color/theme_secondary_variant</item>
     </style>
 
     <style name="Theme.MediCare" parent="Base.Theme.MediCare" />
