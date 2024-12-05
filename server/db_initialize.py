@@ -22,7 +22,7 @@ def init_database(database_path: str) -> None:
         cursor.execute("BEGIN;")
 
         # 检查数据库中的表是否存在，不存在则创建
-        table_names = ["user"]
+        table_names = ["user", "token"]
         for table_name in table_names:
             cursor.execute(f"SELECT name FROM sqlite_master WHERE type='table' AND name=?", (table_name,))
             result = cursor.fetchone()

@@ -2,15 +2,19 @@
 SQLite 数据库对象.
 """
 
+import os
 import sqlite3
 from typing import Tuple
+
+# 数据库路径
+DATABASE_PATH = os.path.join(os.path.dirname(__file__), "data.db")
 
 class SQLiteConnection:
     """
     SQLite 数据库对象.
     支持使用上下文管理器 with 来确保操作完成后关闭连接.
     """
-    def __init__(self, db_path: str) -> None:
+    def __init__(self, db_path: str = DATABASE_PATH) -> None:
         """
         初始化 SQLite 类.
         
