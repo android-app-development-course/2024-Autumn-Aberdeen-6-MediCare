@@ -26,6 +26,9 @@ def build_message(code: int = 200,
                   data: str | int | dict = None,
                   err_code: str = None,
                   err_description: str = None) -> Tuple[str, int]:
+    if code == 204:
+        return "", 204
+
     message = {
         "code": code,
         "success": success,
