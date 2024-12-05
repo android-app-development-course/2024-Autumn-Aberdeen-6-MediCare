@@ -1,0 +1,6 @@
+# Server SQLite data
+*.db
+
+# Python Cache
+__pycache__/*
+*.pyc
