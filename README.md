@@ -4,16 +4,18 @@
 - 2024 年秋季阿伯丁学院 第 6 组  
 ### 项目目录  
 - [/doc](/doc/) - 项目文档  
-    - [/01 商业计划书](/doc/01%20商业计划书.md)  
-    - [/02 MediCare 设计方案汇报（PPT）](/doc/02%20MediCare%20设计方案汇报.pptx)  
-    - [/03 MediCare 设计方案汇报（PDF）](/doc/03%20MediCare%20设计方案汇报%20PDF版.pdf)  
-    - [/04 MediCare UI设计汇报（PPT）](/doc/04%20MediCare%20UI设计汇报.pptx)  
-    - [/05 MediCare UI设计汇报（PDF）](/doc/05%20MediCare%20UI设计汇报%20PDF版.pdf)  
-    - [/06 MediCare UI演示视频](/doc/06%20MediCare%20UI演示.mp4)  
-    - [/07 MediCare 界面流程图](/doc/07%20MediCare%20界面流程图.png)  
-    - [/08 MediCare 界面流程图（draw.io存档）](/doc/08%20MediCare%20界面流程图（drawio存档）.xml)
+    - [/01](/doc/01%20商业计划书.md) - 商业计划书  
+    - [/02](/doc/02%20MediCare%20设计方案汇报.pptx) - 设计方案汇报（PPT） 
+    - [/03](/doc/03%20MediCare%20设计方案汇报%20PDF版.pdf) - 设计方案汇报（PDF）  
+    - [/04](/doc/04%20MediCare%20UI设计汇报.pptx) - UI 设计汇报（PPT）  
+    - [/05](/doc/05%20MediCare%20UI设计汇报%20PDF版.pdf) - UI 设计汇报（PDF）  
+    - [/06](/doc/06%20MediCare%20UI演示.mp4) - UI 演示视频  
+    - [/07](/doc/07%20MediCare%20界面流程图.png) - 界面流程图  
+    - [/08](/doc/08%20MediCare%20界面流程图（drawio存档）.xml) - 界面流程图（[draw.io](https://app.diagrams.net/) 存档）  
+- [/server](/server/) - App 服务器，使用 Python 实现  
+- 其余目录和文件 - Android 项目  
 
-### CalendarPage开发问题与解决
+### CalendarPage 开发问题与解决  
 
 1. 在使用系统闹钟设置闹钟提醒时，不能连续设置闹钟。因为是加载Intent，会只有第一个时间被设置  
    使用`handler.post()`设置延迟后解决
