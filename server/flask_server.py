@@ -29,7 +29,7 @@ def ping():
 """
 /register - 注册账号
 请求 - POST {"username": "Username", "passwordHash": "password"}（哈希密码）
-响应 - 成功：不返回消息，失败：USERNAME_ALREADY_EXIST 用户名已注册
+响应 - 成功：返回 200，失败：USERNAME_ALREADY_EXIST 用户名已注册
 """
 @app.route("/register", methods=["POST"])
 def register():
@@ -60,13 +60,13 @@ def register():
         conn.commit()
 
     logger.info(f"User \"{username}\" register success.")
-    return build_message(code=204)
+    return build_message(message="Register success")
 
 
 """
 /login - 登录账号
 请求 - POST {"username": "Username", "passwordHash": "password"}（哈希密码）
-响应 - 成功：返回登录 Token（字符串），失败：INVALID_USERNAME_OR_PASSWORD 无效的用户名或密码
+响应 - 成功：返回 200 和登录 Token（字符串），失败：INVALID_USERNAME_OR_PASSWORD 无效的用户名或密码
 """
 @app.route("/login", methods=["POST"])
 def login():
@@ -107,7 +107,7 @@ def login():
 """
 /logout - 登出账号
 请求：null
-响应 - 成功：不返回消息，失败：INVALID_TOKEN 无效的 Token（客户端无论如何都应该登出）
+响应 - 成功：返回 200，失败：INVALID_TOKEN 无效的 Token（客户端无论如何都应该登出）
 """
 @app.route("/logout", methods=["POST"])
 def logout():
@@ -122,7 +122,7 @@ def logout():
     if user_id != -1:
         invalidate_token(token)
         logger.info(f"User logout success.")
-        return build_message(code=204)
+        return build_message(message="Logout success.")
     else:
         logger.info(f"User logout failed, reason: token is invalid or already expired.")
         return build_message(code=410, success=False, err_code="INVALID_TOKEN", err_description="Token is invalid or already expired.")
