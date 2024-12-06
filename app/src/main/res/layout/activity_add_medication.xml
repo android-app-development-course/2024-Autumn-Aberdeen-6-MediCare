@@ -162,6 +162,70 @@
             android:hint="服用频率（每几天）"
             android:inputType="number" />
 
+        <LinearLayout
+            android:id="@+id/linearLayoutDays"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <CheckBox
+                android:id="@+id/checkBoxMonday"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="16sp"
+                android:text="一" />
+
+            <CheckBox
+                android:id="@+id/checkBoxTuesday"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="16sp"
+                android:text="二" />
+
+            <CheckBox
+                android:id="@+id/checkBoxWednesday"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="16sp"
+                android:text="三" />
+
+            <CheckBox
+                android:id="@+id/checkBoxThursday"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="16sp"
+                android:text="四" />
+
+            <CheckBox
+                android:id="@+id/checkBoxFriday"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="16sp"
+                android:text="五" />
+
+            <CheckBox
+                android:id="@+id/checkBoxSaturday"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="16sp"
+                android:text="六" />
+
+            <CheckBox
+                android:id="@+id/checkBoxSunday"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="16sp"
+                android:text="日" />
+        </LinearLayout>
+
         <!-- Reminder mode -->
         <!-- 支持多选，选择无则全不选 -->
         <TextView
@@ -182,7 +246,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="日历"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:enabled="false"/>
 
             <CheckBox
                 android:id="@+id/checkboxAlarm"
