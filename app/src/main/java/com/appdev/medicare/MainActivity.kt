@@ -1,266 +1,118 @@
 package com.appdev.medicare
 
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
-import android.widget.ImageButton
-import android.widget.TextView
-import android.widget.Toast
-import androidx.activity.result.ActivityResultLauncher
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.RadioButton
+import android.widget.RadioGroup
 import androidx.appcompat.app.AppCompatActivity
-import androidx.activity.result.contract.ActivityResultContracts
-import com.appdev.calendarpage.model.MedicationData
-import com.appdev.calendarpage.model.DateItem
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import java.text.SimpleDateFormat
-import com.appdev.medicare.CalendarAdapter.OnDateSelectedListener
-import java.util.*
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
+import androidx.viewpager2.adapter.FragmentStateAdapter
+import androidx.viewpager2.widget.ViewPager2
+import java.util.ArrayList
+
+// 在构建好每个Fragment页面后替换这些类即可
+class Fragment2 : Fragment() {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.activity_box, container, false)
+    }
+}
+
+class Fragment3 : Fragment() {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.activity_record, container, false)
+    }
+}
+class Fragment4 : Fragment() {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.activity_me, container, false)
+    }
+}
 
 class MainActivity : AppCompatActivity() {
-
-    private lateinit var textMonthYear: TextView
-    private lateinit var recyclerViewCalendar: RecyclerView
-    private lateinit var switchToggleMode : androidx.appcompat.widget.SwitchCompat
-    private lateinit var calendarAdapter: CalendarAdapter
-    private var allTextViews : MutableList<TextView> = mutableListOf()
-
-    private lateinit var buttonPreviousMonth : ImageButton
-    private lateinit var buttonNextMonth : ImageButton
-    private lateinit var buttonAddMedication : ImageButton
-
-    private lateinit var dateItems: MutableList<DateItem> // 只是当前月份的，更换月份后重新初始化
-
-    private lateinit var medicationAdapter: MedicationAdapter
-    private lateinit var recyclerViewMedication: RecyclerView
-
-    private lateinit var addMedicationActivityLauncher : ActivityResultLauncher<Intent>
+    // 使用更符合Kotlin命名习惯的变量名
+    private lateinit var viewPager: ViewPager2
+    private lateinit var radioGroup: RadioGroup
+    private lateinit var radioButton1: RadioButton
+    private lateinit var radioButton2: RadioButton
+    private lateinit var radioButton3: RadioButton
+    private lateinit var radioButton4: RadioButton
+    private val fragmentList = ArrayList<Fragment>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_calendar)
+        setContentView(R.layout.activity_main)
 
-        textMonthYear = findViewById(R.id.textMonthYear)
-        recyclerViewCalendar = findViewById(R.id.recyclerViewCalendar)
-        recyclerViewMedication = findViewById(R.id.recyclerViewMedication)
-        switchToggleMode = findViewById(R.id.switchToggleMode)
-        buttonNextMonth = findViewById(R.id.buttonNextMonth)
-        buttonPreviousMonth = findViewById(R.id.buttonPreviousMonth)
-        buttonAddMedication = findViewById(R.id.buttonAddMedication)
+        initViews()
 
-        // Set the current month and year in the header
-        val currentDate = Calendar.getInstance()
-        val dateFormat = SimpleDateFormat("MMMM yyyy", Locale.getDefault())
-        textMonthYear.text = dateFormat.format(currentDate.time)
-
-        // Prepare the days of the month
-        val daysOfMonth = getDaysOfMonth(currentDate)
-
-        // Get the DateItems in this month
-        dateItems = generateDateItemsForMonth(currentDate)
-
-
-        recyclerViewMedication.layoutManager = LinearLayoutManager(this)
-        // Setup RecyclerView with a GridLayoutManager
-        recyclerViewCalendar.layoutManager = GridLayoutManager(this, 7)
-        calendarAdapter = CalendarAdapter(daysOfMonth, false, dateItems)
-        recyclerViewCalendar.adapter = calendarAdapter
-
-        switchToggleMode.setOnCheckedChangeListener  {_, isChecked ->
-            recyclerViewMedication.adapter = null
-            calendarAdapter.setMultiSelectMode = isChecked
-            allTextViews = calendarAdapter.getAllTextViews()
-            allTextViews.forEach{view ->
-                view.setBackgroundResource(R.drawable.default_shape)
-            }
-            if (isChecked) {
-                // 显示启用多选模式的提示
-                Toast.makeText(this, "多选模式已启用", Toast.LENGTH_SHORT).show()
-            } else {
-                // 显示禁用多选模式的提示
-                Toast.makeText(this, "多选模式已禁用", Toast.LENGTH_SHORT).show()
+        // 为RadioGroup设置选中状态改变的监听器
+        radioGroup.setOnCheckedChangeListener { _, checkedId ->
+            when (checkedId) {
+                R.id.rb_calendar -> viewPager.currentItem = 0
+                R.id.rb_box -> viewPager.currentItem = 1
+                R.id.rb_record -> viewPager.currentItem = 2
+                R.id.rb_me -> viewPager.currentItem = 3
             }
         }
 
-        buttonPreviousMonth.setOnClickListener {
-            currentDate.add(Calendar.MONTH, -1)
-            updateUI(currentDate)
-        }
-
-        buttonNextMonth.setOnClickListener {
-            currentDate.add(Calendar.MONTH, 1)
-            updateUI(currentDate)
-        }
-
-        addMedicationActivityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == RESULT_OK) {
-                val data = result.data
-                if (data!= null) {
-                    val medicationData = data.getParcelableExtra("MEDICATION_DATA") as MedicationData?
-                    if (medicationData!= null) {
-                        if (calendarAdapter.setMultiSelectMode) {
-                            val selectedDateItems = calendarAdapter.getSelectedDateItems()
-                            selectedDateItems.forEach { dateItem ->
-                                dateItem.medicationData?.add(medicationData)
-//                                val medicationList = dateItem.medicationData
-//                                medicationList?.let {
-//                                    medicationList.forEach {medicationData ->
-//                                        setRemindersForDailyIntake(this, dateItem.date, medicationData.dailyIntakeTimes, medicationData.reminderMode)
-//                                    }
-//                                }
-                            }
-                            calendarAdapter.clearStates()
-                        } else {
-                            val selectedDateItem = calendarAdapter.getSelectedDateItem()
-                            if (selectedDateItem!= null) {
-                                selectedDateItem.medicationData?.add(medicationData)
-                                val medicationList = selectedDateItem.medicationData
-                                medicationList?.let {
-//                                    medicationList.forEach {medicationData ->
-//                                        setRemindersForDailyIntake(this, selectedDateItem.date, medicationData.dailyIntakeTimes, medicationData.reminderMode)
-//                                    }
-                                    medicationAdapter = MedicationAdapter(medicationList){}
-                                    recyclerViewMedication.adapter = medicationAdapter
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        buttonAddMedication.setOnClickListener {
-            // 保证在点击加号之前，用户已经选定了要做更改的日期
-            val intent = Intent(this, AddMedActivity::class.java)
-            addMedicationActivityLauncher.launch(intent)
-//            if (calendarAdapter.setMultiSelectMode) {
-//                val selectedDateItems = calendarAdapter.getSelectedDateItems()
-//                if (selectedDateItems.isNotEmpty()) {
-//                    val intent = Intent(this, AddMedActivity::class.java)
-//                    startActivity(intent)
-//                } else {
-//                    Toast.makeText(this, "请先选择日期", Toast.LENGTH_SHORT).show()
-//                }
-//            } else {
-//                val selectedDateItem = calendarAdapter.getSelectedDateItem()
-//                if (selectedDateItem != null) {
-//                    val intent = Intent(this, AddMedActivity::class.java)
-//                    startActivity(intent)
-//                } else {
-//                    Toast.makeText(this, "请先选择日期", Toast.LENGTH_SHORT).show()
-//                }
-//            }
-        }
-
-        // 设置日期选择监听器
-        calendarAdapter.setOnDateSelectedListener(object : OnDateSelectedListener {
-            override fun onDateSelected(dateItem: DateItem, flag: Boolean) {
-                if (flag) {
-                    val medicationList = dateItem.medicationData
-                    if (medicationList!= null) {
-                        medicationAdapter = MedicationAdapter(medicationList){}
-                        recyclerViewMedication.adapter = medicationAdapter
-                    }
-                } else {
-                    recyclerViewMedication.adapter = null
-                }
+        // 为ViewPager2注册页面变化监听器
+        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                updateRadioButtonCheckedState(position)
             }
         })
     }
 
-    private fun combineDateAndTime(date:Date, time: String): Date {
-        val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-        val timeDate = timeFormat.parse(time)
+    private fun initViews() {
+        viewPager = findViewById(R.id.viewpager)
+        radioGroup = findViewById(R.id.rg_tab)
+        radioButton1 = findViewById(R.id.rb_calendar)
+        radioButton2 = findViewById(R.id.rb_box)
+        radioButton3 = findViewById(R.id.rb_record)
+        radioButton4 = findViewById(R.id.rb_me)
 
-        // 使用 Calendar 将日期和时间合并
-        val calendar = Calendar.getInstance()
-        calendar.time = date
+        fragmentList.add(CalendarActivity())
+        fragmentList.add(Fragment2())
+        fragmentList.add(Fragment3())
+        fragmentList.add(Fragment4())
 
-        // 获取时间部分的小时和分钟
-        val timeCalendar = Calendar.getInstance()
-        timeCalendar.time = timeDate!!
-
-        // 设置日期的小时和分钟
-        calendar.set(Calendar.HOUR_OF_DAY, timeCalendar.get(Calendar.HOUR_OF_DAY))
-        calendar.set(Calendar.MINUTE, timeCalendar.get(Calendar.MINUTE))
-        calendar.set(Calendar.SECOND, 0)
-        calendar.set(Calendar.MILLISECOND, 0)
-
-        return calendar.time
+        val adapter = ViewPager2Adapter(this, fragmentList)
+        viewPager.adapter = adapter
     }
 
-//    private fun setRemindersForDailyIntake(context: Context, date: Date, intakeTimes: MutableList<String>, reminderMode: String) {
-//        val isCalendarEnabled = reminderMode.getOrNull(0) == '1'
-//        val isAlarmEnabled = reminderMode.getOrNull(1) == '1'
-//        val isNotificationEnabled = reminderMode.getOrNull(2) == '1'
-//
-//        for (time in intakeTimes) {
-//            val entireTime = combineDateAndTime(date, time)
-//            if (isCalendarEnabled) {
-//                // setCalendarReminder(context, entireTime)
-//            }
-//            if (isAlarmEnabled) {
-//                // setAlarmReminder(context, entireTime)
-//            }
-//            if (isNotificationEnabled) {
-//                // setNotificationReminder(context, entireTime)
-//            }
-//        }
-//    }
+    // 根据ViewPager2的当前页面位置更新RadioButton的选中状态
+    private fun updateRadioButtonCheckedState(position: Int) {
+        radioButton1.isChecked = position == 0
+        radioButton2.isChecked = position == 1
+        radioButton3.isChecked = position == 2
+        radioButton4.isChecked = position == 3
+    }
+}
 
-    private fun generateDateItemsForMonth(calendar: Calendar): MutableList<DateItem> {
-        val dateItems = mutableListOf<DateItem>()
-        val daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
 
-        for (day in 1..daysInMonth) {
-            calendar.set(Calendar.DAY_OF_MONTH, day)
-            val dateIdentifier = generateDateIdentifier(calendar)
-            dateItems.add(
-                DateItem(
-                    dateIdentifier = dateIdentifier,
-                    date = calendar.time,
-                    medicationData = mutableListOf()
-                )
-            )
-        }
-        return dateItems
+class ViewPager2Adapter(fragmentActivity: FragmentActivity, private val fragmentList: List<Fragment>) :
+    FragmentStateAdapter(fragmentActivity) {
+
+    override fun getItemCount(): Int {
+        return fragmentList.size
     }
 
-    private fun generateDateIdentifier(calendar: Calendar): Int {
-        val year = calendar.get(Calendar.YEAR)
-        val month = calendar.get(Calendar.MONTH) + 1  // Calendar.MONTH 从 0 开始
-        val day = calendar.get(Calendar.DAY_OF_MONTH)
-        return year * 10000 + month * 100 + day
-    }
-
-    private fun getDaysOfMonth(calendar: Calendar): List<Int> {
-        val daysOfMonth = mutableListOf<Int>()
-        calendar.set(Calendar.DAY_OF_MONTH, 1)
-        val daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
-
-        // 星期日返回7
-        val adjustedDayOfWeek = when (val firstDayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)) {
-            Calendar.SUNDAY -> 7
-            else -> firstDayOfWeek - 1
-        }
-        // Add empty days for alignment
-        for (i in 1 until adjustedDayOfWeek) {
-            daysOfMonth.add(0) // Add empty slots
-        }
-
-        // Add the actual days of the month
-        for (day in 1..daysInMonth) {
-            daysOfMonth.add(day)
-        }
-
-        return daysOfMonth
-    }
-
-    private fun updateUI(currentDate : Calendar) {
-        textMonthYear.text = SimpleDateFormat("MMMM yyyy", Locale.getDefault()).format(currentDate.time)
-        val daysOfMonth = getDaysOfMonth(currentDate)
-        calendarAdapter = CalendarAdapter(daysOfMonth, switchToggleMode.isChecked, generateDateItemsForMonth(currentDate))
-        recyclerViewCalendar.adapter = calendarAdapter
+    override fun createFragment(position: Int): Fragment {
+        return fragmentList[position]
     }
 }

@@ -122,22 +122,21 @@
     <!-- RecyclerView to display dates in a grid format -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewCalendar"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:columnCount="7"
-        android:orientation="vertical" />
+        android:orientation="horizontal" />
 <!--    设置自适应layout_height，当月份不足5行时，height应该适当减小-->
 
     <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/switchToggleMode"
         android:layout_width="wrap_content"
-        android:layout_height="?listPreferredItemHeight"
+        android:layout_height="wrap_content"
         android:text="切换选中模式"
         android:textOn = "多选模式"
         android:textOff = "单选模式"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="5dp" />
+        android:layout_gravity="center_horizontal" />
 
     <View
         android:layout_width="match_parent"
@@ -156,7 +155,7 @@
             android:text="用药记录"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:layout_marginTop="16dp" />
+            android:layout_marginTop="14dp" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerViewMedication"
