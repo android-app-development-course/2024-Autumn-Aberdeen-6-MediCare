@@ -1,12 +1,19 @@
 package com.appdev.medicare
 
-import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import com.appdev.medicare.api.RetrofitClient
+import com.appdev.medicare.model.RegisterRequest
+import com.appdev.medicare.utils.hashString
 import com.google.android.material.textfield.TextInputEditText
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class RegisterActivity : AppCompatActivity() {
     private lateinit var usernameInput: TextInputEditText
@@ -45,19 +52,32 @@ class RegisterActivity : AppCompatActivity() {
                 "Please fill in all fields.",
                 Toast.LENGTH_SHORT
             ).show()
-        } else if (password.toString() === confirmPassword.toString()) {
+        } else if (password.toString() != confirmPassword.toString()) {
             Toast.makeText(
                 this,
-                "Not the same password",
+                "Passwords do not match",
                 Toast.LENGTH_SHORT
             ).show()
         } else {
-            Toast.makeText(
-                this,
-                "Trying to register with username '${username}'!",
-                Toast.LENGTH_SHORT
-            ).show()
-            // to be implemented
+            lifecycleScope.launch {
+                val registerRequest = RegisterRequest(username.toString(), hashString(password.toString()))
+                val response = withContext(Dispatchers.IO) {
+                    RetrofitClient.api.register(registerRequest).execute()
+                }
+
+                val responseBody = response.body()!!
+                if (responseBody.success) {
+                    Log.d("RegisterActivity", "Register success.")
+                    runOnUiThread {
+                        Toast.makeText(
+                            this@RegisterActivity,
+                            "Register success",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        finish()
+                    }
+                }
+            }
         }
     }
 }
