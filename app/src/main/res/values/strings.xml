@@ -6,4 +6,9 @@
     <string name="register">Register</string>
     <string name="confirmPassword">Confirm Password</string>
     <string name="ok">OK</string>
+    <string name="registerFailed">Register Failed</string>
+    <string name="registerSuccess">Register success</string>
+    <string name="usernameAlreadyExist">Username already exist</string>
+    <string name="fillInAllFields">Please fill in all fields</string>
+    <string name="passwordsNotMatch">Passwords do not match</string>
 </resources>

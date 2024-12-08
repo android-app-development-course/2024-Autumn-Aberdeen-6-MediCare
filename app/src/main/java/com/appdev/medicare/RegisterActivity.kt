@@ -9,7 +9,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.appdev.medicare.api.RetrofitClient
 import com.appdev.medicare.model.RegisterRequest
+import com.appdev.medicare.utils.buildAlertDialog
 import com.appdev.medicare.utils.hashString
+import com.appdev.medicare.utils.parseRequestBody
 import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -49,32 +51,60 @@ class RegisterActivity : AppCompatActivity() {
         if (username!!.isEmpty() || password!!.isEmpty() || confirmPassword!!.isEmpty()) {
             Toast.makeText(
                 this,
-                "Please fill in all fields.",
+                this.getString(R.string.fillInAllFields),
                 Toast.LENGTH_SHORT
             ).show()
         } else if (password.toString() != confirmPassword.toString()) {
             Toast.makeText(
                 this,
-                "Passwords do not match",
+                this.getString(R.string.passwordsNotMatch),
                 Toast.LENGTH_SHORT
             ).show()
         } else {
             lifecycleScope.launch {
-                val registerRequest = RegisterRequest(username.toString(), hashString(password.toString()))
+                val registerRequest =
+                    RegisterRequest(username.toString(), hashString(password.toString()))
                 val response = withContext(Dispatchers.IO) {
                     RetrofitClient.api.register(registerRequest).execute()
                 }
 
-                val responseBody = response.body()!!
-                if (responseBody.success) {
-                    Log.d("RegisterActivity", "Register success.")
+                if (response.isSuccessful) {
+                    Log.d("RegisterActivity", "Register success")
                     runOnUiThread {
                         Toast.makeText(
                             this@RegisterActivity,
-                            "Register success",
+                            this@RegisterActivity.getString(R.string.registerSuccess),
                             Toast.LENGTH_SHORT
                         ).show()
                         finish()
+                    }
+                } else {
+                    val failReason = parseRequestBody(response.errorBody()).error!!
+                    if (failReason.code == "USERNAME_ALREADY_EXIST") {
+                        Log.w(
+                            "RegisterActivity",
+                            "Register Failed, reason: username $username already exist."
+                        )
+                        runOnUiThread {
+                            buildAlertDialog(
+                                this@RegisterActivity,
+                                this@RegisterActivity.getString(R.string.registerFailed),
+                                this@RegisterActivity.getString(R.string.usernameAlreadyExist)
+                            )
+                                .show()
+                        }
+                    } else {
+                        Log.w(
+                            "RegisterActivity",
+                            "Register failed, reason: ${failReason.code}, ${failReason.description}"
+                        )
+                        runOnUiThread {
+                            buildAlertDialog(
+                                this@RegisterActivity,
+                                this@RegisterActivity.getString(R.string.registerFailed),
+                                "${failReason.code} - ${failReason.description}"
+                            )
+                        }
                     }
                 }
             }
