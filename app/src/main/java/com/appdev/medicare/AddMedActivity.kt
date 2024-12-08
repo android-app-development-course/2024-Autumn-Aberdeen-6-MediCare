@@ -7,6 +7,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.view.Gravity
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
@@ -159,10 +160,8 @@ class AddMedActivity : AppCompatActivity() {
         builder.setItems(items) { dialog, which ->
             val selectedNumber = items[which].toInt()
             val timeSelectionLayout = findViewById<LinearLayout>(R.id.timeSelectionLayout)
-
             // 获取选择天数
             dailyIntakeFrequency = selectedNumber
-
             timeSelectionLayout.removeAllViews()
             selectedTimes.clear()
 
@@ -178,16 +177,30 @@ class AddMedActivity : AppCompatActivity() {
                     val index = (i - 1) * 3 + j
                     if (index < selectedNumber) {
                         val timeButton = android.widget.Button(this)
-                        timeButton.text = "选择时间 $index"
+                        timeButton.apply {
+                            text = "选择时间 $index"
+                            setTextColor(Color.parseColor("#000000")) // 按钮文字颜色
+                            setBackgroundResource(R.drawable.rounded_blue_background) // 使用自定义背景
+                            textSize = 16f
+                            gravity = Gravity.CENTER
+                        }
 
                         val fixedWidth =
-                            ((resources.displayMetrics.widthPixels * 4 / 5 - 80) / 3).toInt()
+                            ((resources.displayMetrics.widthPixels * 4 / 5 - 80) / 3) - 30.toInt()
                         val buttonParams = LinearLayout.LayoutParams(
                             fixedWidth,
                             LinearLayout.LayoutParams.WRAP_CONTENT
                         )
-                        buttonParams.setMargins(20, 0, 20, 2)
+//                        buttonParams.setMargins(20, 0, 20, 2)
+                        buttonParams.setMargins(18, 8, 18, 8) // 更均匀的间距
                         timeButton.layoutParams = buttonParams
+
+                        val rowLayoutParams = LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT, // 父布局宽度匹配屏幕
+                            LinearLayout.LayoutParams.WRAP_CONTENT
+                        )
+                        rowLayoutParams.setMargins(0, 16, 0, 16) // 每一行的上下间距
+                        rowLayout.layoutParams = rowLayoutParams
 
                         timeButton.setOnClickListener {
                             showTimePicker(timeButton, index)

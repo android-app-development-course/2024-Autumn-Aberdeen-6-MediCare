@@ -21,6 +21,17 @@
         android:theme="@style/Theme.MediCare"
         android:usesCleartextTraffic="true">
 
+
+        <receiver android:name=".receiver.AlarmReceiver" />
+        <receiver
+            android:name=".receiver.NotificationReceiver"
+            android:enabled="true"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="com.appdev.medicare.NOTIFICATION_ACTION" />
+            </intent-filter>
+        </receiver>
+
         <activity
             android:name=".CalendarFragment"
             android:exported="true">

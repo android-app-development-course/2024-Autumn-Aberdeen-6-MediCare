@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+<!--    <item android:state_pressed="true">-->
+<!--        <shape>-->
+<!--            <solid android:color="#6a9efc" /> &lt;!&ndash; 按下时背景色 &ndash;&gt;-->
+<!--            <corners android:radius="5dp" /> &lt;!&ndash; 圆角 &ndash;&gt;-->
+<!--        </shape>-->
+<!--    </item>-->
+    <item android:state_enabled="true">
+        <shape>
+            <solid android:color="#9dc9fd" /> <!-- 默认背景色 -->
+            <corners android:radius="5dp" />
+        </shape>
+    </item>
+</selector>

@@ -18,10 +18,10 @@
             android:orientation="horizontal">
 
             <ImageButton
+                style="?android:attr/buttonBarStyle"
                 android:id="@+id/buttonBackMain"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@android:color/white"
                 android:contentDescription="返回"
                 android:padding="10dp"
                 android:src="@drawable/calendar_ic_arrow_left" />
@@ -48,34 +48,36 @@
 
         <!-- Medication Name -->
         <EditText
+            style="@style/CustomInputStyle"
             android:id="@+id/editTextMedicationName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="药品名称"
+            android:hint="药品名称:"
             android:inputType="text" />
 
         <!-- Patient Name and Medical Record -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp">
 
             <!-- Patient Name -->
             <EditText
+                style="@style/CustomInputStyle"
                 android:id="@+id/editTextPatientName"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="用药人"
+                android:hint="用药人:"
                 android:inputType="textPersonName" />
+
+            <Space
+                android:layout_width="10dp"
+                android:layout_height="wrap_content" />
 
             <!-- Medical Record -->
             <EditText
+                style="@style/CustomInputStyle"
                 android:id="@+id/editTextMedicalRecord"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="诊籍"
+                android:hint="诊籍:"
                 android:inputType="text" />
 
         </LinearLayout>
@@ -84,24 +86,27 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp">
 
             <!-- Dosage -->
             <EditText
+                style="@style/CustomInputStyle"
                 android:id="@+id/editTextDosage"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="服用剂量(mg, ml等)"
+                android:hint="服用剂量(mg, ml等):"
                 android:inputType="text" />
+
+            <Space
+                android:layout_width="10dp"
+                android:layout_height="wrap_content" />
 
             <!-- Remaining Amount -->
             <EditText
+                style="@style/CustomInputStyle"
                 android:id="@+id/editTextRemainingAmount"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="余量"
+                android:hint="余量:"
                 android:inputType="number" />
 
         </LinearLayout>
@@ -119,7 +124,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="一天服用次数"
-                android:textSize="20sp" />
+                android:textSize="18sp" />
 
             <ImageButton
                 android:id="@+id/listButtonDailyIntakeFrequency"
@@ -141,6 +146,7 @@
             android:orientation="vertical" />
 
         <EditText
+            style="@style/CustomInputStyle"
             android:id="@+id/editTextDailyIntakeFrequency"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -153,9 +159,10 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="服用频率"
-            android:textSize="20sp" />
+            android:textSize="18sp" />
 
         <EditText
+            style="@style/CustomInputStyle"
             android:id="@+id/editTextIntakeIntervalDays"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -231,9 +238,8 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
             android:text="提醒方式"
-            android:textSize="20sp" />
+            android:textSize="18sp" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -279,8 +285,8 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="保质期" />
+            android:text="保质期"
+            android:textSize="18sp"/>
 
         <EditText
             android:id="@+id/editTextExpiryDate"
