@@ -18,4 +18,6 @@ object RetrofitClient {
         .build()
 
     val api: ApiService = retrofit.create(ApiService::class.java)
+
+    fun getGson(): Gson { return gson }
 }
