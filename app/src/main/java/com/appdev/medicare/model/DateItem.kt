@@ -1,4 +1,4 @@
-package com.appdev.calendarpage.model
+package com.appdev.medicare.model
 
 import java.util.*
 

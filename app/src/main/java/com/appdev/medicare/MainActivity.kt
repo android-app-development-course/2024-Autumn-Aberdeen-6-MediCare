@@ -86,7 +86,7 @@ class MainActivity : AppCompatActivity() {
         radioButton3 = findViewById(R.id.rb_record)
         radioButton4 = findViewById(R.id.rb_me)
 
-        fragmentList.add(CalendarActivity())
+        fragmentList.add(CalendarFragment())
         fragmentList.add(Fragment2())
         fragmentList.add(Fragment3())
         fragmentList.add(Fragment4())

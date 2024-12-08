@@ -5,7 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.appdev.calendarpage.model.DateItem
+import com.appdev.medicare.model.DateItem
 
 class CalendarAdapter(private val daysOfMonth: List<Int>, private val deMode : Boolean, private val dateItems: List<DateItem>) :
     RecyclerView.Adapter<CalendarAdapter.CalendarViewHolder>() {

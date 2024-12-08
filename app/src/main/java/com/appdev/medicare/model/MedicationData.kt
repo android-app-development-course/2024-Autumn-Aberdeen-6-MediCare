@@ -1,4 +1,4 @@
-package com.appdev.calendarpage.model
+package com.appdev.medicare.model
 
 import android.os.Parcel
 import android.os.Parcelable

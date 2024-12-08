@@ -8,7 +8,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import com.appdev.calendarpage.model.MedicationData
+import com.appdev.medicare.model.MedicationData
 import java.text.SimpleDateFormat
 import java.util.*
 
