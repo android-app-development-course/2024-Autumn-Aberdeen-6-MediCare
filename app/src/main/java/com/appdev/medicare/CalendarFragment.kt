@@ -79,15 +79,11 @@ class CalendarFragment : Fragment() {
         buttonPreviousMonth = binding.buttonPreviousMonth
         buttonAddMedication = binding.buttonAddMedication
 
-        // Set the current month and year in the header
         val currentDate = Calendar.getInstance()
         val dateFormat = SimpleDateFormat("MMMM yyyy", Locale.getDefault())
-        textMonthYear.text = dateFormat.format(currentDate.time)
-
-        // Prepare the days of the month
         val daysOfMonth = getDaysOfMonth(currentDate)
 
-        // Get the DateItems in this month
+        textMonthYear.text = dateFormat.format(currentDate.time)
         dateItems = generateDateItemsForMonth(currentDate)
 
         recyclerViewMedication.layoutManager = LinearLayoutManager(requireContext())
@@ -138,7 +134,7 @@ class CalendarFragment : Fragment() {
                                     medicationList?.let {
                                         medicationList.forEach { medicationData ->
                                             setRemindersForDailyIntake(
-                                                requireContext(),
+                                                this@CalendarFragment.requireActivity(),
                                                 dateItem.date,
                                                 medicationData.dailyIntakeTimes,
                                                 medicationData.weekMode,
@@ -156,7 +152,7 @@ class CalendarFragment : Fragment() {
                                     medicationList?.let {
                                         medicationList.forEach { medicationData ->
                                             setRemindersForDailyIntake(
-                                                requireContext(),
+                                                this@CalendarFragment.requireActivity(),
                                                 selectedDateItem.date,
                                                 medicationData.dailyIntakeTimes,
                                                 medicationData.weekMode,
@@ -186,7 +182,7 @@ class CalendarFragment : Fragment() {
                         .setTitle("选择日期")
                         .setMessage("请先选择日期，以便添加药物。")
                         .setPositiveButton("确定") { dialog, _ ->
-                            dialog.dismiss()  // Dismiss the dialog
+                            dialog.dismiss()
                         }
                         .create()
                     alertDialog.show()
@@ -222,11 +218,9 @@ class CalendarFragment : Fragment() {
         val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
         val timeDate = timeFormat.parse(time)
 
-        // 使用 Calendar 将日期和时间合并
         val calendar = Calendar.getInstance()
         calendar.time = date
 
-        // 获取时间部分的小时和分钟
         val timeCalendar = Calendar.getInstance()
         timeCalendar.time = timeDate!!
 
@@ -331,6 +325,7 @@ class CalendarFragment : Fragment() {
         try {
             // 尝试启动闹钟 Intent
             context.startActivity(alarmIntent)
+            Log.d("Alarm", "Start Alarm setting")
             // 设置完系统闹钟，用户可以选择此次之后暂停但无法实现直接删除，单次闹钟考虑使用别的方法
         } catch (e: ActivityNotFoundException) {
             // 如果没有任何应用可以处理这个 Intent
@@ -341,7 +336,7 @@ class CalendarFragment : Fragment() {
     fun setNotificationReminder(context: Context, remindTime: Date, requestCode: Int) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val notificationIntent = Intent(context, NotificationReceiver::class.java).apply {
-            action = "com.example.calendar.NOTIFICATION_ACTION"
+            action = "com.appdev.medicare.NOTIFICATION_ACTION"
             putExtra("title", "Medication Reminder")
             putExtra("message", "It's time to take your medication.")
         }
