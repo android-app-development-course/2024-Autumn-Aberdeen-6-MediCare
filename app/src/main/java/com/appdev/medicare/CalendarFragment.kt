@@ -1,7 +1,6 @@
 package com.appdev.medicare
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -17,13 +16,17 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.appdev.calendarpage.model.DateItem
-import com.appdev.calendarpage.model.MedicationData
+import com.appdev.medicare.model.DateItem
+import com.appdev.medicare.model.MedicationData
+import com.appdev.medicare.databinding.FragmentCalendarBinding
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.MutableList
 
-class CalendarActivity : Fragment() {
+class CalendarFragment : Fragment() {
+
+    private var _binding: FragmentCalendarBinding? = null
+    private val binding get() = _binding!!
 
     private lateinit var textMonthYear: TextView
     private lateinit var recyclerViewCalendar: RecyclerView
@@ -47,15 +50,17 @@ class CalendarActivity : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.activity_calendar, container, false)
+        _binding = FragmentCalendarBinding.inflate(inflater, container, false)
 
-        textMonthYear = view.findViewById(R.id.textMonthYear)
-        recyclerViewCalendar = view.findViewById(R.id.recyclerViewCalendar)
-        recyclerViewMedication = view.findViewById(R.id.recyclerViewMedication)
-        switchToggleMode = view.findViewById(R.id.switchToggleMode)
-        buttonNextMonth = view.findViewById(R.id.buttonNextMonth)
-        buttonPreviousMonth = view.findViewById(R.id.buttonPreviousMonth)
-        buttonAddMedication = view.findViewById(R.id.buttonAddMedication)
+        val root: View = binding.root
+
+        textMonthYear = binding.textMonthYear
+        recyclerViewCalendar = binding.recyclerViewCalendar
+        recyclerViewMedication = binding.recyclerViewMedication
+        switchToggleMode = binding.switchToggleMode
+        buttonNextMonth = binding.buttonNextMonth
+        buttonPreviousMonth = binding.buttonPreviousMonth
+        buttonAddMedication = binding.buttonAddMedication
 
         // Set the current month and year in the header
         val currentDate = Calendar.getInstance()
@@ -110,7 +115,7 @@ class CalendarActivity : Fragment() {
                     if (medicationData!= null) {
                         if (calendarAdapter.setMultiSelectMode) {
                             val selectedDateItems = calendarAdapter.getSelectedDateItems()
-                            selectedDateItems.forEach { dateItem ->
+                            selectedDateItems.forEach { dateItem:DateItem ->
                                 dateItem.medicationData?.add(medicationData)
 //                                val medicationList = dateItem.medicationData
 //                                medicationList?.let {
@@ -143,23 +148,6 @@ class CalendarActivity : Fragment() {
             // 保证在点击加号之前，用户已经选定了要做更改的日期
             val intent = Intent(requireContext(), AddMedActivity::class.java)
             addMedicationActivityLauncher.launch(intent)
-//            if (calendarAdapter.setMultiSelectMode) {
-//                val selectedDateItems = calendarAdapter.getSelectedDateItems()
-//                if (selectedDateItems.isNotEmpty()) {
-//                    val intent = Intent(requireContext(), AddMedActivity::class.java)
-//                    startActivity(intent)
-//                } else {
-//                    Toast.makeText(requireContext(), "请先选择日期", Toast.LENGTH_SHORT).show()
-//                }
-//            } else {
-//                val selectedDateItem = calendarAdapter.getSelectedDateItem()
-//                if (selectedDateItem!= null) {
-//                    val intent = Intent(requireContext(), AddMedActivity::class.java)
-//                    startActivity(intent)
-//                } else {
-//                    Toast.makeText(requireContext(), "请先选择日期", Toast.LENGTH_SHORT).show()
-//                }
-//            }
         }
 
         // 设置日期选择监听器
@@ -177,7 +165,7 @@ class CalendarActivity : Fragment() {
             }
         })
 
-        return view
+        return root
     }
 
     private fun combineDateAndTime(date: Date, time: String): Date {
@@ -200,25 +188,6 @@ class CalendarActivity : Fragment() {
 
         return calendar.time
     }
-
-//    private fun setRemindersForDailyIntake(context: Context, date: Date, intakeTimes: MutableList<String>, reminderMode: String) {
-//        val isCalendarEnabled = reminderMode.getOrNull(0) == '1'
-//        val isAlarmEnabled = reminderMode.getOrNull(1) == '1'
-//        val isNotificationEnabled = reminderMode.getOrNull(2) == '1'
-//
-//        for (time in intakeTimes) {
-//            val entireTime = combineDateAndTime(date, time)
-//            if (isCalendarEnabled) {
-//                // setCalendarReminder(context, entireTime)
-//            }
-//            if (isAlarmEnabled) {
-//                // setAlarmReminder(context, entireTime)
-//            }
-//            if (isNotificationEnabled) {
-//                // setNotificationReminder(context, entireTime)
-//            }
-//        }
-//    }
 
     private fun generateDateItemsForMonth(calendar: Calendar): MutableList<DateItem> {
         val dateItems = mutableListOf<DateItem>()
@@ -273,5 +242,9 @@ class CalendarActivity : Fragment() {
         val daysOfMonth = getDaysOfMonth(currentDate)
         calendarAdapter = CalendarAdapter(daysOfMonth, switchToggleMode.isChecked, generateDateItemsForMonth(currentDate))
         recyclerViewCalendar.adapter = calendarAdapter
+    }
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null // Clean up the binding
     }
 }
