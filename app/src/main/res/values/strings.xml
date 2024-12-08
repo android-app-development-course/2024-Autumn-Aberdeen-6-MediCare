@@ -11,4 +11,7 @@
     <string name="usernameAlreadyExist">Username already exist</string>
     <string name="fillInAllFields">Please fill in all fields</string>
     <string name="passwordsNotMatch">Passwords do not match</string>
+    <string name="loginFailed">Login failed</string>
+    <string name="loginSuccess">Login success</string>
+    <string name="invalidUsernameOrPassword">Invalid username or password.</string>
 </resources>
