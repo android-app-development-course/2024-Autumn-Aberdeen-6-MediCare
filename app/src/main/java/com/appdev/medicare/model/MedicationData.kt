@@ -12,6 +12,7 @@ data class MedicationData(
     var dailyIntakeFrequency: Int,
     var dailyIntakeTimes: MutableList<String>,
     var intakeIntervalDays: Int,
+    var weekMode: String,
     var reminderMode: String,
     var expiryDate: Date
 ) : Parcelable {
@@ -27,6 +28,7 @@ data class MedicationData(
         },
         parcel.readInt(),
         parcel.readString()!!,
+        parcel.readString()!!,
         parcel.readSerializable() as Date
     )
 
@@ -38,6 +40,7 @@ data class MedicationData(
         parcel.writeInt(dailyIntakeFrequency)
         parcel.writeStringList(dailyIntakeTimes)
         parcel.writeInt(intakeIntervalDays)
+        parcel.writeString(weekMode)
         parcel.writeString(reminderMode)
         parcel.writeSerializable(expiryDate)
     }
@@ -59,7 +62,7 @@ data class MedicationData(
     override fun toString(): String {
         return String.format(
             Locale.getDefault(),
-            "Medication: %s, Patient: %s, Dosage: %s, Remaining: %d, Frequency: %d, Times: %s, Interval: %d, Reminder Mode: %s, Expiry: %s",
+            "Medication: %s, Patient: %s, Dosage: %s, Remaining: %d, Frequency: %d, Times: %s, Interval: %d, Week Mode: %s, Reminder Mode: %s, Expiry: %s",
             medicationName,
             patientName,
             dosage,
@@ -67,6 +70,7 @@ data class MedicationData(
             dailyIntakeFrequency,
             dailyIntakeTimes.joinToString(", "),
             intakeIntervalDays,
+            weekMode,
             reminderMode,
             expiryDate.toString()
         )
