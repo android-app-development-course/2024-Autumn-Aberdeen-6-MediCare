@@ -10,7 +10,7 @@ import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.appdev.calendarpage.model.MedicationData
+import com.appdev.medicare.model.MedicationData
 import java.util.Locale
 
 

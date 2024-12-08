@@ -16,7 +16,7 @@
         android:usesCleartextTraffic="true">
 
         <activity
-            android:name=".CalendarActivity"
+            android:name=".CalendarFragment"
             android:exported="true">
         </activity>
 
