@@ -4,10 +4,13 @@ import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import com.appdev.medicare.model.DateItem
 import com.appdev.medicare.model.MedicationData
 import java.text.SimpleDateFormat
 import java.util.*
@@ -21,7 +24,16 @@ class AddMedActivity : AppCompatActivity() {
     private lateinit var editTextDailyIntakeFrequency: EditText
     private lateinit var editTextIntakeIntervalDays: EditText
 
+    private var dailyIntakeFrequency: Int? = null
     private var selectedTimes: MutableMap<Int, String> = mutableMapOf()
+
+    private lateinit var checkBox1: CheckBox
+    private lateinit var checkBox2: CheckBox
+    private lateinit var checkBox3: CheckBox
+    private lateinit var checkBox4: CheckBox
+    private lateinit var checkBox5: CheckBox
+    private lateinit var checkBox6: CheckBox
+    private lateinit var checkBox7: CheckBox
 
     private lateinit var checkboxCalendar: CheckBox
     private lateinit var checkboxAlarm: CheckBox
@@ -50,8 +62,19 @@ class AddMedActivity : AppCompatActivity() {
         editTextMedicalRecord = findViewById(R.id.editTextMedicalRecord)
         editTextDosage = findViewById(R.id.editTextDosage)
         editTextRemainingAmount = findViewById(R.id.editTextRemainingAmount)
+
         editTextDailyIntakeFrequency = findViewById(R.id.editTextDailyIntakeFrequency)
         editTextIntakeIntervalDays = findViewById(R.id.editTextIntakeIntervalDays)
+
+        checkBox1 = findViewById(R.id.checkBoxMonday)
+        checkBox2 = findViewById(R.id.checkBoxTuesday)
+        checkBox3 = findViewById(R.id.checkBoxWednesday)
+        checkBox4 = findViewById(R.id.checkBoxThursday)
+        checkBox5 = findViewById(R.id.checkBoxFriday)
+        checkBox6 = findViewById(R.id.checkBoxSaturday)
+        checkBox7 = findViewById(R.id.checkBoxSunday)
+        val checkBoxWeeks = listOf(checkBox1, checkBox2, checkBox3, checkBox4, checkBox5, checkBox6,checkBox7)
+
 
         // 提醒方式
         checkboxCalendar = findViewById(R.id.checkboxCalendar)
@@ -63,6 +86,28 @@ class AddMedActivity : AppCompatActivity() {
         buttonSaveMedication = findViewById(R.id.buttonSaveMedication)
         buttonBackMain = findViewById(R.id.buttonBackMain)
 
+
+        // 锁定当天的星期，全部星期栏禁用
+        val mode = intent.getBooleanExtra("mode", false)
+        if (!mode) {
+            val selectedDate = intent.getParcelableExtra<DateItem>("selectedDate")
+            val calendar = Calendar.getInstance().apply {
+                time = selectedDate!!.date
+            }
+            val week = when (val w = calendar.get(Calendar.DAY_OF_WEEK)) {
+                Calendar.SUNDAY -> 6
+                else -> w - 2
+            }
+            checkBoxWeeks[week].isChecked = true
+            checkBoxWeeks.forEach { box ->
+                if (box != checkBoxWeeks[week]) box.isChecked = false
+            }
+            checkBoxWeeks.forEach { box ->
+                box.isEnabled = false
+            }
+        }
+
+
         // Set up the checkboxes
         // 支持多选，选择无取消选中其他的
         checkboxNone.setOnCheckedChangeListener { _, isChecked ->
@@ -72,7 +117,12 @@ class AddMedActivity : AppCompatActivity() {
                 checkboxAppNotification.isChecked = false
             }
         }
-        val reminderCheckboxes = listOf(checkboxCalendar, checkboxAlarm, checkboxAppNotification)
+
+        checkboxCalendar.setOnClickListener {
+            Toast.makeText(this, "日历提醒功能已被弃用！！", Toast.LENGTH_SHORT).show()
+        }
+
+        val reminderCheckboxes = listOf(checkboxAlarm, checkboxAppNotification)
         reminderCheckboxes.forEach { checkbox ->
             checkbox.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
@@ -109,6 +159,9 @@ class AddMedActivity : AppCompatActivity() {
         builder.setItems(items) { dialog, which ->
             val selectedNumber = items[which].toInt()
             val timeSelectionLayout = findViewById<LinearLayout>(R.id.timeSelectionLayout)
+
+            // 获取选择天数
+            dailyIntakeFrequency = selectedNumber
 
             timeSelectionLayout.removeAllViews()
             selectedTimes.clear()
@@ -197,12 +250,25 @@ class AddMedActivity : AppCompatActivity() {
 
     fun getRemindMode(): String {
         var modeCode = ""
-        var checkboxes: MutableList<CheckBox> = mutableListOf(checkboxCalendar, checkboxAlarm, checkboxAppNotification)
+        var checkboxes: MutableList<CheckBox> = mutableListOf(checkboxAlarm, checkboxAppNotification)
         checkboxes.forEach { checkbox ->
             if (checkbox.isChecked) {
-                modeCode += "0"
-            } else {
                 modeCode += "1"
+            } else {
+                modeCode += "0"
+            }
+        }
+        return modeCode
+    }
+    // 对星期的选择编码，便于数据库储存
+    fun getWeekMode(): String {
+        var modeCode = ""
+        var checkboxes: List<CheckBox> = listOf(checkBox1, checkBox2, checkBox3, checkBox4, checkBox5, checkBox6, checkBox7)
+        checkboxes.forEach { checkbox ->
+            if (checkbox.isChecked) {
+                modeCode += "1"
+            } else {
+                modeCode += "0"
             }
         }
         return modeCode
@@ -215,15 +281,16 @@ class AddMedActivity : AppCompatActivity() {
         val medicalRecord = editTextMedicalRecord.text.toString()
         val dosage = editTextDosage.text.toString()
         val remainingAmount = editTextRemainingAmount.text.toString()
-        val dailyIntakeFrequency = editTextDailyIntakeFrequency.text.toString()
+        val dailyIntakeFrequency = dailyIntakeFrequency
         var dailyIntakeTimes: MutableList<String> = mutableListOf()
         val intakeIntervalDays = editTextIntakeIntervalDays.text.toString()
         var reminderMode: String? = null
+        var weekMode: String? = null
         val expiryDate = editTextExpiryDate.text.toString()
 
         // Validate data input
         if (medicationName.isBlank() || patientName.isBlank() || dosage.isBlank() ||
-            remainingAmount.isBlank() || dailyIntakeFrequency.isBlank() || selectedTimes.isEmpty() ||
+            remainingAmount.isBlank() || dailyIntakeFrequency == null || selectedTimes.isEmpty() ||
             intakeIntervalDays.isBlank() || expiryDate.isBlank()) {
             Toast.makeText(this, "请填写所有药品信息", Toast.LENGTH_SHORT).show()
             return
@@ -231,8 +298,9 @@ class AddMedActivity : AppCompatActivity() {
 
         dailyIntakeTimes = sortTimes(selectedTimes.values.toMutableList())
         reminderMode = getRemindMode()
+        weekMode = getWeekMode()
 
-        medicationData = MedicationData(medicationName, patientName, dosage, remainingAmount.toInt(), dailyIntakeFrequency.toInt(), dailyIntakeTimes, intakeIntervalDays.toInt(), reminderMode, formattedExpiryDate)
+        medicationData = MedicationData(medicationName, patientName, dosage, remainingAmount.toInt(), dailyIntakeFrequency.toInt(), dailyIntakeTimes, intakeIntervalDays.toInt(), weekMode, reminderMode, formattedExpiryDate)
 
         val intent = Intent()
         intent.putExtra("MEDICATION_DATA", medicationData)

@@ -1,6 +1,7 @@
 package com.appdev.medicare
 
 import android.content.Context
+import android.content.Intent
 import android.icu.text.SimpleDateFormat
 import android.view.LayoutInflater
 import android.view.View
@@ -10,13 +11,15 @@ import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.appdev.medicare.CalendarAdapter.OnDateSelectedListener
+import com.appdev.medicare.model.DateItem
 import com.appdev.medicare.model.MedicationData
 import java.util.Locale
 
 
 class MedicationAdapter(
     private var medicationList: MutableList<MedicationData>,
-    private val onDeleteClick: (MedicationData) -> Unit
+    private val onDeleteClick: (MutableList<MedicationData>) -> Unit
 ) : RecyclerView.Adapter<MedicationAdapter.MedicationViewHolder>() {
 
     inner class MedicationViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -70,7 +73,7 @@ class MedicationAdapter(
     private fun removeMedication(medicationData: MedicationData) {
         medicationList = medicationList.filter { it!= medicationData }.toMutableList()
         notifyDataSetChanged()
-        onDeleteClick(medicationData)
+        onDeleteClick(medicationList)
     }
 
     private fun showDetailsDialog(context: Context, medicationData: MedicationData) {
