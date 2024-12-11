@@ -9,6 +9,7 @@ import android.widget.RadioGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import java.util.ArrayList
@@ -33,18 +34,8 @@ class Fragment3 : Fragment() {
         return inflater.inflate(R.layout.activity_record, container, false)
     }
 }
-class Fragment4 : Fragment() {
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.activity_me, container, false)
-    }
-}
 
 class MainActivity : AppCompatActivity() {
-    // 使用更符合Kotlin命名习惯的变量名
     private lateinit var viewPager: ViewPager2
     private lateinit var radioGroup: RadioGroup
     private lateinit var radioButton1: RadioButton
@@ -58,6 +49,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         initViews()
+
+        viewPager.reduceDragSensitivity()
 
         // 为RadioGroup设置选中状态改变的监听器
         radioGroup.setOnCheckedChangeListener { _, checkedId ->
@@ -89,7 +82,7 @@ class MainActivity : AppCompatActivity() {
         fragmentList.add(CalendarFragment())
         fragmentList.add(Fragment2())
         fragmentList.add(Fragment3())
-        fragmentList.add(Fragment4())
+        fragmentList.add(MeFragment())
 
         val adapter = ViewPager2Adapter(this, fragmentList)
         viewPager.adapter = adapter
@@ -115,4 +108,16 @@ class ViewPager2Adapter(fragmentActivity: FragmentActivity, private val fragment
     override fun createFragment(position: Int): Fragment {
         return fragmentList[position]
     }
+}
+
+// 定义扩展函数用于降低ViewPager2的拖动灵敏度
+fun ViewPager2.reduceDragSensitivity() {
+    val recyclerViewField = ViewPager2::class.java.getDeclaredField("mRecyclerView")
+    recyclerViewField.isAccessible = true
+    val recyclerView = recyclerViewField.get(this) as RecyclerView
+
+    val touchSlopField = RecyclerView::class.java.getDeclaredField("mTouchSlop")
+    touchSlopField.isAccessible = true
+    val touchSlop = touchSlopField.get(recyclerView) as Int
+    touchSlopField.set(recyclerView, touchSlop * 2)       // "8" was obtained experimentally
 }

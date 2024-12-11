@@ -47,11 +47,26 @@
         </LinearLayout>
 
         <!-- Medication Name -->
-        <EditText
+        <LinearLayout
             style="@style/CustomInputStyle"
-            android:id="@+id/editTextMedicationName"
-            android:hint="药品名称:"
-            android:inputType="text" />
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="药品名称:"
+                android:textSize="16sp"/>
+            <EditText
+                android:id="@+id/editTextMedicationName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="12dp"
+                android:inputType="text"
+                android:textSize="16sp"
+                android:backgroundTint="@android:color/transparent"/>
+        </LinearLayout>
 
         <!-- Patient Name and Medical Record -->
         <LinearLayout
@@ -61,24 +76,50 @@
             android:layout_marginTop="16dp">
 
             <!-- Patient Name -->
-            <EditText
+            <LinearLayout
                 style="@style/CustomInputStyle"
-                android:id="@+id/editTextPatientName"
                 android:layout_weight="1"
-                android:hint="用药人:"
-                android:inputType="textPersonName" />
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="用药人:"
+                    android:textSize="16sp"/>
+                <EditText
+                    android:id="@+id/editTextPatientName"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:padding="12dp"
+                    android:inputType="textPersonName"
+                    android:textSize="16sp"
+                    android:backgroundTint="@android:color/transparent"/>
+            </LinearLayout>
 
             <Space
                 android:layout_width="10dp"
                 android:layout_height="wrap_content" />
 
             <!-- Medical Record -->
-            <EditText
+            <LinearLayout
                 style="@style/CustomInputStyle"
-                android:id="@+id/editTextMedicalRecord"
                 android:layout_weight="1"
-                android:hint="诊籍:"
-                android:inputType="text" />
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="诊籍:"
+                    android:textSize="16sp"/>
+                <EditText
+                    android:id="@+id/editTextMedicalRecord"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:padding="12dp"
+                    android:inputType="text"
+                    android:textSize="16sp"
+                    android:backgroundTint="@android:color/transparent"/>
+            </LinearLayout>
 
         </LinearLayout>
 
@@ -90,24 +131,50 @@
             android:layout_marginTop="16dp">
 
             <!-- Dosage -->
-            <EditText
+            <LinearLayout
                 style="@style/CustomInputStyle"
-                android:id="@+id/editTextDosage"
                 android:layout_weight="1"
-                android:hint="服用剂量(mg, ml等):"
-                android:inputType="text" />
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="剂量:"
+                    android:textSize="16sp"/>
+                <EditText
+                    android:id="@+id/editTextDosage"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:padding="12dp"
+                    android:inputType="text"
+                    android:textSize="16sp"
+                    android:backgroundTint="@android:color/transparent"/>
+            </LinearLayout>
 
             <Space
                 android:layout_width="10dp"
                 android:layout_height="wrap_content" />
 
             <!-- Remaining Amount -->
-            <EditText
+            <LinearLayout
                 style="@style/CustomInputStyle"
-                android:id="@+id/editTextRemainingAmount"
                 android:layout_weight="1"
-                android:hint="余量:"
-                android:inputType="number" />
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="余量:"
+                    android:textSize="16sp"/>
+                <EditText
+                    android:id="@+id/editTextRemainingAmount"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:padding="12dp"
+                    android:inputType="number"
+                    android:textSize="16sp"
+                    android:backgroundTint="@android:color/transparent"/>
+            </LinearLayout>
 
         </LinearLayout>
 
