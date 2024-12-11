@@ -12,7 +12,7 @@ DATABASE_PATH = os.path.join(os.path.dirname(__file__), "data.db")
 # logger
 logging.basicConfig(level=logging.INFO,
                     format="[%(asctime)s] %(filename)s - %(levelname)s - %(message)s",
-                    datefmt="%Y-%m-%d %H-%M-%S")
+                    datefmt="%Y-%m-%d %H:%M:%S")
 logger = logging.getLogger(__name__)
 
 # 创建 Flask 应用
@@ -105,10 +105,12 @@ def login():
 响应 - 成功：返回 200，失败：INVALID_TOKEN 无效的 Token（客户端无论如何都应该登出）
 """
 @app.route("/logout", methods=["POST"])
-@token_required
 def logout():
     token = request.headers.get("Authorization", None)
     logger.info(f"Received /logout request.")
+
+    if not token:
+        return build_message(code=401, success=False, err_code="TOKEN_REQUIRED", err_description="Authorization token must included in the request.")
 
     user_id, invalid_reason = validate_token(token)
 
@@ -118,4 +120,15 @@ def logout():
         return build_message(message="Logout success.")
     else:
         logger.info(f"User logout failed, reason: token is invalid or already expired.")
-        return build_message(code=410, success=False, err_code="INVALID_TOKEN", err_description="Token is invalid or already expired.")
+        return build_message(code=410, success=False, err_code="INVALID_TOKEN", err_description="Token is invalid or expired.")
+
+"""
+/check_token - 检测 Token 有效性
+请求：null
+响应 - 成功：返回 200，失败：INVALID_TOKEN 无效的 TOKEN
+"""
+@app.route("/check_token", methods=["POST"])
+@token_required
+def check_token():
+    # 失效 Token 检测由 @token_required 实现
+    return build_message(f"Token is valid.")
