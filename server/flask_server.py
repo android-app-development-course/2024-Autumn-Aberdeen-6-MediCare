@@ -3,6 +3,7 @@ import logging
 from flask import Flask, request
 from database import SQLiteConnection
 from message_builder import build_message
+from function_decorator import json_required, token_required
 from token_manager import new_token, validate_token, update_token_expire_time, invalidate_token, invalidate_all_token
 
 # 数据库路径
@@ -32,12 +33,9 @@ def ping():
 响应 - 成功：返回 200，失败：USERNAME_ALREADY_EXIST 用户名已注册
 """
 @app.route("/register", methods=["POST"])
+@json_required
 def register():
-    if not request.is_json:
-        return build_message(code=500, success=False, err_code="BAD_REQUEST", err_description="Request must be JSON.")
-
     data = request.get_json()
-
     logger.info(f"Received /register request: {data}")
 
     username = data["username"]
@@ -69,12 +67,9 @@ def register():
 响应 - 成功：返回 200 和登录 Token（字符串），失败：INVALID_USERNAME_OR_PASSWORD 无效的用户名或密码
 """
 @app.route("/login", methods=["POST"])
+@json_required
 def login():
-    if not request.is_json:
-        return build_message(code=500, success=False, err_code="BAD_REQUEST", err_description="Request must be JSON.")
-
     data = request.get_json()
-
     logger.info(f"Received /login request: {data}")
 
     username = data["username"]
@@ -110,11 +105,9 @@ def login():
 响应 - 成功：返回 200，失败：INVALID_TOKEN 无效的 Token（客户端无论如何都应该登出）
 """
 @app.route("/logout", methods=["POST"])
+@token_required
 def logout():
     token = request.headers.get("Authorization", None)
-    if not token:
-        return build_message(code=401, success=False, err_code="TOKEN_REQUIRED", err_description="Missing Authorization in header.")
-
     logger.info(f"Received /logout request.")
 
     user_id, invalid_reason = validate_token(token)
