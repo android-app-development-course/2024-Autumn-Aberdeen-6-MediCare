@@ -134,7 +134,7 @@ def logout():
 请求：null
 响应 - 成功：返回 200，失败：INVALID_TOKEN 无效的 TOKEN
 """
-@app.route("/check_token", methods=["POST"])
+@app.route("/check_token", methods=["GET"])
 @token_required
 def check_token(user_id):
     token = request.headers.get("Authorization", None)
