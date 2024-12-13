@@ -141,4 +141,4 @@ def check_token(user_id):
     logger.info(f"Received /check_token request: {token}")
     # 失效 Token 检测由 @token_required 实现
     logger.info(f"User ID {user_id}'s token \"{token}\" is valid, and expire time updated.")
-    return build_message(f"Token is valid.")
+    return build_message(message="Token is valid.")
