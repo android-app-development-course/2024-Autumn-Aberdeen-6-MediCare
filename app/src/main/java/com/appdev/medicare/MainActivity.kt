@@ -12,6 +12,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
+import com.appdev.medicare.api.RetrofitClient
 import java.util.ArrayList
 
 // 在构建好每个Fragment页面后替换这些类即可
@@ -69,6 +70,9 @@ class MainActivity : AppCompatActivity() {
                 updateRadioButtonCheckedState(position)
             }
         })
+        
+        // 初始化 RetrofitClient 中的 sharedPreferences
+        RetrofitClient.init(applicationContext)
     }
 
     private fun initViews() {
