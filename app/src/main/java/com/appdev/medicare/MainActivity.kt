@@ -1,18 +1,26 @@
 package com.appdev.medicare
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RadioButton
 import android.widget.RadioGroup
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.appdev.medicare.api.RetrofitClient
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.ArrayList
 
 // 在构建好每个Fragment页面后替换这些类即可
@@ -70,10 +78,14 @@ class MainActivity : AppCompatActivity() {
                 updateRadioButtonCheckedState(position)
             }
         })
-        
+
         // 初始化 RetrofitClient 中的 sharedPreferences
         RetrofitClient.init(applicationContext)
+
+        // 检查登录状态是否有效
+        checkLoginStatus()
     }
+
 
     private fun initViews() {
         viewPager = findViewById(R.id.viewpager)
@@ -98,6 +110,47 @@ class MainActivity : AppCompatActivity() {
         radioButton2.isChecked = position == 1
         radioButton3.isChecked = position == 2
         radioButton4.isChecked = position == 3
+    }
+
+    private fun checkLoginStatus() {
+        val prefs = this.getSharedPreferences("MediCare", Context.MODE_PRIVATE)
+        val token = prefs.getString("login_token", null);
+
+        if (!token.isNullOrEmpty()) {
+            Log.i("MainActivity", "Verifying user token $token")
+            lifecycleScope.launch {
+                val response = withContext(Dispatchers.IO) {
+                    RetrofitClient.api.checkToken().execute()
+                }
+
+                // 登录状态失效，跳转登录页面要求重新登录
+                if (!response.isSuccessful) {
+                    Log.w("MainActivity", "Token expired, asking to re-login.")
+                    // 删除 Token
+                    val editor = prefs.edit()
+                    editor.remove("MediCare")
+                    editor.apply()
+
+                    // 展示提示 Toast 并跳转登录页面
+                    runOnUiThread {
+                        Toast.makeText(
+                            this@MainActivity,
+                            this@MainActivity.getString(R.string.loginExpired),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        val intent = Intent(this@MainActivity, LoginActivity().javaClass)
+                        startActivity(intent)
+                    }
+
+                    // 删除用户数据
+                    // TODO 从本地删除用户数据，确保安全
+                } else {
+                    Log.i("MainActivity", "Token is valid.")
+                }
+            }
+        } else {
+            Log.i("MainActivity", "User token not exist, continue without logged in.")
+        }
     }
 }
 

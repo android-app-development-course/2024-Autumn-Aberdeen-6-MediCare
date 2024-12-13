@@ -14,4 +14,7 @@ interface ApiService {
 
     @POST("login")
     fun login(@Body body: LoginRequest): Call<ApiResponse>
+
+    @GET("check_token")
+    fun checkToken(): Call<ApiResponse>
 }
