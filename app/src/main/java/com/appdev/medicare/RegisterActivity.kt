@@ -1,5 +1,6 @@
 package com.appdev.medicare
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
@@ -34,11 +35,12 @@ class RegisterActivity : AppCompatActivity() {
         buttonRegister = findViewById(R.id.buttonRegister)
         loginText = findViewById(R.id.loginText)
 
-        buttonRegister.setOnClickListener() {
+        buttonRegister.setOnClickListener {
             register()
         }
 
         loginText.setOnClickListener {
+            // 返回登录页面
             finish()
         }
     }
@@ -71,6 +73,12 @@ class RegisterActivity : AppCompatActivity() {
                 if (response.isSuccessful) {
                     Log.d("RegisterActivity", "Register success")
                     runOnUiThread {
+                        // 存储用户名
+                        val sharedPreferences = this@RegisterActivity.getSharedPreferences("MediCare", Context.MODE_PRIVATE)
+                        val editor = sharedPreferences.edit()
+                        editor.putString("username", username.toString())
+                        editor.apply()
+
                         Toast.makeText(
                             this@RegisterActivity,
                             this@RegisterActivity.getString(R.string.registerSuccess),

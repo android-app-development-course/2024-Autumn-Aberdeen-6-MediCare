@@ -1,5 +1,6 @@
 package com.appdev.medicare
 
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -46,6 +47,18 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        // 存在默认用户名时自动填入用户名
+        val prefs = this.getSharedPreferences("MediCare", Context.MODE_PRIVATE)
+        val savedUsername = prefs.getString("username", null)
+
+        if (!savedUsername.isNullOrEmpty()) {
+            usernameInput.setText(savedUsername)
+        }
+    }
+
     private fun login() {
         val username = usernameInput.text
         val password = passwordInput.text
@@ -72,6 +85,7 @@ class LoginActivity : AppCompatActivity() {
                         this@LoginActivity.getSharedPreferences("MediCare", MODE_PRIVATE)
                     val editor = prefs.edit()
                     editor.putString("login_token", loginToken) // 存储 token
+                    editor.putString("username", username.toString()) // 存储用户名
                     editor.apply()
                     runOnUiThread {
                         Toast.makeText(
@@ -83,7 +97,7 @@ class LoginActivity : AppCompatActivity() {
                     }
                 } else {
                     val failReason = parseRequestBody(response.errorBody()).error!!
-                    if (failReason.code == "USERNAME_ALREADY_EXIST") {
+                    if (failReason.code == "INVALID_USERNAME_OR_PASSWORD") {
                         Log.w(
                             "LoginActivity",
                             "Login Failed, reason: invalid username or password"
