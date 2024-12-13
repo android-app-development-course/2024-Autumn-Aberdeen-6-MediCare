@@ -31,7 +31,7 @@ object RetrofitClient {
         .addInterceptor(object : Interceptor {
             @Throws(IOException::class)
             override fun intercept(chain: Interceptor.Chain): Response {
-                val token = sharedPreferences.getString("token", "")
+                val token = sharedPreferences.getString("login_token", "")
                 val originalRequest: Request = chain.request()
                 val requestWithHeaders: Request = originalRequest.newBuilder()
                     .header("Authorization", token!!)
