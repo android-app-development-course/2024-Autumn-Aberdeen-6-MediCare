@@ -90,9 +90,16 @@ def login():
             data = {"token": token}
             logger.info(f"User \"{username}\" login success.")
             return build_message(message="Login success.", data=data)
+        else:
+            fail_reason = "password is incorrect."
+    else:
+        fail_reason = "username not exist."
     
-    logger.info(f"User \"{username}\" login failed, reason: invalid username or password.")
-    return build_message(code=401, success=False, err_code="INVALID_USERNAME_OR_PASSWORD", err_description="Invalid username or password.")
+    logger.info(f"User \"{username}\" login failed, reason: {fail_reason}")
+    return build_message(code=401,
+                         success=False,
+                         err_code="INVALID_USERNAME_OR_PASSWORD",   # 为保安全，服务端不返回具体失败原因
+                         err_description="Invalid username or password.")
 
 # ----------------------------------------------------------
 # 以下请求需要在 Headers 中添加 Authorization: token 参数，
@@ -112,15 +119,15 @@ def logout():
     if not token:
         return build_message(code=401, success=False, err_code="TOKEN_REQUIRED", err_description="Authorization token must included in the request.")
 
-    user_id, invalid_reason = validate_token(token)
+    _, invalid_reason = validate_token(token)
 
-    if user_id != -1:
+    if invalid_reason:
+        logger.info(f"User logout failed, reason: token is invalid or already expired.")
+        return build_message(code=410, success=False, err_code="INVALID_TOKEN", err_description="Token is invalid or expired.")
+    else:
         invalidate_token(token)
         logger.info(f"User logout success.")
         return build_message(message="Logout success.")
-    else:
-        logger.info(f"User logout failed, reason: token is invalid or already expired.")
-        return build_message(code=410, success=False, err_code="INVALID_TOKEN", err_description="Token is invalid or expired.")
 
 """
 /check_token - 检测 Token 有效性
@@ -129,6 +136,9 @@ def logout():
 """
 @app.route("/check_token", methods=["POST"])
 @token_required
-def check_token():
+def check_token(user_id):
+    token = request.headers.get("Authorization", None)
+    logger.info(f"Received /check_token request: {token}")
     # 失效 Token 检测由 @token_required 实现
+    logger.info(f"User ID {user_id}'s token \"{token}\" is valid, and expire time updated.")
     return build_message(f"Token is valid.")
