@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -11,10 +12,19 @@ import android.view.Gravity
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.appdev.medicare.model.DateItem
 import com.appdev.medicare.model.MedicationData
 import java.text.SimpleDateFormat
 import java.util.*
+import com.appdev.medicare.api.RetrofitClient
+import com.appdev.medicare.model.AddMedicationRequest
+import com.appdev.medicare.model.JsonValue
+import com.appdev.medicare.utils.buildAlertDialog
+import com.appdev.medicare.utils.parseRequestBody
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class AddMedActivity : AppCompatActivity() {
     private lateinit var editTextMedicationName: EditText
@@ -46,12 +56,10 @@ class AddMedActivity : AppCompatActivity() {
     private lateinit var buttonBackMain: ImageButton
 
     private lateinit var medicationData : MedicationData
-    private lateinit var formattedExpiryDate : Date
+    private lateinit var formattedExpiryDate : String
 
+    private lateinit var dateList: List<String>
 
-    private fun getSelectedTimes(): MutableMap<Int, String> {
-        return selectedTimes
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -87,13 +95,14 @@ class AddMedActivity : AppCompatActivity() {
         buttonSaveMedication = findViewById(R.id.buttonSaveMedication)
         buttonBackMain = findViewById(R.id.buttonBackMain)
 
-
         // 锁定当天的星期，全部星期栏禁用
         val mode = intent.getBooleanExtra("mode", false)
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         if (!mode) {
             val selectedDate = intent.getParcelableExtra<DateItem>("selectedDate")
+            dateList = listOf(dateFormat.format(selectedDate!!.date))
             val calendar = Calendar.getInstance().apply {
-                time = selectedDate!!.date
+                time = selectedDate.date
             }
             val week = when (val w = calendar.get(Calendar.DAY_OF_WEEK)) {
                 Calendar.SUNDAY -> 6
@@ -106,6 +115,9 @@ class AddMedActivity : AppCompatActivity() {
             checkBoxWeeks.forEach { box ->
                 box.isEnabled = false
             }
+        } else  {
+            val selectedDates: ArrayList<DateItem>? = intent.getParcelableArrayListExtra("selectedDates")
+            dateList = selectedDates?.map { dateFormat.format(it.date) } ?: emptyList()
         }
 
 
@@ -149,7 +161,75 @@ class AddMedActivity : AppCompatActivity() {
 
         // Save medication data on button click
         buttonSaveMedication.setOnClickListener {
-            saveMedicationData()
+            val medicationName = editTextMedicationName.text.toString()
+            val patientName = editTextPatientName.text.toString()
+            // 诊籍的唯一标识符。待定
+            val medicalRecord = editTextMedicalRecord.text.toString()
+            val dosage = editTextDosage.text.toString()
+            val remainingAmount = editTextRemainingAmount.text.toString()
+            val dailyIntakeFrequency = dailyIntakeFrequency
+            var dailyIntakeTimes: MutableList<String> = mutableListOf()
+            val intakeIntervalDays = editTextIntakeIntervalDays.text.toString()
+            var reminderMode: String? = null
+            var weekMode: String? = null
+            val expiryDate = editTextExpiryDate.text.toString()
+
+            // Validate data input
+            if (medicationName.isBlank() || patientName.isBlank() || dosage.isBlank() ||
+                remainingAmount.isBlank() || dailyIntakeFrequency == null || selectedTimes.isEmpty() ||
+                intakeIntervalDays.isBlank() || expiryDate.isBlank()) {
+                Toast.makeText(
+                    this,
+                    "请填写所有药品信息",
+                    Toast.LENGTH_SHORT).show()
+            } else {
+                dailyIntakeTimes = sortTimes(selectedTimes.values.toMutableList())
+                reminderMode = getRemindMode()
+                weekMode = getWeekMode()
+
+                lifecycleScope.launch {
+                    val medicationRequest = AddMedicationRequest(
+                        medicationName,
+                        patientName,
+                        dosage,
+                        remainingAmount.toInt(),
+                        dailyIntakeFrequency.toString(),
+                        weekMode,
+                        reminderMode,
+                        formattedExpiryDate,
+                        dateList, // 由操作台传入
+                        dailyIntakeTimes
+                    )
+                    val response = withContext(Dispatchers.IO) {
+                        RetrofitClient.api.addMedication(medicationRequest).execute()
+                    }
+
+                    if (response.isSuccessful) {
+                        runOnUiThread {
+                            Toast.makeText(
+                                this@AddMedActivity,
+                                "药品信息已保存",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            val medicationID = (response.body()!!.data as? JsonValue.JsonNumber)?.value!!.toInt()
+                            medicationData = MedicationData(medicationID, medicationName, patientName, dosage, remainingAmount.toInt(), dailyIntakeFrequency.toInt(), dailyIntakeTimes, weekMode, reminderMode, formattedExpiryDate)
+                            val intent = Intent()
+                            intent.putExtra("MEDICATION_DATA", medicationData)
+                            setResult(RESULT_OK, intent)
+                            finish()
+                        }
+                    } else {
+                        runOnUiThread {
+                            buildAlertDialog(
+                                this@AddMedActivity,
+                                "药品信息保存失败",
+                                "原因1"
+                            )
+                                .show()
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -246,7 +326,7 @@ class AddMedActivity : AppCompatActivity() {
                 val formattedDate = "%04d-%02d-%02d".format(selectedYear, selectedMonth + 1, selectedDay)
                 val calendar = Calendar.getInstance()
                 calendar.set(selectedYear, selectedMonth + 1, selectedDay)
-                formattedExpiryDate = calendar.time
+                formattedExpiryDate = formattedDate
                 editTextExpiryDate.setText(formattedDate)
             },
             year, month, day
@@ -273,6 +353,7 @@ class AddMedActivity : AppCompatActivity() {
         }
         return modeCode
     }
+
     // 对星期的选择编码，便于数据库储存
     fun getWeekMode(): String {
         var modeCode = ""
@@ -285,44 +366,5 @@ class AddMedActivity : AppCompatActivity() {
             }
         }
         return modeCode
-    }
-
-    private fun saveMedicationData() {
-        val medicationName = editTextMedicationName.text.toString()
-        val patientName = editTextPatientName.text.toString()
-        // 诊籍的唯一标识符。待定
-        val medicalRecord = editTextMedicalRecord.text.toString()
-        val dosage = editTextDosage.text.toString()
-        val remainingAmount = editTextRemainingAmount.text.toString()
-        val dailyIntakeFrequency = dailyIntakeFrequency
-        var dailyIntakeTimes: MutableList<String> = mutableListOf()
-        val intakeIntervalDays = editTextIntakeIntervalDays.text.toString()
-        var reminderMode: String? = null
-        var weekMode: String? = null
-        val expiryDate = editTextExpiryDate.text.toString()
-
-        // Validate data input
-        if (medicationName.isBlank() || patientName.isBlank() || dosage.isBlank() ||
-            remainingAmount.isBlank() || dailyIntakeFrequency == null || selectedTimes.isEmpty() ||
-            intakeIntervalDays.isBlank() || expiryDate.isBlank()) {
-            Toast.makeText(this, "请填写所有药品信息", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        dailyIntakeTimes = sortTimes(selectedTimes.values.toMutableList())
-        reminderMode = getRemindMode()
-        weekMode = getWeekMode()
-
-        medicationData = MedicationData(medicationName, patientName, dosage, remainingAmount.toInt(), dailyIntakeFrequency.toInt(), dailyIntakeTimes, intakeIntervalDays.toInt(), weekMode, reminderMode, formattedExpiryDate)
-
-        val intent = Intent()
-        intent.putExtra("MEDICATION_DATA", medicationData)
-        setResult(RESULT_OK, intent)
-
-        // Data saved successfully message
-        Toast.makeText(this, "药品信息已保存", Toast.LENGTH_SHORT).show()
-
-        // Return to the previous screen or handle saved data as needed
-        finish()
     }
 }

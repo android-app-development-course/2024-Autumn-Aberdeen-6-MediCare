@@ -18,9 +18,11 @@ import java.util.Locale
 
 
 class MedicationAdapter(
-    private var medicationList: MutableList<MedicationData>,
-    private val onDeleteClick: (MutableList<MedicationData>) -> Unit
+    private val dateItem: DateItem,
+    private val onDeleteClick: (MutableList<MedicationData>, DateItem, MedicationData) -> Unit
 ) : RecyclerView.Adapter<MedicationAdapter.MedicationViewHolder>() {
+
+    private var medicationList = dateItem.medicationData!!
 
     inner class MedicationViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val textMedicationName: TextView = itemView.findViewById(R.id.textMedicationName)
@@ -41,12 +43,10 @@ class MedicationAdapter(
 
         val dailyIntakeTimes = medication.dailyIntakeTimes
 
-
         holder.itemView.setOnClickListener {
             // 点击小卡片，进入详细页逻辑
             showDetailsDialog(holder.itemView.context, medication)
         }
-
 
         holder.timeCheckBoxLayout.removeAllViews()
         var currentRow: LinearLayout? = null
@@ -73,7 +73,7 @@ class MedicationAdapter(
     private fun removeMedication(medicationData: MedicationData) {
         medicationList = medicationList.filter { it!= medicationData }.toMutableList()
         notifyDataSetChanged()
-        onDeleteClick(medicationList)
+        onDeleteClick(medicationList, dateItem, medicationData)
     }
 
     private fun showDetailsDialog(context: Context, medicationData: MedicationData) {
@@ -83,7 +83,6 @@ class MedicationAdapter(
         val dialogTextDosageInfo = dialogView.findViewById<TextView>(R.id.dialog_textDosageInfo)
         val dialogTextRemainingAmount = dialogView.findViewById<TextView>(R.id.dialog_textRemainingAmount)
         val dialogTextDailyIntakeFrequency = dialogView.findViewById<TextView>(R.id.dialog_textDailyIntakeFrequency)
-        val dialogTextIntakeIntervalDays = dialogView.findViewById<TextView>(R.id.dialog_textIntakeIntervalDays)
         val dialogTextExpiryDate = dialogView.findViewById<TextView>(R.id.dialog_textExpiryDate)
         val dialogButtonClose = dialogView.findViewById<ImageButton>(R.id.dialog_buttonClose)
 
@@ -92,8 +91,7 @@ class MedicationAdapter(
         dialogTextDosageInfo.text = "剂量: ${medicationData.dosage}"
         dialogTextRemainingAmount.text = "剩余数量: ${medicationData.remainingAmount}"
         dialogTextDailyIntakeFrequency.text = "每日摄入频率: ${medicationData.dailyIntakeFrequency}"
-        dialogTextIntakeIntervalDays.text = "摄入间隔天数: ${medicationData.intakeIntervalDays}"
-        dialogTextExpiryDate.text = "过期日期: ${SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(medicationData.expiryDate)}"
+        dialogTextExpiryDate.text = "过期日期: ${medicationData.expiryDate}"
 
         val dialog = android.app.AlertDialog.Builder(context)
             .setView(dialogView)

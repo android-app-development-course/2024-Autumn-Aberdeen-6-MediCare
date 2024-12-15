@@ -3,44 +3,57 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="8dp"
-    android:background="@drawable/card_background">
+    android:padding="16dp"
+    android:background="@drawable/card_background"
+    android:clipToPadding="false"
+    android:elevation="4dp"
+    android:layout_margin="8dp">
 
-    <!-- 药品名称 -->
-    <TextView
-        android:id="@+id/textMedicationName"
-        android:layout_width="wrap_content"
+    <!-- 药品信息标题行 -->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="药品名称"
-        android:textStyle="bold"
-        android:textSize="16sp"
-        android:layout_marginBottom="4dp" />
+        android:orientation="horizontal">
+
+        <!-- 药品名称 -->
+        <TextView
+            android:id="@+id/textMedicationName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="药品名称"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:layout_marginEnd="8dp" />
+
+        <!-- 删除按钮 -->
+        <ImageButton
+            android:id="@+id/buttonDelete"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/ic_delete"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="删除药品" />
+    </LinearLayout>
 
     <!-- 剂量信息 -->
     <TextView
         android:id="@+id/textDosageInfo"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="剂量信息"
         android:textSize="14sp"
-        android:layout_marginBottom="4dp" />
+        android:textColor="@color/black"
+        android:layout_marginBottom="8dp" />
 
     <!-- 用于展示时间 CheckBox 的布局 -->
     <LinearLayout
         android:id="@+id/timeCheckBoxLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical" />
-
-    <!-- 删除按钮 -->
-    <ImageButton
-        style="?android:attr/buttonBarStyle"
-        android:id="@+id/buttonDelete"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_delete"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:layout_gravity="end"
-        android:contentDescription="删除药品" />
+        android:orientation="vertical"
+        android:paddingTop="8dp" />
 
 </LinearLayout>
