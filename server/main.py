@@ -7,4 +7,4 @@ if __name__ == "__main__":
     init_database(DATABASE_PATH)
 
     # 启动服务
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host="0.0.0.0", port=5000)

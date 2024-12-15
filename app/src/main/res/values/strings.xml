@@ -14,4 +14,5 @@
     <string name="loginFailed">Login failed</string>
     <string name="loginSuccess">Login success</string>
     <string name="invalidUsernameOrPassword">Invalid username or password.</string>
+    <string name="loginExpired">Login status has expired, please login again.</string>
 </resources>
