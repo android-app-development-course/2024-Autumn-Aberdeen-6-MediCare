@@ -5,19 +5,20 @@ import android.os.Parcelable
 import java.util.*
 
 data class MedicationData(
+    var medicationID: Int,
     var medicationName: String,
     var patientName: String,
     var dosage: String,
     var remainingAmount: Int,
     var dailyIntakeFrequency: Int,
     var dailyIntakeTimes: MutableList<String>,
-    var intakeIntervalDays: Int,
     var weekMode: String,
     var reminderMode: String,
-    var expiryDate: Date
+    var expiryDate: String
 ) : Parcelable {
 
     constructor(parcel: Parcel) : this(
+        parcel.readInt(),
         parcel.readString()!!,
         parcel.readString()!!,
         parcel.readString()!!,
@@ -26,23 +27,22 @@ data class MedicationData(
         mutableListOf<String>().apply {
             parcel.readStringList(this)
         },
-        parcel.readInt(),
         parcel.readString()!!,
         parcel.readString()!!,
-        parcel.readSerializable() as Date
+        parcel.readString()!!
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeInt(medicationID)
         parcel.writeString(medicationName)
         parcel.writeString(patientName)
         parcel.writeString(dosage)
         parcel.writeInt(remainingAmount)
         parcel.writeInt(dailyIntakeFrequency)
         parcel.writeStringList(dailyIntakeTimes)
-        parcel.writeInt(intakeIntervalDays)
         parcel.writeString(weekMode)
         parcel.writeString(reminderMode)
-        parcel.writeSerializable(expiryDate)
+        parcel.writeString(expiryDate)
     }
 
     override fun describeContents(): Int {
@@ -62,17 +62,17 @@ data class MedicationData(
     override fun toString(): String {
         return String.format(
             Locale.getDefault(),
-            "Medication: %s, Patient: %s, Dosage: %s, Remaining: %d, Frequency: %d, Times: %s, Interval: %d, Week Mode: %s, Reminder Mode: %s, Expiry: %s",
+            "Id: %d, Medication: %s, Patient: %s, Dosage: %s, Remaining: %d, Frequency: %d, Times: %s, Week Mode: %s, Reminder Mode: %s, Expiry: %s",
+            medicationID,
             medicationName,
             patientName,
             dosage,
             remainingAmount,
             dailyIntakeFrequency,
             dailyIntakeTimes.joinToString(", "),
-            intakeIntervalDays,
             weekMode,
             reminderMode,
-            expiryDate.toString()
+            expiryDate
         )
     }
 }

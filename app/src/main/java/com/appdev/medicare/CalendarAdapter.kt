@@ -1,17 +1,16 @@
 package com.appdev.medicare
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.appdev.medicare.model.DateItem
 
-class CalendarAdapter(private val daysOfMonth: List<Int>, private val deMode : Boolean, private val dateItems: List<DateItem>) :
+class CalendarAdapter(private var daysOfMonth: List<Int>, private val deMode : Boolean, private var dateItems: List<DateItem>) :
     RecyclerView.Adapter<CalendarAdapter.CalendarViewHolder>() {
-
-    private lateinit var medicationAdapter: MedicationAdapter
-    private lateinit var recyclerViewMedication: RecyclerView
 
     private var allDateTextViews: MutableList<TextView> = mutableListOf()
     private var selectedView : View? = null
@@ -22,6 +21,14 @@ class CalendarAdapter(private val daysOfMonth: List<Int>, private val deMode : B
     private var selectedDateItems : MutableList<DateItem> = mutableListOf()
     private var onDateSelectedListener: OnDateSelectedListener? = null
     var setMultiSelectMode = deMode
+
+    fun updateData(newDateItems: List<DateItem>, newDaysOfMonth: List<Int>) {
+        dateItems = newDateItems
+        daysOfMonth = newDaysOfMonth
+        allDateTextViews = mutableListOf() // 更新后，同步这个全局查询
+        clearStates()
+        notifyDataSetChanged() // 通知 Adapter 数据发生变化
+    }
 
     interface OnDateSelectedListener {
         fun onDateSelected(dateItem: DateItem, flag: Boolean)
@@ -76,8 +83,10 @@ class CalendarAdapter(private val daysOfMonth: List<Int>, private val deMode : B
                             }
                         }
                         selectedViews.forEach{view ->
-                            if (view != startSelectView!!.second && view != endSelectView!!.second)
+                            if (view != startSelectView!!.second && view != endSelectView!!.second) {
+                                Log.d("改变样式", "Enter the process")
                                 view.setBackgroundResource(R.drawable.pressed_shape)
+                            }
                         }
                     }
                     else if (day == startSelectView!!.first || day == endSelectView!!.first) {
@@ -114,7 +123,6 @@ class CalendarAdapter(private val daysOfMonth: List<Int>, private val deMode : B
                         holder.textDay.setBackgroundResource(R.drawable.pressed_shape)
                         selectedDateItem = currentDateItem
                         selectedView = holder.textDay
-//                        Toast.makeText(holder.itemView.context, "Selected date: $day", Toast.LENGTH_SHORT).show()
 
                         // 在Main中处理当天药品信息的展示操作
                         onDateSelectedListener?.onDateSelected(currentDateItem, true)
@@ -127,19 +135,21 @@ class CalendarAdapter(private val daysOfMonth: List<Int>, private val deMode : B
         }
     }
     fun clearStates() {
-        if (setMultiSelectMode) {
-            selectedViews.forEach{view ->
-                view.setBackgroundResource(R.drawable.default_shape)
-            }
-            startSelectView = null
-            endSelectView = null
-            selectedViews.clear()
-            selectedDateItems.clear()
-        } else {
-            selectedDateItem = null
-            selectedView!!.setBackgroundResource(R.drawable.default_shape)
-            selectedView = null
-        }
+        // 多选变量
+        startSelectView?.second?.setBackgroundResource(R.drawable.default_shape)
+        endSelectView?.second?.setBackgroundResource(R.drawable.default_shape)
+        selectedViews.forEach{view ->
+            view.setBackgroundResource(R.drawable.default_shape)
+        } // 保留逻辑，单独处理头
+        startSelectView = null
+        endSelectView = null
+        selectedViews.clear()
+        selectedDateItems.clear()
+
+        // 单选变量
+        selectedDateItem = null
+        selectedView?.setBackgroundResource(R.drawable.default_shape)
+        selectedView = null
     }
 
     override fun getItemCount(): Int = daysOfMonth.size

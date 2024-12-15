@@ -29,13 +29,22 @@ import androidx.appcompat.app.AppCompatActivity.RESULT_OK
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.appdev.medicare.api.RetrofitClient
 import com.appdev.medicare.model.DateItem
 import com.appdev.medicare.model.MedicationData
 import com.appdev.medicare.databinding.FragmentCalendarBinding
+import com.appdev.medicare.model.AddMedicationRequest
+import com.appdev.medicare.model.JsonValue
 import com.appdev.medicare.receiver.NotificationReceiver
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.MutableList
@@ -62,6 +71,8 @@ class CalendarFragment : Fragment() {
 
     private lateinit var addMedicationActivityLauncher: ActivityResultLauncher<Intent>
 
+    private val cachedDateItems = mutableMapOf<String, MutableList<DateItem>>() // 缓存 dateItems
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -86,8 +97,31 @@ class CalendarFragment : Fragment() {
         textMonthYear.text = dateFormat.format(currentDate.time)
         dateItems = generateDateItemsForMonth(currentDate)
 
+        lifecycleScope.launch {
+            val previousMonth = Calendar.getInstance().apply {
+                time = currentDate.time
+                add(Calendar.MONTH, -1)
+            }
+            val nextMonth = Calendar.getInstance().apply {
+                time = currentDate.time
+                add(Calendar.MONTH, 1)
+            }
+            init_medicationInfo(dateItems)
+
+            val previousMonthItems = generateDateItemsForMonth(previousMonth)
+            val nextMonthItems = generateDateItemsForMonth(nextMonth)
+            val deferredPrevious = async {
+                init_medicationInfo(previousMonthItems)
+            }
+            val deferredNext = async {
+                init_medicationInfo(nextMonthItems)
+            }
+            deferredPrevious.await()
+            deferredNext.await()
+        }
+
+
         recyclerViewMedication.layoutManager = LinearLayoutManager(requireContext())
-        // Setup RecyclerView with a GridLayoutManager
         recyclerViewCalendar.layoutManager = GridLayoutManager(requireContext(), 7)
         calendarAdapter = CalendarAdapter(daysOfMonth, false, dateItems)
         recyclerViewCalendar.adapter = calendarAdapter
@@ -95,10 +129,11 @@ class CalendarFragment : Fragment() {
         switchToggleMode.setOnCheckedChangeListener { _, isChecked ->
             recyclerViewMedication.adapter = null
             calendarAdapter.setMultiSelectMode = isChecked
-            allTextViews = calendarAdapter.getAllTextViews()
-            allTextViews.forEach { view ->
-                view.setBackgroundResource(R.drawable.default_shape)
-            }
+            calendarAdapter.clearStates()
+//            allTextViews = calendarAdapter.getAllTextViews()
+//            allTextViews.forEach { view ->
+//                view.setBackgroundResource(R.drawable.default_shape)
+//            }
             if (isChecked) {
                 // 显示启用多选模式的提示
                 Toast.makeText(requireContext(), "多选模式已启用", Toast.LENGTH_SHORT).show()
@@ -126,56 +161,69 @@ class CalendarFragment : Fragment() {
                         val medicationData =
                             data.getParcelableExtra("MEDICATION_DATA") as MedicationData?
                         if (medicationData != null) {
-                            if (calendarAdapter.setMultiSelectMode) {
-                                val selectedDateItems = calendarAdapter.getSelectedDateItems()
-                                selectedDateItems.forEach { dateItem ->
-                                    dateItem.medicationData?.add(medicationData)
-                                    val medicationList = dateItem.medicationData
-                                    medicationList?.let {
-                                        medicationList.forEach { medicationData ->
-                                            setRemindersForDailyIntake(
-                                                this@CalendarFragment.requireActivity(),
-                                                dateItem.date,
-                                                medicationData.dailyIntakeTimes,
-                                                medicationData.weekMode,
-                                                medicationData.reminderMode
-                                            )
+                            lifecycleScope.launch {
+                                val checkFormat = SimpleDateFormat("yyyy-MM", Locale.getDefault())
+                                    if (calendarAdapter.setMultiSelectMode) {
+                                        val selectedDateItems = calendarAdapter.getSelectedDateItems()
+                                        withContext(Dispatchers.IO) {
+                                            selectedDateItems.forEach { dateItem ->
+                                                dateItem.medicationData?.add(medicationData)
+                                                val medicationList = dateItem.medicationData
+                                                medicationList?.let {
+                                                    medicationList.forEach { medicationData ->
+                                                        setRemindersForDailyIntake(
+                                                            this@CalendarFragment.requireActivity(),
+                                                            dateItem.date,
+                                                            medicationData.dailyIntakeTimes,
+                                                            medicationData.weekMode,
+                                                            medicationData.reminderMode
+                                                        )
+                                                    }
+                                                }
+                                                val yearMonth = checkFormat.format(dateItem.date)
+                                                cachedDateItems[yearMonth]?.find { it.date == dateItem.date }?.medicationData =
+                                                    dateItem.medicationData
+                                            }
+                                            calendarAdapter.clearStates()
                                         }
-                                    }
-                                }
-                                calendarAdapter.clearStates()
-                            } else {
-                                val selectedDateItem = calendarAdapter.getSelectedDateItem()
-                                if (selectedDateItem != null) {
-                                    selectedDateItem.medicationData?.add(medicationData)
-                                    val medicationList = selectedDateItem.medicationData
-                                    medicationList?.let {
-                                        medicationList.forEach { medicationData ->
-                                            setRemindersForDailyIntake(
-                                                this@CalendarFragment.requireActivity(),
-                                                selectedDateItem.date,
-                                                medicationData.dailyIntakeTimes,
-                                                medicationData.weekMode,
-                                                medicationData.reminderMode
-                                            )
+                                    } else {
+                                        val selectedDateItem = calendarAdapter.getSelectedDateItem()
+                                        if (selectedDateItem != null) {
+                                            selectedDateItem.medicationData?.add(medicationData)
+                                            val medicationList = selectedDateItem.medicationData
+                                            medicationList?.let {
+                                                medicationList.forEach { medicationData ->
+                                                    setRemindersForDailyIntake(
+                                                        this@CalendarFragment.requireActivity(),
+                                                        selectedDateItem.date,
+                                                        medicationData.dailyIntakeTimes,
+                                                        medicationData.weekMode,
+                                                        medicationData.reminderMode
+                                                    )
+                                                }
+                                                val yearMonth = checkFormat.format(selectedDateItem.date)
+                                                cachedDateItems[yearMonth]?.find { it.date == selectedDateItem.date }?.medicationData =
+                                                    selectedDateItem.medicationData
+                                                medicationAdapter = MedicationAdapter(selectedDateItem) { newList, item, deleteMedic ->
+                                                    selectedDateItem.medicationData = newList
+                                                    deleteOne(item, deleteMedic)
+                                                }
+                                                recyclerViewMedication.adapter = medicationAdapter
+                                            }
                                         }
-                                        medicationAdapter = MedicationAdapter(medicationList) { newList ->
-                                            selectedDateItem.medicationData = newList
-                                        }
-                                        recyclerViewMedication.adapter = medicationAdapter
                                     }
                                 }
                             }
                         }
                     }
                 }
-            }
 
         buttonAddMedication.setOnClickListener {
             // 保证在点击加号之前，用户已经选定了要做更改的日期
             val selectedDateItem = calendarAdapter.getSelectedDateItem()
+            val selectedDateItems = calendarAdapter.getSelectedDateItems()
             Log.d("CalendarFragment", "Selected Date Item: $selectedDateItem")
-            if (selectedDateItem == null) {
+            if (selectedDateItem == null && selectedDateItems.isEmpty()) {
                 val handler = Handler(Looper.getMainLooper())
                 handler.post {
                     val alertDialog = AlertDialog.Builder(requireContext())
@@ -192,6 +240,8 @@ class CalendarFragment : Fragment() {
                 intent.putExtra("mode", calendarAdapter.setMultiSelectMode)
                 if (!calendarAdapter.setMultiSelectMode) {
                     intent.putExtra("selectedDate", calendarAdapter.getSelectedDateItem())
+                } else {
+                    intent.putExtra("selectedDates", ArrayList(calendarAdapter.getSelectedDateItems()))
                 }
                 addMedicationActivityLauncher.launch(intent)
             }
@@ -201,8 +251,11 @@ class CalendarFragment : Fragment() {
             override fun onDateSelected(dateItem: DateItem, flag: Boolean) {
                 if (flag) {
                     val medicationList = dateItem.medicationData
-                    if (medicationList!= null) {
-                        medicationAdapter = MedicationAdapter(medicationList) {}
+                    if (medicationList != null) {
+                        medicationAdapter = MedicationAdapter(dateItem) {newList, item, deleteMedic ->
+                            dateItem.medicationData = newList
+                            deleteOne(item, deleteMedic)
+                        }
                         recyclerViewMedication.adapter = medicationAdapter
                     }
                 } else {
@@ -416,9 +469,119 @@ class CalendarFragment : Fragment() {
 
     private fun updateUI(currentDate: Calendar) {
         textMonthYear.text = SimpleDateFormat("MMMM yyyy", Locale.getDefault()).format(currentDate.time)
+        val checkFormat = SimpleDateFormat("yyyy-MM", Locale.getDefault())
+        val yearMonth = checkFormat.format(currentDate.time)
+        if (cachedDateItems.containsKey(yearMonth)) {
+            dateItems = cachedDateItems[yearMonth]!!
+        } else {
+            dateItems = generateDateItemsForMonth(currentDate)
+        }
         val daysOfMonth = getDaysOfMonth(currentDate)
-        calendarAdapter = CalendarAdapter(daysOfMonth, switchToggleMode.isChecked, generateDateItemsForMonth(currentDate))
+
+        calendarAdapter.updateData(dateItems, daysOfMonth)
+//        calendarAdapter = CalendarAdapter(daysOfMonth, switchToggleMode.isChecked, dateItems)
         recyclerViewCalendar.adapter = calendarAdapter
+
+        recyclerViewMedication.adapter = null // 清空记录栏
+
+        lifecycleScope.launch {
+            val previousMonth = Calendar.getInstance().apply {
+                time = currentDate.time
+                add(Calendar.MONTH, -1)
+            }
+            val nextMonth = Calendar.getInstance().apply {
+                time = currentDate.time
+                add(Calendar.MONTH, 1)
+            }
+            init_medicationInfo(dateItems)
+            init_medicationInfo(generateDateItemsForMonth(previousMonth))
+            init_medicationInfo(generateDateItemsForMonth(nextMonth))
+        }
+    }
+
+    private fun convertMedicationData(data: JsonValue.JsonObject): MedicationData {
+        val map = data.value
+        return MedicationData(
+            (map["medication_id"] as? JsonValue.JsonNumber)?.value!!.toInt(),
+            (map["medication_name"] as? JsonValue.JsonString)?.value!!,
+            (map["patient_name"] as? JsonValue.JsonString)?.value!!,
+            (map["dosage"] as? JsonValue.JsonString)?.value!!,
+            (map["remaining_amount"] as? JsonValue.JsonNumber)?.value!!.toInt(),
+            (map["frequency"] as? JsonValue.JsonString)?.value!!.toInt(),
+            (map["times"] as? JsonValue.JsonList)?.value?.mapNotNull {
+                (it as? JsonValue.JsonString)?.value
+            }?.toMutableList() ?: mutableListOf(),
+            (map["week_mode"] as? JsonValue.JsonString)?.value!!,
+            (map["reminder_mode"] as? JsonValue.JsonString)?.value!!,
+            (map["expiry_date"] as? JsonValue.JsonString)?.value!!
+        )
+    }
+
+    private fun init_medicationInfo(dateItems: MutableList<DateItem>) {
+        val checkFormat = SimpleDateFormat("yyyy-MM", Locale.getDefault())
+        val yearMonth = checkFormat.format(dateItems[0].date)
+
+        if (!cachedDateItems.containsKey(yearMonth)) {
+            lifecycleScope.launch {
+                val deferredList = dateItems.map { dateItem ->
+                    async {
+                        dealEach(dateItem)
+                    }
+                }
+                deferredList.awaitAll()
+                cachedDateItems[yearMonth] = dateItems
+            }
+        }
+    }
+
+    private fun dealEach(dateItem: DateItem) {
+        lifecycleScope.launch {
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            val date = dateFormat.format(dateItem.date)
+            val records = withContext(Dispatchers.IO) {
+                RetrofitClient.api.getAll(date).execute()
+            }
+            if (records.isSuccessful) {
+                val data = records.body()?.data
+                if (data is JsonValue.JsonList) {
+                    val listInfo = mutableListOf<MedicationData>()
+                    data.value.mapNotNull { item ->
+                        if (item is JsonValue.JsonObject) {
+                            val convertedData = convertMedicationData(item)
+                            listInfo.add(convertedData)
+                        } else {
+                            Log.w("数据类型错误", "应该是JsonValue.JsonObject")
+                        }
+                    }
+                    dateItem.medicationData = listInfo
+                } else {
+                    Log.w("数据类型错误", "应该时JsonValue.JsonList")
+                }
+            } else {
+                Log.w("无查询结果", "不存在记录")
+            }
+        }
+    }
+
+    private fun deleteOne(dateItem: DateItem, deleteMedic: MedicationData) {
+        lifecycleScope.launch {
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            val checkFormat = SimpleDateFormat("yyyy-MM", Locale.getDefault())
+            val date = dateFormat.format(dateItem.date)
+            val yearMonth = checkFormat.format(dateItem.date)
+            val medicationId = deleteMedic.medicationID
+            val response = withContext(Dispatchers.IO) {
+                RetrofitClient.api.deleteMedicationRecord(date, medicationId).execute()
+            }
+            if (response.isSuccessful) {
+                cachedDateItems[yearMonth]?.find { it.date == dateItem.date }?.medicationData =
+                    dateItem.medicationData
+                Toast.makeText(requireContext(), "删除成功", Toast.LENGTH_SHORT).show()
+            } else {
+                Log.w("处理失败", "请检查两端")
+                Toast.makeText(requireContext(), "删除出现问题", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     override fun onDestroyView() {

@@ -69,15 +69,6 @@
             android:textSize="14sp"
             android:layout_marginBottom="4dp" />
 
-        <!-- 摄入间隔天数 -->
-        <TextView
-            android:id="@+id/dialog_textIntakeIntervalDays"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="摄入间隔天数"
-            android:textSize="14sp"
-            android:layout_marginBottom="4dp" />
-
         <!-- 过期日期 -->
         <TextView
             android:id="@+id/dialog_textExpiryDate"
