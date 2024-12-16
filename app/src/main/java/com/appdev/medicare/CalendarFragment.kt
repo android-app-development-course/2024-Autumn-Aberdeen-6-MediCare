@@ -540,7 +540,7 @@ class CalendarFragment : Fragment() {
             val records = withContext(Dispatchers.IO) {
                 RetrofitClient.api.getAllOnDate(getAllOnDateRequest).execute()
             }
-            if (records.isSuccessful) {
+            if (records.code() == 200) {
                 val data = records.body()?.data
                 if (data is JsonValue.JsonList) {
                     val listInfo = mutableListOf<MedicationData>()
@@ -556,7 +556,7 @@ class CalendarFragment : Fragment() {
                 } else {
                     Log.w("CalendarFragment", "Data type error, should be JsonValue.JsonObject")
                 }
-            } else {
+            } else if (records.code() == 204){
                 Log.w("CalendarFragment", "Record not exist")
             }
         }
