@@ -3,7 +3,6 @@ package com.appdev.medicare.room.dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
-import com.appdev.medicare.room.entity.Medication
 import com.appdev.medicare.room.entity.MedicationTime
 
 interface MedicationTimeDao {
