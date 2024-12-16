@@ -366,7 +366,7 @@ def get_medication_info(user_id):
 
 """
 /getAllOnDate - 根据用户日期获取在这个日期下的全部药物信息
-请求：GET {"date": "2024-12-16"}
+请求：{"date": "2024-12-16"}
 响应 - 成功：返回 200 和全部药物信息，或 204 未找到该日期下的信息
 """
 @app.route("/getAllOnDate", methods=["POST"])
