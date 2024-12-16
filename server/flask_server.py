@@ -239,7 +239,7 @@ def add_medication(user_id):
 }
 响应 - 成功：返回 200 和用药时间，或 204 无用药时间
 """
-@app.route("/getMedicationTimes", methods=["GET"])
+@app.route("/getMedicationTimes", methods=["POST"])
 @token_required
 @json_required
 def get_medication_times(user_id):
@@ -283,7 +283,7 @@ def get_medication_times(user_id):
 请求：{"date": "2024-12-16"}
 响应 - 成功：返回 200 和用药的 ID，或 204 无用药记录
 """
-@app.route("/getMedicationRecords", methods=["GET"])
+@app.route("/getMedicationRecords", methods=["POST"])
 @token_required
 @json_required
 def get_medication_records(user_id):
@@ -318,7 +318,7 @@ def get_medication_records(user_id):
 请求：{"medicationId": 0}
 响应 - 成功：返回 200 和用药信息，失败：MEDICATION_NOT_FOUND 未找到药物
 """
-@app.route("/getMedicationInfo", methods=["GET"])
+@app.route("/getMedicationInfo", methods=["POST"])
 @token_required
 @json_required
 def get_medication_info(user_id):
@@ -361,10 +361,10 @@ def get_medication_info(user_id):
 
 """
 /getAllOnDate - 根据用户日期获取在这个日期下的全部药物信息
-请求：GET {"date": "2024-12-16"}
+请求：{"date": "2024-12-16"}
 响应 - 成功：返回 200 和全部药物信息，或 204 未找到该日期下的信息
 """
-@app.route("/getAllOnDate", methods=["GET"])
+@app.route("/getAllOnDate", methods=["POST"])
 @json_required
 @token_required
 def get_all_on_date(user_id):
@@ -444,7 +444,7 @@ def get_all_on_date(user_id):
 请求：{"date": "2024-12-16", "medicationId": 1}
 响应 - 成功：返回 200，失败：RECORD_NOT_FOUND 未找到用药信息，INTERNAL_SERVER_ERROR 服务器内部错误
 """
-@app.route("/deleteMedicationRecord", methods=["DELETE"])
+@app.route("/deleteMedicationRecord", methods=["POST"])
 @token_required
 def delete_record(user_id):
     data = request.get_json()
