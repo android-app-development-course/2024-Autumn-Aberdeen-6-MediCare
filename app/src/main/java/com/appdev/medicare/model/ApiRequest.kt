@@ -11,14 +11,36 @@ data class LoginRequest(
 )
 
 data class AddMedicationRequest(
-    val medication_name: String,
-    val patient_name: String,
+    val medicationName: String,
+    val patientName: String,
     val dosage: String,
-    val remaining_amount: Int,
+    val remainingAmount: Int,
     val frequency: String,
-    val week_mode: String,
-    val reminder_type: String,
-    val expiration_date: String,
-    val date_list: List<String>,
-    val time_list: List<String>
+    val weekMode: String,
+    val reminderType: String,
+    val expirationDate: String,
+    val dateList: List<String>,
+    val timeList: List<String>
+)
+
+data class GetMedicationTimesRequest(
+    val medicationId: Int,
+    val date: String
+)
+
+data class GetMedicationRecordsRequest(
+    val date: String
+)
+
+data class GetMedicationInfoRequest(
+    val medicationId: Int
+)
+
+data class GetAllOnDateRequest(
+    val date: String
+)
+
+data class DeleteMedicationRecordRequest(
+    val dare: String,
+    val medicationId: Int
 )

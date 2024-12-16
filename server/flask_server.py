@@ -1,10 +1,11 @@
 import os
 import logging
+from traceback import format_exc
 from flask import Flask, request
 from database import SQLiteConnection
 from message_builder import build_message
 from function_decorator import json_required, token_required
-from token_manager import new_token, validate_token, update_token_expire_time, invalidate_token, invalidate_all_token
+from token_manager import new_token, validate_token, invalidate_token, invalidate_all_token
 
 # 数据库路径
 DATABASE_PATH = os.path.join(os.path.dirname(__file__), "data.db")
@@ -111,7 +112,7 @@ def login():
 请求：null
 响应 - 成功：返回 200，失败：INVALID_TOKEN 无效的 Token（客户端无论如何都应该登出）
 """
-@app.route("/logout", methods=["POST"])
+@app.route("/logout", methods=["POST"]) # 不使用 @token_required 以手动处理 Token 失效情形
 def logout():
     token = request.headers.get("Authorization", None)
     logger.info(f"Received /logout request.")
@@ -130,42 +131,53 @@ def logout():
         return build_message(message="Logout success.")
 
 """
-/check_token - 检测 Token 有效性
+/checkToken - 检测 Token 有效性
 请求：null
 响应 - 成功：返回 200，失败：INVALID_TOKEN 无效的 TOKEN
 """
-@app.route("/check_token", methods=["GET"])
+@app.route("/checkToken", methods=["GET"])
 @token_required
 def check_token(user_id):
     token = request.headers.get("Authorization", None)
-    logger.info(f"Received /check_token request: {token}")
+    logger.info(f"Received /checkToken request: {token}")
     # 失效 Token 检测由 @token_required 实现
     logger.info(f"User ID {user_id}'s token \"{token}\" is valid, and expire time updated.")
     return build_message(message="Token is valid.")
 
 
 """
-/add_medication - 添加使用药品
-请求：POST {"medication_name", "patient_name", "dosage", "remaining_amount", "frequency", "week_mode", "reminder_type", "expiration_date", "date_list", "time_list"}
-响应 - 成功：返回 200，失败：ADD_Medication_ERROR 添加药品失败
+/addMedication - 添加药品
+请求：{
+    "medicationName": "string",     // 药品名称
+    "patientName": "string",        // 用药人
+    "dosage": "string",             // 剂量（如2片）
+    "remainingAmount": 1,           // 余量（整数）
+    "frequency": "string",          // 用药频率
+    "weekMode": "0000010",          // 周一至周日，1服用0不服用，如此处为周六服用
+    "reminderType": "00",           // 提醒方式，第一个闹钟，第二个应用
+    "expirationDate": "string",     // 过期日期
+    "dateList": ["2024-12-14", "2024-12-16"],  // 服用日期
+    "timeList": ["12:30", "14:30"]  // 服用时间
+}
+响应 - 成功：返回 200，失败：ADD_MEDICATION_ERROR 药品添加失败
 """
-@app.route("/add_medication", methods=["POST"])
+@app.route("/addMedication", methods=["POST"])
 @token_required
 @json_required
 def add_medication(user_id):
     data = request.get_json()
-    logger.info(f"Received /add_medication request: {data}")
+    logger.info(f"Received /addMedication request: {data}")
 
-    medication_name = data["medication_name"]
-    patient_name = data["patient_name"]
+    medication_name = data["medicationName"]
+    patient_name = data["patientName"]
     dosage = data["dosage"]
-    remaining_amount = data["remaining_amount"]
+    remaining_amount = data["remainingAmount"]
     frequency = data["frequency"]
-    week_mode = data["week_mode"]
-    reminder_type = data["reminder_type"]
-    expiration_date = data["expiration_date"]
-    date_list = data["date_list"]  # 用药日期列表
-    time_list = data["time_list"]  # 用药时间列表
+    week_mode = data["weekMode"]
+    reminder_type = data["reminderType"]
+    expiration_date = data["expirationDate"]
+    date_list = data["dateList"]  # 用药日期列表
+    time_list = data["timeList"]  # 用药时间列表
 
     with SQLiteConnection() as (conn, cursor):
         # 将药物的基本信息导入到 medication 库中
@@ -216,22 +228,25 @@ def add_medication(user_id):
         conn.commit()
 
     logger.info(f'Add_medication "{medication_name}" success.')
-    return build_message(message="Add_medication success", data=medication_id)
+    return build_message(message="Successfully added medication", data=medication_id)
 
 
 """
-/check_time - 获取用药时间
-请求：GET {"medication_id", "date"}
-响应 - 成功：返回 200 和用药时间，失败：NULL_TIME 未找到用药时间
+/getMedicationTimes - 获取用药时间
+请求：{
+    "medicationId": 1,      // 药物 ID
+    "date": "2024-12-16"    // 用药时间
+}
+响应 - 成功：返回 200 和用药时间，或 204 无用药时间
 """
-@app.route("/check_time", methods=["GET"])
+@app.route("/getMedicationTimes", methods=["GET"])
 @token_required
 @json_required
-def check_time(user_id):
+def get_medication_times(user_id):
     data = request.get_json()
-    logger.info(f"Received /check_time request: {data}")
+    logger.info(f"Received /getMedicationTimes request: {data}")
 
-    medication_id = data["medication_id"]
+    medication_id = data["medicationId"]
     date = data["date"]
 
     with SQLiteConnection() as (conn, cursor):
@@ -254,26 +269,26 @@ def check_time(user_id):
         times = cursor.fetchall()
 
         if not times:
-            logger.warning("NULL_TIME: No medication times found.")
-            return build_message(message="NULL_TIME", code=404)
+            logger.log(f"No medication time data found for user {user_id} for medicine {medication_id} on {date}")
+            return build_message(code=204)
 
         time_list = [row[0] for row in times]
         conn.commit()
-    logger.info(f"Check_time success: {time_list}")
-    return build_message(message="Check_time success", data=time_list, code=200)
+    logger.info(f"Successfully found medication time data for user {user_id} for medicine {medication_id} on {date}: {time_list}.")
+    return build_message(message="Successfully get medication time data.", data=time_list)
 
 
 """
-/check_date - 获取用药记录
-请求：GET {"date"}
-响应 - 成功：返回 200 和用药的id，失败：NULL_Record 未找到用药记录
+/getMedicationRecords - 获取指定日期的用药记录
+请求：{"date": "2024-12-16"}
+响应 - 成功：返回 200 和用药的 ID，或 204 无用药记录
 """
-@app.route("/check_date", methods=["GET"])
+@app.route("/getMedicationRecords", methods=["GET"])
 @token_required
 @json_required
-def check_date(user_id):
+def get_medication_records(user_id):
     data = request.get_json()
-    logger.info(f"Received /check_date request: {data}")
+    logger.info(f"Received /getMedicationRecords request: {data}")
 
     date = data["date"]
 
@@ -289,28 +304,28 @@ def check_date(user_id):
         medications = cursor.fetchall()
 
         if not medications:
-            logger.warning("NULL_Record: No medication records found.")
-            return build_message(message="NULL_Record", code=404)
+            logger.warning(f"No medication record data found for user {user_id} for medicin on {date}")
+            return build_message(code=204)
 
         medic_list = [row[0] for row in medications]
         conn.commit()
-    logger.info(f"Check_date success: {medic_list}")
-    return build_message(message="Check_date success", data=medic_list, code=200)
+    logger.info(f"Successfully found medication time data for user {user_id} on {date}: {medic_list}.")
+    return build_message(message="Successfully get medication data", data=medic_list)
 
 
 """
-/check_medic - 获取药物信息
-请求：GET {"medication_id"}
-响应 - 成功：返回 200 和药物信息，失败：NULL_Medic 未找到药物
+/getMedicationInfo - 获取用药信息
+请求：{"medicationId": 0}
+响应 - 成功：返回 200 和用药信息，失败：MEDICATION_NOT_FOUND 未找到药物
 """
-@app.route("/check_medic", methods=["GET"])
+@app.route("/getMedicationInfo", methods=["GET"])
 @token_required
 @json_required
-def check_medic(user_id):
+def get_medication_info(user_id):
     data = request.get_json()
-    logger.info(f"Received /check_medic request: {data}")
+    logger.info(f"Received /getMedicationInfo request: {data}")
 
-    medication_id = data["medication_id"]
+    medication_id = data["medicationId"]
 
     with SQLiteConnection() as (conn, cursor):
         cursor.execute(
@@ -325,8 +340,8 @@ def check_medic(user_id):
         result = cursor.fetchone()
 
         if not result:
-            logger.warning("NULL_Medic: No medication found.")
-            return build_message(message="NULL_Medic", code=404)
+            logger.warning(f"No medication found of ID {medication_id}.")
+            return build_message(err_description=f"No medication data found about the medication {medication_id}",err_code="MEDICATION_NOT_FOUND", code=404, success=False)
 
         medication_info = {
             "medication_id": result[0],
@@ -340,20 +355,23 @@ def check_medic(user_id):
             "expiration_date": result[8],
         }
         conn.commit()
-    logger.info(f"Check_medic success: {medication_info}")
-    return build_message(message="Check_medic success", data=medication_info, code=200)
+    logger.info(f"Successfully found medication data of ID {medication_id}: {medication_info}")
+    return build_message(message="Successfully get medication data.", data=medication_info, code=200)
 
 
 """
-/check_all - 根据用户日期获取在这个日期下的全部药物信息
-请求：GET {"date"}
-响应 - 成功：返回 200 和全部药物信息，失败：NULL_Record 未找到药物
+/getAllOnDate - 根据用户日期获取在这个日期下的全部药物信息
+请求：GET {"date": "2024-12-16"}
+响应 - 成功：返回 200 和全部药物信息，或 204 未找到该日期下的信息
 """
-@app.route("/check_all", methods=["GET"])
+@app.route("/getAllOnDate", methods=["GET"])
+@json_required
 @token_required
-def check_all(user_id):
-    date = request.args.get("date")
-    logger.info(f"Received /check_all request: {date}")
+def get_all_on_date(user_id):
+    data = request.get_json()
+    logger.info(f"Received /getAllOnDate request: {data}")
+
+    date = data["date"]
 
     results = []
 
@@ -369,8 +387,8 @@ def check_all(user_id):
         medications = cursor.fetchall()
 
         if not medications:
-            logger.warning("NULL_Record: No medication records found.")
-            return build_message(message="NULL_Record", code=404)
+            logger.info(f"No medication data found for user {user_id} on {date}.")
+            return build_message(code=204)
         medic_list = [row[0] for row in medications]
 
         for i in medic_list:
@@ -417,20 +435,23 @@ def check_all(user_id):
             results.append(medicationInfo)
         conn.commit()
 
-    logger.info(f"Check_all success: {results}")
-    return build_message(message="Check_all success", data=results, code=200)
+    logger.info(f"Successfully get all medication data for user {user_id} on date {date}: {results}")
+    return build_message(message=f"Successfully get all medication data on date {date}", data=results)
 
 
 """
-/delete_record - 根据用户日期和药物信息id(在具体日期下药物信息id唯一)
-请求：DELETE {"date", "medication_id"}
-响应 - 成功：返回 200，失败：数据库同步问题/ 显示问题
+/deleteMedicationRecord - 根据用户日期和药物信息 ID 删除用药信息（在具体日期下药物信息id唯一）
+请求：{"date": "2024-12-16", "medicationId": 1}
+响应 - 成功：返回 200，失败：RECORD_NOT_FOUND 未找到用药信息，INTERNAL_SERVER_ERROR 服务器内部错误
 """
-@app.route("/delete_record", methods=["DELETE"])
+@app.route("/deleteMedicationRecord", methods=["DELETE"])
 @token_required
 def delete_record(user_id):
-    date = request.args.get("date")
-    medication_id = request.args.get("medication_id")
+    data = request.get_json()
+    logger.info(f"Received /getAllOnDate request: {data}")
+
+    date = data["date"]
+    medication_id = data["medicationId"]
 
     try:
         with SQLiteConnection() as (conn, cursor):
@@ -444,8 +465,11 @@ def delete_record(user_id):
             )
             conn.commit()
             if cursor.rowcount > 0:
-                return build_message(message="Record deleted successfully", code=200)
+                logger.info(f"Successfully delete record {medication_id} on date {date}")
+                return build_message(message="Successfully deleted record.")
             else:
-                return build_message(message="Record not found", code=404)
+                logger.info(f"Falied to delete record {medication_id} on date {date}: record not found")
+                return build_message(err_code="RECORD_NOT_FOUND", err_description=f"Record {medication_id} not found on date {date}", code=404, success=False)
     except Exception as e:
-        return build_message(message=f"Error occurred: {str(e)}", code=501)
+        logger.error(f"An error occurred while deleting records {medication_id} on {date}: {format_exc()}")
+        return build_message(err_code="INTERNAL_SERVER_ERROR",err_descriptin=f"An error occurred while trying to process", code=500, success=False)

@@ -1,6 +1,5 @@
 package com.appdev.medicare
 
-import android.app.Activity
 import android.app.AlarmManager
 import android.app.AlertDialog
 import android.app.NotificationManager
@@ -24,10 +23,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity.NOTIFICATION_SERVICE
 import androidx.appcompat.app.AppCompatActivity.RESULT_OK
 import androidx.appcompat.widget.SwitchCompat
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
@@ -37,7 +34,8 @@ import com.appdev.medicare.api.RetrofitClient
 import com.appdev.medicare.model.DateItem
 import com.appdev.medicare.model.MedicationData
 import com.appdev.medicare.databinding.FragmentCalendarBinding
-import com.appdev.medicare.model.AddMedicationRequest
+import com.appdev.medicare.model.DeleteMedicationRecordRequest
+import com.appdev.medicare.model.GetAllOnDateRequest
 import com.appdev.medicare.model.JsonValue
 import com.appdev.medicare.receiver.NotificationReceiver
 import kotlinx.coroutines.Dispatchers
@@ -538,8 +536,9 @@ class CalendarFragment : Fragment() {
         lifecycleScope.launch {
             val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
             val date = dateFormat.format(dateItem.date)
+            val getAllOnDateRequest = GetAllOnDateRequest(date)
             val records = withContext(Dispatchers.IO) {
-                RetrofitClient.api.getAll(date).execute()
+                RetrofitClient.api.getAllOnDate(getAllOnDateRequest).execute()
             }
             if (records.isSuccessful) {
                 val data = records.body()?.data
@@ -550,15 +549,15 @@ class CalendarFragment : Fragment() {
                             val convertedData = convertMedicationData(item)
                             listInfo.add(convertedData)
                         } else {
-                            Log.w("数据类型错误", "应该是JsonValue.JsonObject")
+                            Log.w("CalendarFragment", "Data type error, should be JsonValue.JsonObject")
                         }
                     }
                     dateItem.medicationData = listInfo
                 } else {
-                    Log.w("数据类型错误", "应该时JsonValue.JsonList")
+                    Log.w("CalendarFragment", "Data type error, should be JsonValue.JsonObject")
                 }
             } else {
-                Log.w("无查询结果", "不存在记录")
+                Log.w("CalendarFragment", "Record not exist")
             }
         }
     }
@@ -570,15 +569,16 @@ class CalendarFragment : Fragment() {
             val date = dateFormat.format(dateItem.date)
             val yearMonth = checkFormat.format(dateItem.date)
             val medicationId = deleteMedic.medicationID
+            val deleteMedicationRecordRequest = DeleteMedicationRecordRequest(date, medicationId)
             val response = withContext(Dispatchers.IO) {
-                RetrofitClient.api.deleteMedicationRecord(date, medicationId).execute()
+                RetrofitClient.api.deleteMedicationRecord(deleteMedicationRecordRequest).execute()
             }
             if (response.isSuccessful) {
                 cachedDateItems[yearMonth]?.find { it.date == dateItem.date }?.medicationData =
                     dateItem.medicationData
                 Toast.makeText(requireContext(), "删除成功", Toast.LENGTH_SHORT).show()
             } else {
-                Log.w("处理失败", "请检查两端")
+                Log.e("CalendarFragment", "Failed to process, check both client and server.")
                 Toast.makeText(requireContext(), "删除出现问题", Toast.LENGTH_SHORT).show()
             }
         }
