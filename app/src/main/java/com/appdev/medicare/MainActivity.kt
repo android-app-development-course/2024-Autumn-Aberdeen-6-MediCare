@@ -23,26 +23,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.ArrayList
 
-// 在构建好每个Fragment页面后替换这些类即可
-class Fragment2 : Fragment() {
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.activity_box, container, false)
-    }
-}
 
-class Fragment3 : Fragment() {
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.activity_record, container, false)
-    }
-}
 
 class MainActivity : AppCompatActivity() {
     private lateinit var viewPager: ViewPager2
@@ -96,8 +77,8 @@ class MainActivity : AppCompatActivity() {
         radioButton4 = findViewById(R.id.rb_me)
 
         fragmentList.add(CalendarFragment())
-        fragmentList.add(Fragment2())
-        fragmentList.add(Fragment3())
+        fragmentList.add(BoxFragment())
+        fragmentList.add(RecordFragment())
         fragmentList.add(MeFragment())
 
         val adapter = ViewPager2Adapter(this, fragmentList)
