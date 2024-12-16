@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@drawable/rounded_gray_background2"
+    android:clipToPadding="false"
+    android:elevation="6dp"
+    android:outlineAmbientShadowColor="#000000"
+    android:layout_margin="8dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <!-- 病名 -->
+        <TextView
+            android:id="@+id/textDiseaseName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="病名"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:layout_marginEnd="8dp" />
+
+        <!-- 删除按钮 -->
+        <ImageButton
+            android:id="@+id/buttonDelete"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/ic_delete"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="删除记录" />
+
+    </LinearLayout>
+
+    <!-- 病人 -->
+    <TextView
+        android:id="@+id/textPatientName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="病人"
+        android:textSize="14sp"
+        android:textColor="@color/black"
+        android:layout_marginBottom="8dp" />
+
+    <!-- 填写时间 -->
+    <TextView
+        android:id="@+id/textTime"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="时间"
+        android:textSize="14sp"
+        android:textColor="@color/black"
+        android:layout_marginBottom="8dp"
+        android:gravity="right|bottom"/>
+
+</LinearLayout>
