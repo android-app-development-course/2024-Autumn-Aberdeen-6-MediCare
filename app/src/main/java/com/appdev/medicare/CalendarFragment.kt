@@ -549,15 +549,15 @@ class CalendarFragment : Fragment() {
                             val convertedData = convertMedicationData(item)
                             listInfo.add(convertedData)
                         } else {
-                            Log.w("数据类型错误", "应该是JsonValue.JsonObject")
+                            Log.w("CalendarFragment", "Data type error, should be JsonValue.JsonObject")
                         }
                     }
                     dateItem.medicationData = listInfo
                 } else {
-                    Log.w("数据类型错误", "应该时JsonValue.JsonList")
+                    Log.w("CalendarFragment", "Data type error, should be JsonValue.JsonObject")
                 }
             } else {
-                Log.w("无查询结果", "不存在记录")
+                Log.w("CalendarFragment", "Record not exist")
             }
         }
     }
@@ -578,7 +578,7 @@ class CalendarFragment : Fragment() {
                     dateItem.medicationData
                 Toast.makeText(requireContext(), "删除成功", Toast.LENGTH_SHORT).show()
             } else {
-                Log.w("处理失败", "请检查两端")
+                Log.e("CalendarFragment", "Failed to process, check both client and server.")
                 Toast.makeText(requireContext(), "删除出现问题", Toast.LENGTH_SHORT).show()
             }
         }

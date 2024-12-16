@@ -84,7 +84,7 @@ class CalendarAdapter(private var daysOfMonth: List<Int>, private val deMode : B
                         }
                         selectedViews.forEach{view ->
                             if (view != startSelectView!!.second && view != endSelectView!!.second) {
-                                Log.d("改变样式", "Enter the process")
+                                Log.d("CalenderAdapter", "Entering the process to change style")
                                 view.setBackgroundResource(R.drawable.pressed_shape)
                             }
                         }
