@@ -5,22 +5,15 @@ from flask import Flask, request
 from database import SQLiteConnection
 from message_builder import build_message
 from function_decorator import json_required, token_required
-from token_manager import (
-    new_token,
-    validate_token,
-    invalidate_token,
-    invalidate_all_token,
-)
+from token_manager import new_token, validate_token, invalidate_token, invalidate_all_token
 
 # 数据库路径
 DATABASE_PATH = os.path.join(os.path.dirname(__file__), "data.db")
 
 # logger
-logging.basicConfig(
-    level=logging.INFO,
-    format="[%(asctime)s] %(filename)s - %(levelname)s - %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
-)
+logging.basicConfig(level=logging.INFO,
+                    format="[%(asctime)s] %(filename)s - %(levelname)s - %(message)s",
+                    datefmt="%Y-%m-%d %H:%M:%S")
 logger = logging.getLogger(__name__)
 
 # 创建 Flask 应用
@@ -30,21 +23,16 @@ app = Flask(__name__)
 """
 /ping - Ping-pong
 """
-
-
 @app.route("/ping", methods=["POST", "GET"])
 def ping():
     logger.info("Received Ping.")
     return build_message(message="Pong")
-
 
 """
 /register - 注册账号
 请求 - POST {"username": "Username", "passwordHash": "password"}（哈希密码）
 响应 - 成功：返回 200，失败：USERNAME_ALREADY_EXIST 用户名已注册
 """
-
-
 @app.route("/register", methods=["POST"])
 @json_required
 def register():
@@ -57,19 +45,12 @@ def register():
     with SQLiteConnection() as (conn, cursor):
         # 检查用户名是否已存在
         query = "SELECT username FROM user WHERE username = ?"
-        params = (username,)
+        params = (username, )
         cursor.execute(query, params)
 
         if cursor.fetchone():
-            logger.info(
-                f'User "{username}" register fail, reason: USERNAME_ALREADY_EXIST.'
-            )
-            return build_message(
-                code=409,
-                success=False,
-                err_code="USERNAME_ALREADY_EXIST",
-                err_description=f'The username "{username}" has already registered.',
-            )
+            logger.info(f"User \"{username}\" register fail, reason: USERNAME_ALREADY_EXIST.")
+            return build_message(code=409, success=False, err_code="USERNAME_ALREADY_EXIST", err_description=f"The username \"{username}\" has already registered.")
 
         # 插入用户数据
         query = "INSERT INTO user (username, password_hash) VALUES (?, ?)"
@@ -77,7 +58,7 @@ def register():
         cursor.execute(query, params)
         conn.commit()
 
-    logger.info(f'User "{username}" register success.')
+    logger.info(f"User \"{username}\" register success.")
     return build_message(message="Register success")
 
 
@@ -86,8 +67,6 @@ def register():
 请求 - POST {"username": "Username", "passwordHash": "password"}（哈希密码）
 响应 - 成功：返回 200 和登录 Token（字符串），失败：INVALID_USERNAME_OR_PASSWORD 无效的用户名或密码
 """
-
-
 @app.route("/login", methods=["POST"])
 @json_required
 def login():
@@ -100,7 +79,7 @@ def login():
     # 验证密码
     with SQLiteConnection() as (conn, cursor):
         query = "SELECT id, password_hash FROM user WHERE username = ?"
-        params = (username,)
+        params = (username, )
         cursor.execute(query, params)
         result = cursor.fetchone()
 
@@ -110,21 +89,18 @@ def login():
             user_id = result[0]
             token = new_token(user_id, username)
             data = {"token": token}
-            logger.info(f'User "{username}" login success.')
+            logger.info(f"User \"{username}\" login success.")
             return build_message(message="Login success.", data=data)
         else:
             fail_reason = "password is incorrect."
     else:
         fail_reason = "username not exist."
-
-    logger.info(f'User "{username}" login failed, reason: {fail_reason}')
-    return build_message(
-        code=401,
-        success=False,
-        err_code="INVALID_USERNAME_OR_PASSWORD",  # 为保安全，服务端不返回具体失败原因
-        err_description="Invalid username or password.",
-    )
-
+    
+    logger.info(f"User \"{username}\" login failed, reason: {fail_reason}")
+    return build_message(code=401,
+                         success=False,
+                         err_code="INVALID_USERNAME_OR_PASSWORD",   # 为保安全，服务端不返回具体失败原因
+                         err_description="Invalid username or password.")
 
 # ----------------------------------------------------------
 # 以下请求需要在 Headers 中添加 Authorization: token 参数，
@@ -136,55 +112,36 @@ def login():
 请求：null
 响应 - 成功：返回 200，失败：INVALID_TOKEN 无效的 Token（客户端无论如何都应该登出）
 """
-
-
-@app.route(
-    "/logout", methods=["POST"]
-)  # 不使用 @token_required 以手动处理 Token 失效情形
+@app.route("/logout", methods=["POST"]) # 不使用 @token_required 以手动处理 Token 失效情形
 def logout():
     token = request.headers.get("Authorization", None)
     logger.info(f"Received /logout request.")
 
     if not token:
-        return build_message(
-            code=401,
-            success=False,
-            err_code="TOKEN_REQUIRED",
-            err_description="Authorization token must included in the request.",
-        )
+        return build_message(code=401, success=False, err_code="TOKEN_REQUIRED", err_description="Authorization token must included in the request.")
 
     _, invalid_reason = validate_token(token)
 
     if invalid_reason:
         logger.info(f"User logout failed, reason: token is invalid or already expired.")
-        return build_message(
-            code=410,
-            success=False,
-            err_code="INVALID_TOKEN",
-            err_description="Token is invalid or expired.",
-        )
+        return build_message(code=410, success=False, err_code="INVALID_TOKEN", err_description="Token is invalid or expired.")
     else:
         invalidate_token(token)
         logger.info(f"User logout success.")
         return build_message(message="Logout success.")
-
 
 """
 /checkToken - 检测 Token 有效性
 请求：null
 响应 - 成功：返回 200，失败：INVALID_TOKEN 无效的 TOKEN
 """
-
-
 @app.route("/checkToken", methods=["GET"])
 @token_required
 def check_token(user_id):
     token = request.headers.get("Authorization", None)
     logger.info(f"Received /checkToken request: {token}")
     # 失效 Token 检测由 @token_required 实现
-    logger.info(
-        f'User ID {user_id}\'s token "{token}" is valid, and expire time updated.'
-    )
+    logger.info(f"User ID {user_id}'s token \"{token}\" is valid, and expire time updated.")
     return build_message(message="Token is valid.")
 
 
@@ -204,8 +161,6 @@ def check_token(user_id):
 }
 响应 - 成功：返回 200，失败：ADD_MEDICATION_ERROR 药品添加失败
 """
-
-
 @app.route("/addMedication", methods=["POST"])
 @token_required
 @json_required
@@ -284,8 +239,6 @@ def add_medication(user_id):
 }
 响应 - 成功：返回 200 和用药时间，或 204 无用药时间
 """
-
-
 @app.route("/getMedicationTimes", methods=["POST"])
 @token_required
 @json_required
@@ -335,8 +288,6 @@ def get_medication_times(user_id):
 请求：{"date": "2024-12-16"}
 响应 - 成功：返回 200 和用药的 ID，或 204 无用药记录
 """
-
-
 @app.route("/getMedicationRecords", methods=["POST"])
 @token_required
 @json_required
@@ -358,16 +309,12 @@ def get_medication_records(user_id):
         medications = cursor.fetchall()
 
         if not medications:
-            logger.warning(
-                f"No medication record data found for user {user_id} for medicin on {date}"
-            )
+            logger.warning(f"No medication record data found for user {user_id} for medicin on {date}")
             return build_message(code=204)
 
         medic_list = [row[0] for row in medications]
         conn.commit()
-    logger.info(
-        f"Successfully found medication time data for user {user_id} on {date}: {medic_list}."
-    )
+    logger.info(f"Successfully found medication time data for user {user_id} on {date}: {medic_list}.")
     return build_message(message="Successfully get medication data", data=medic_list)
 
 
@@ -376,8 +323,6 @@ def get_medication_records(user_id):
 请求：{"medicationId": 0}
 响应 - 成功：返回 200 和用药信息，失败：MEDICATION_NOT_FOUND 未找到药物
 """
-
-
 @app.route("/getMedicationInfo", methods=["POST"])
 @token_required
 @json_required
@@ -401,12 +346,7 @@ def get_medication_info(user_id):
 
         if not result:
             logger.warning(f"No medication found of ID {medication_id}.")
-            return build_message(
-                err_description=f"No medication data found about the medication {medication_id}",
-                err_code="MEDICATION_NOT_FOUND",
-                code=404,
-                success=False,
-            )
+            return build_message(err_description=f"No medication data found about the medication {medication_id}",err_code="MEDICATION_NOT_FOUND", code=404, success=False)
 
         medication_info = {
             "medication_id": result[0],
@@ -420,21 +360,15 @@ def get_medication_info(user_id):
             "expiration_date": result[8],
         }
         conn.commit()
-    logger.info(
-        f"Successfully found medication data of ID {medication_id}: {medication_info}"
-    )
-    return build_message(
-        message="Successfully get medication data.", data=medication_info, code=200
-    )
+    logger.info(f"Successfully found medication data of ID {medication_id}: {medication_info}")
+    return build_message(message="Successfully get medication data.", data=medication_info, code=200)
 
 
 """
 /getAllOnDate - 根据用户日期获取在这个日期下的全部药物信息
-请求：{"date": "2024-12-16"}
+请求：GET {"date": "2024-12-16"}
 响应 - 成功：返回 200 和全部药物信息，或 204 未找到该日期下的信息
 """
-
-
 @app.route("/getAllOnDate", methods=["POST"])
 @json_required
 @token_required
@@ -512,12 +446,8 @@ def get_all_on_date(user_id):
             results.append(medicationInfo)
         conn.commit()
 
-    logger.info(
-        f"Successfully get all medication data for user {user_id} on date {date}: {results}"
-    )
-    return build_message(
-        message=f"Successfully get all medication data on date {date}", data=results
-    )
+    logger.info(f"Successfully get all medication data for user {user_id} on date {date}: {results}")
+    return build_message(message=f"Successfully get all medication data on date {date}", data=results)
 
 
 """
@@ -525,10 +455,7 @@ def get_all_on_date(user_id):
 请求：{"date": "2024-12-16", "medicationId": 1}
 响应 - 成功：返回 200，失败：RECORD_NOT_FOUND 未找到用药信息，INTERNAL_SERVER_ERROR 服务器内部错误
 """
-
-
 @app.route("/deleteMedicationRecord", methods=["POST"])
-@json_required
 @token_required
 def delete_record(user_id):
     data = request.get_json()
@@ -549,27 +476,11 @@ def delete_record(user_id):
             )
             conn.commit()
             if cursor.rowcount > 0:
-                logger.info(
-                    f"Successfully delete record {medication_id} on date {date}"
-                )
+                logger.info(f"Successfully delete record {medication_id} on date {date}")
                 return build_message(message="Successfully deleted record.")
             else:
-                logger.info(
-                    f"Falied to delete record {medication_id} on date {date}: record not found"
-                )
-                return build_message(
-                    err_code="RECORD_NOT_FOUND",
-                    err_description=f"Record {medication_id} not found on date {date}",
-                    code=404,
-                    success=False,
-                )
+                logger.info(f"Falied to delete record {medication_id} on date {date}: record not found")
+                return build_message(err_code="RECORD_NOT_FOUND", err_description=f"Record {medication_id} not found on date {date}", code=404, success=False)
     except Exception as e:
-        logger.error(
-            f"An error occurred while deleting records {medication_id} on {date}: {format_exc()}"
-        )
-        return build_message(
-            err_code="INTERNAL_SERVER_ERROR",
-            err_descriptin=f"An error occurred while trying to process",
-            code=500,
-            success=False,
-        )
+        logger.error(f"An error occurred while deleting records {medication_id} on {date}: {format_exc()}")
+        return build_message(err_code="INTERNAL_SERVER_ERROR",err_descriptin=f"An error occurred while trying to process", code=500, success=False)
