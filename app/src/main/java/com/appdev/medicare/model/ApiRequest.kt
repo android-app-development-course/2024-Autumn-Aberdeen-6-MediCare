@@ -41,6 +41,6 @@ data class GetAllOnDateRequest(
 )
 
 data class DeleteMedicationRecordRequest(
-    val dare: String,
+    val date: String,
     val medicationId: Int
 )

@@ -3,11 +3,13 @@ package com.appdev.medicare
 import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.AttributeSet
 import android.view.Gravity
 import android.view.View
 import android.widget.*
@@ -32,10 +34,8 @@ class AddMedActivity : AppCompatActivity() {
     private lateinit var editTextMedicalRecord: EditText
     private lateinit var editTextDosage: EditText
     private lateinit var editTextRemainingAmount: EditText
-    private lateinit var editTextDailyIntakeFrequency: EditText
-    private lateinit var editTextIntakeIntervalDays: EditText
 
-    private var dailyIntakeFrequency: Int? = null
+    private var dailyIntakeFrequency: Int = 3
     private var selectedTimes: MutableMap<Int, String> = mutableMapOf()
 
     private lateinit var checkBox1: CheckBox
@@ -72,9 +72,6 @@ class AddMedActivity : AppCompatActivity() {
         editTextDosage = findViewById(R.id.editTextDosage)
         editTextRemainingAmount = findViewById(R.id.editTextRemainingAmount)
 
-        editTextDailyIntakeFrequency = findViewById(R.id.editTextDailyIntakeFrequency)
-        editTextIntakeIntervalDays = findViewById(R.id.editTextIntakeIntervalDays)
-
         checkBox1 = findViewById(R.id.checkBoxMonday)
         checkBox2 = findViewById(R.id.checkBoxTuesday)
         checkBox3 = findViewById(R.id.checkBoxWednesday)
@@ -94,6 +91,8 @@ class AddMedActivity : AppCompatActivity() {
         editTextExpiryDate = findViewById(R.id.editTextExpiryDate)
         buttonSaveMedication = findViewById(R.id.buttonSaveMedication)
         buttonBackMain = findViewById(R.id.buttonBackMain)
+
+        showIntakeTimes(3, true)
 
         // 锁定当天的星期，全部星期栏禁用
         val mode = intent.getBooleanExtra("mode", false)
@@ -167,17 +166,15 @@ class AddMedActivity : AppCompatActivity() {
             val medicalRecord = editTextMedicalRecord.text.toString()
             val dosage = editTextDosage.text.toString()
             val remainingAmount = editTextRemainingAmount.text.toString()
-            val dailyIntakeFrequency = dailyIntakeFrequency
+
             var dailyIntakeTimes: MutableList<String> = mutableListOf()
-            val intakeIntervalDays = editTextIntakeIntervalDays.text.toString()
             var reminderMode: String? = null
             var weekMode: String? = null
             val expiryDate = editTextExpiryDate.text.toString()
 
             // Validate data input
             if (medicationName.isBlank() || patientName.isBlank() || dosage.isBlank() ||
-                remainingAmount.isBlank() || dailyIntakeFrequency == null || selectedTimes.isEmpty() ||
-                intakeIntervalDays.isBlank() || expiryDate.isBlank()) {
+                remainingAmount.isBlank() || selectedTimes.size != dailyIntakeFrequency || expiryDate.isBlank()) {
                 Toast.makeText(
                     this,
                     "请填写所有药品信息",
@@ -212,7 +209,7 @@ class AddMedActivity : AppCompatActivity() {
                                 Toast.LENGTH_SHORT
                             ).show()
                             val medicationID = (response.body()!!.data as? JsonValue.JsonNumber)?.value!!.toInt()
-                            medicationData = MedicationData(medicationID, medicationName, patientName, dosage, remainingAmount.toInt(), dailyIntakeFrequency.toInt(), dailyIntakeTimes, weekMode, reminderMode, formattedExpiryDate)
+                            medicationData = MedicationData(medicationID, medicationName, patientName, dosage, remainingAmount.toInt(), dailyIntakeFrequency!!.toInt(), dailyIntakeTimes, weekMode, reminderMode, formattedExpiryDate)
                             val intent = Intent()
                             intent.putExtra("MEDICATION_DATA", medicationData)
                             setResult(RESULT_OK, intent)
@@ -232,6 +229,73 @@ class AddMedActivity : AppCompatActivity() {
             }
         }
     }
+    fun showIntakeTimes(selectedNumber: Int, defaultFlag: Boolean) {
+        val timeSelectionLayout = findViewById<LinearLayout>(R.id.timeSelectionLayout)
+        dailyIntakeFrequency = selectedNumber
+        timeSelectionLayout.removeAllViews()
+        selectedTimes.clear()
+
+        if(defaultFlag) {
+            selectedTimes[0] = "08:30"
+            selectedTimes[1] = "12:30"
+            selectedTimes[2] = "19:30"
+        }
+
+        for (i in 1..selectedNumber) {
+            val rowLayout = LinearLayout(this)
+            rowLayout.orientation = LinearLayout.HORIZONTAL
+            val rowLayoutParams = LinearLayout.LayoutParams(
+                (resources.displayMetrics.widthPixels * 4 / 5), // 设置宽度为屏幕的 4/5
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            rowLayout.layoutParams = rowLayoutParams
+            for (j in 0 until selectedNumber) {
+                val index = (i - 1) * 3 + j
+                if (index < selectedNumber) {
+                    val timeButton = android.widget.Button(this)
+                    timeButton.apply {
+                        val defaultTimeText = when (index) {
+                            0 -> "08:30"
+                            1 -> "12:30"
+                            2 -> "19:30"
+                            else -> ""
+                        }
+                        if (defaultFlag)
+                            text = defaultTimeText
+                        else
+                            text =  ("选择时间 ${index+1}")
+                        setTextColor(Color.parseColor("#000000")) // 按钮文字颜色
+                        setBackgroundResource(R.drawable.rounded_blue_background) // 使用自定义背景
+                        textSize = 16f
+                        gravity = Gravity.CENTER
+                    }
+
+                    val fixedWidth =
+                        ((resources.displayMetrics.widthPixels * 4 / 5 - 80) / 3) - 30.toInt()
+                    val buttonParams = LinearLayout.LayoutParams(
+                        fixedWidth,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    )
+//                        buttonParams.setMargins(20, 0, 20, 2)
+                    buttonParams.setMargins(18, 8, 18, 8) // 更均匀的间距
+                    timeButton.layoutParams = buttonParams
+
+                    val rowLayoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT, // 父布局宽度匹配屏幕
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    )
+                    rowLayoutParams.setMargins(0, 16, 0, 16) // 每一行的上下间距
+                    rowLayout.layoutParams = rowLayoutParams
+
+                    timeButton.setOnClickListener {
+                        showTimePicker(timeButton, index)
+                    }
+                    rowLayout.addView(timeButton)
+                }
+            }
+            timeSelectionLayout.addView(rowLayout)
+        }
+    }
 
     fun showDailyIntakeList(view: View) {
         val items = arrayOf("1", "2", "3", "4", "5", "6", "7", "8", "9")
@@ -239,57 +303,7 @@ class AddMedActivity : AppCompatActivity() {
         builder.setTitle("选择每日服用次数")
         builder.setItems(items) { dialog, which ->
             val selectedNumber = items[which].toInt()
-            val timeSelectionLayout = findViewById<LinearLayout>(R.id.timeSelectionLayout)
-            // 获取选择天数
-            dailyIntakeFrequency = selectedNumber
-            timeSelectionLayout.removeAllViews()
-            selectedTimes.clear()
-
-            for (i in 1..selectedNumber) {
-                val rowLayout = LinearLayout(this)
-                rowLayout.orientation = LinearLayout.HORIZONTAL
-                val rowLayoutParams = LinearLayout.LayoutParams(
-                    (resources.displayMetrics.widthPixels * 4 / 5), // 设置宽度为屏幕的 4/5
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-                )
-                rowLayout.layoutParams = rowLayoutParams
-                for (j in 0 until 3) {
-                    val index = (i - 1) * 3 + j
-                    if (index < selectedNumber) {
-                        val timeButton = android.widget.Button(this)
-                        timeButton.apply {
-                            text = "选择时间 $index"
-                            setTextColor(Color.parseColor("#000000")) // 按钮文字颜色
-                            setBackgroundResource(R.drawable.rounded_blue_background) // 使用自定义背景
-                            textSize = 16f
-                            gravity = Gravity.CENTER
-                        }
-
-                        val fixedWidth =
-                            ((resources.displayMetrics.widthPixels * 4 / 5 - 80) / 3) - 30.toInt()
-                        val buttonParams = LinearLayout.LayoutParams(
-                            fixedWidth,
-                            LinearLayout.LayoutParams.WRAP_CONTENT
-                        )
-//                        buttonParams.setMargins(20, 0, 20, 2)
-                        buttonParams.setMargins(18, 8, 18, 8) // 更均匀的间距
-                        timeButton.layoutParams = buttonParams
-
-                        val rowLayoutParams = LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.MATCH_PARENT, // 父布局宽度匹配屏幕
-                            LinearLayout.LayoutParams.WRAP_CONTENT
-                        )
-                        rowLayoutParams.setMargins(0, 16, 0, 16) // 每一行的上下间距
-                        rowLayout.layoutParams = rowLayoutParams
-
-                        timeButton.setOnClickListener {
-                            showTimePicker(timeButton, index)
-                        }
-                        rowLayout.addView(timeButton)
-                    }
-                }
-                timeSelectionLayout.addView(rowLayout)
-            }
+            showIntakeTimes(selectedNumber, false)
         }
         builder.show()
     }

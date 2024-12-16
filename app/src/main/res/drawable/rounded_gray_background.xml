@@ -1,5 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="@color/theme_light_gray" />
-    <corners android:radius="8dp" />
-</shape>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 边 -->
+    <item>
+        <shape android:shape="rectangle">
+            <padding
+                android:bottom="0.8dp"
+                android:left="0dp"
+                android:right="1dp"
+                android:top="0.8dp" />
+            <solid android:color="#18000000" />
+            <corners android:radius="8.5dp" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <padding
+                android:bottom="0.8dp"
+                android:left="0dp"
+                android:right="1dp"
+                android:top="0.8dp" />
+            <solid android:color="#19000000" />
+            <corners android:radius="8.5dp" />
+        </shape>
+    </item>
+
+    <!-- 中心背景 -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/theme_light_gray" />
+            <corners android:radius="8dp" />
+        </shape>
+    </item>
+</layer-list>

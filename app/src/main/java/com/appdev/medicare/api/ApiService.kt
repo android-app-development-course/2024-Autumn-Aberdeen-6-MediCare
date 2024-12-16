@@ -28,18 +28,18 @@ interface ApiService {
     @POST("addMedication")
     fun addMedication(@Body body: AddMedicationRequest): Call<ApiResponse>
 
-    @GET("getMedicationTimes")
+    @POST("getMedicationTimes")
     fun getMedicationTimes(@Body body: GetMedicationTimesRequest): Call<ApiResponse>
 
-    @GET("getMedicationRecords")
+    @POST("getMedicationRecords")
     fun getMedicationRecords(@Body body: GetMedicationRecordsRequest): Call<ApiResponse>
 
-    @GET("getMedicationInfo")
+    @POST("getMedicationInfo")
     fun getMedicationInfo(@Body body: GetMedicationInfoRequest): Call<ApiResponse>
 
-    @GET("getAllOnDate")
+    @POST("getAllOnDate")
     fun getAllOnDate(@Body body: GetAllOnDateRequest): Call<ApiResponse>
 
-    @DELETE("deleteMedicationRecord")
+    @POST("deleteMedicationRecord")
     fun deleteMedicationRecord(@Body body: DeleteMedicationRecordRequest): Call<ApiResponse>
 }
