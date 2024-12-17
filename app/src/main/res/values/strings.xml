@@ -19,4 +19,6 @@
     <string name="serverBaseUrl">Server base URL Setting</string>
     <string name="serverBaseUrlDes">Set the base URL of the server, restart app to take effect:</string>
     <string name="restartToTakeEffect">Restart the app to take effect.</string>
+    <string name="logout">Logout</string>
+    <string name="confirmLogout">Log out from MediCare?</string>
 </resources>
