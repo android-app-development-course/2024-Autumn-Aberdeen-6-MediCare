@@ -19,8 +19,8 @@ interface MedicationTimeDao {
     fun findByMedicationAndDateId(medicationId: Int, dateId: Int): List<MedicationTime>
 
     @Insert
-    fun insertOne(vararg medications: MedicationTime): Long
+    fun insertOne(vararg medicationTime: MedicationTime): Long
 
-    @Delete
-    fun delete(medication: MedicationTime)
+    @Query("UPDATE medication_time SET sync_status = 'deleted' WHERE id = :id")
+    fun softDeleteById(id: Int)
 }

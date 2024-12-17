@@ -21,8 +21,8 @@ interface CalendarMedicationDao {
     fun findId(medicationId: Int, date:String): List<Int>
 
     @Insert
-    fun insertOne(vararg calendarMedications: CalendarMedication): Long
+    fun insertOne(vararg calendarMedication: CalendarMedication): Long
 
-    @Delete
-    fun delete(calendarMedication: CalendarMedication)
+    @Query("UPDATE calendar_medication SET sync_status = 'deleted' WHERE id = :id")
+    fun softDeleteById(id: Int)
 }
