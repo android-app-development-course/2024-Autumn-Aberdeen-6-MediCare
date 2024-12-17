@@ -16,6 +16,9 @@ interface MedicationDao {
     @Query("SELECT id FROM medication WHERE uuid = :uuid LIMIT 1")
     fun findIdByUuid(uuid: String): Int
 
+    @Query("SELECT uuid FROM medication WHERE id = :id LIMIT 1")
+    fun findUuidById(id: Int): String
+
     @Insert
 //    fun insertOne(vararg medications: Medication): Long
     fun insertOne(medication: Medication): Long

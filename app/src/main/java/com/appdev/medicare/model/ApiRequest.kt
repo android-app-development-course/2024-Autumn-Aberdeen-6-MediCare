@@ -44,3 +44,15 @@ data class DeleteMedicationRecordRequest(
     val date: String,
     val medicationId: Int
 )
+
+data class InsertMedicationDataRequest(
+    val medicationTime: List<Map<String, JsonValue>>
+)
+
+data class InsertCalendarMedicationDataRequest(
+    val calendarMedication: List<Map<String, JsonValue>>
+)
+
+data class InsertMedicationTimeDataRequest(
+    val medicationTime: List<Map<String, JsonValue>>
+)

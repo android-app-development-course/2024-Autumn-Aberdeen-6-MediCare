@@ -3,7 +3,11 @@ package com.appdev.medicare.utils
 import android.content.Context
 import android.util.Log
 import com.appdev.medicare.api.RetrofitClient
+import com.appdev.medicare.model.InsertCalendarMedicationDataRequest
+import com.appdev.medicare.model.InsertMedicationDataRequest
+import com.appdev.medicare.model.InsertMedicationTimeDataRequest
 import com.appdev.medicare.model.JsonValue
+import com.appdev.medicare.room.AppDatabase
 import com.appdev.medicare.room.DatabaseBuilder
 import com.appdev.medicare.room.entity.CalendarMedication
 import com.appdev.medicare.room.entity.Medication
@@ -14,14 +18,31 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 interface DatabaseSync {
-    suspend fun getAllDataFromServer() {
-        getMedicationDataFromServer()
-        getCalendarMedicationDataFromServer()
-        getMedicationTimeDataFromServer()
+    suspend fun overwriteAllDataFromServer() {
+        val appDatabase = DatabaseBuilder.getInstance()
+        // 删除本地数据并重新从服务器获取
+        appDatabase.clearAllTables()
+        getMedicationDataFromServer(appDatabase)
+        getCalendarMedicationDataFromServer(appDatabase)
+        getMedicationTimeDataFromServer(appDatabase)
     }
 
-    suspend fun getMedicationDataFromServer() {
+    suspend fun overwriteAllDataToServer() {
+        // 删除服务器数据并重新从本地上传
         val appDatabase = DatabaseBuilder.getInstance()
+        val response = withContext(Dispatchers.IO) {
+            RetrofitClient.api.clearData().execute()
+        }
+
+        if (response.isSuccessful) {
+            Log.i("DatabaseSync", "Successfully cleared data in server.")
+            insertMedicationDataToServer(appDatabase)
+            insertCalendarMedicationDataToServer(appDatabase)
+            insertMedicationTimeDataToServer(appDatabase)
+        }
+    }
+
+    private suspend fun getMedicationDataFromServer(appDatabase: AppDatabase) {
         val response = withContext(Dispatchers.IO) {
             RetrofitClient.api.getMedicationData().execute()
         }
@@ -55,8 +76,7 @@ interface DatabaseSync {
         }
     }
 
-    suspend fun getCalendarMedicationDataFromServer() {
-        val appDatabase = DatabaseBuilder.getInstance()
+    private suspend fun getCalendarMedicationDataFromServer(appDatabase: AppDatabase) {
         val response = withContext(Dispatchers.IO) {
             RetrofitClient.api.getCalendarMedicationData().execute()
         }
@@ -85,8 +105,7 @@ interface DatabaseSync {
         }
     }
 
-    suspend fun getMedicationTimeDataFromServer() {
-        val appDatabase = DatabaseBuilder.getInstance()
+    private suspend fun getMedicationTimeDataFromServer(appDatabase: AppDatabase) {
         val response = withContext(Dispatchers.IO) {
             RetrofitClient.api.getMedicationTimeData().execute()
         }
@@ -117,8 +136,87 @@ interface DatabaseSync {
         }
     }
 
+    private suspend fun insertMedicationDataToServer(appDatabase: AppDatabase) {
+        val medications = appDatabase.medicationDao().getAll()
+        val medicationList: MutableList<Map<String, JsonValue>> = mutableListOf()
+
+        for (item in medications) {
+            val medicationData = mapOf<String, JsonValue>(
+                "uuid" to JsonValue.JsonString(item.uuid),
+                "medicationName" to JsonValue.JsonString(item.medicationName),
+                "patientName" to JsonValue.JsonString(item.patientName),
+                "dosage" to JsonValue.JsonString(item.dosage),
+                "remainingAmount" to JsonValue.JsonString(item.remainingAmount),
+                "frequency" to JsonValue.JsonString(item.frequency),
+                "weekMode" to JsonValue.JsonString(item.weekMode),
+                "reminderType" to JsonValue.JsonString(item.reminderType),
+                "expirationDate" to JsonValue.JsonString(item.expirationDate)
+            )
+            medicationList.add(medicationData)
+        }
+
+        val insertMedicationDataRequest = InsertMedicationDataRequest(medicationList)
+        val response = withContext(Dispatchers.IO) {
+            RetrofitClient.api.insertMedicationData(insertMedicationDataRequest).execute()
+        }
+
+        if (response.isSuccessful) {
+            Log.i("DatabaseSync", "Successfully inserted data to server.")
+        }
+    }
+
+    private suspend fun insertCalendarMedicationDataToServer(appDatabase: AppDatabase) {
+        val calendarMedications = appDatabase.calendarMedicationDao().getAll()
+        val calendarMedicationList: MutableList<Map<String, JsonValue>> = mutableListOf()
+
+        for (item in calendarMedications) {
+            val medicationUuid = appDatabase.medicationDao().findUuidById(item.medicationId)
+            val calendarMedicationData = mapOf<String, JsonValue>(
+                "uuid" to JsonValue.JsonString(item.uuid),
+                "medicationUuid" to JsonValue.JsonString(medicationUuid),
+                "date" to JsonValue.JsonString(item.date)
+            )
+            calendarMedicationList.add(calendarMedicationData)
+        }
+
+        val insertCalendarMedicationDataRequest = InsertCalendarMedicationDataRequest(calendarMedicationList)
+        val response = withContext(Dispatchers.IO) {
+            RetrofitClient.api.insertCalendarMedicationData(insertCalendarMedicationDataRequest).execute()
+        }
+
+        if (response.isSuccessful) {
+            Log.i("DatabaseSync", "Successfully inserted data to server.")
+        }
+    }
+
+    private suspend fun insertMedicationTimeDataToServer(appDatabase: AppDatabase) {
+        val medicationTimes = appDatabase.medicationTimeDao().getAll()
+        val medicationTimeList: MutableList<Map<String, JsonValue>> = mutableListOf()
+
+        for (item in medicationTimes) {
+            val medicationUuid = appDatabase.medicationDao().findUuidById(item.medicationId)
+            val dateUuid = appDatabase.calendarMedicationDao().findUuidById(item.dateId)
+            val medicationTimeData = mapOf<String, JsonValue>(
+                "uuid" to JsonValue.JsonString(item.uuid),
+                "medicationUuid" to JsonValue.JsonString(medicationUuid),
+                "dateUuid" to JsonValue.JsonString(dateUuid),
+                "status" to JsonValue.JsonNumber(item.status),
+                "time" to JsonValue.JsonString(item.time)
+            )
+            medicationTimeList.add(medicationTimeData)
+        }
+
+        val insertMedicationTimeDataRequest = InsertMedicationTimeDataRequest(medicationTimeList)
+        val response = withContext(Dispatchers.IO) {
+            RetrofitClient.api.insertMedicationTimeData(insertMedicationTimeDataRequest).execute()
+        }
+
+        if (response.isSuccessful) {
+            Log.i("DatabaseSync", "Successfully inserted data to server.")
+        }
+    }
+
     suspend fun checkUpdate(context: Context) {
-        val appDatabase = DatabaseBuilder.getInstance()
         val preferences = context.getSharedPreferences("MediCare", Context.MODE_PRIVATE)
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HHH:mm:ss")
         val clientLastUpdate = LocalDateTime.parse(preferences.getString("dataLastUpdate", "1970-01-01 00:00:00") as String, formatter)
@@ -133,16 +231,16 @@ interface DatabaseSync {
 
             if (serverLastUpdate > clientLastUpdate) {
                 // 服务器数据比本地数据新
-                // 删除本地服务器数据并重新从云端获取
-                appDatabase.clearAllTables()
-                getAllDataFromServer()
+                overwriteAllDataFromServer()
                 val editor = preferences.edit()
                 editor.putString("dataLastUpdate", data["lastUpdateTime"].toString())
                 editor.apply()
                 Log.i("DatabaseSync", "Successfully synced data from server.")
             } else if (serverLastUpdate < clientLastUpdate) {
                 // 本地数据比服务器数据新
-                // TODO: 将本地数据更新至服务器
+                overwriteAllDataToServer()
+                // TODO: 更新 dataLastUpdatePref
+                Log.i("DatabaseSync", "Successfully synced data to server.")
             } else {
                 Log.i("DatabaseSync", "All data up to date.")
             }

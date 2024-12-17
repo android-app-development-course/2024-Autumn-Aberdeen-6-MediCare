@@ -22,6 +22,9 @@ interface CalendarMedicationDao {
     @Query("SELECT id FROM calendar_medication WHERE uuid = :uuid LIMIT 1")
     fun findIdByUuid(uuid: String): Int
 
+    @Query("SELECT uuid FROM calendar_medication WHERE id = :id LIMIT 1")
+    fun findUuidById(id: Int): String
+
     @Insert
 //    fun insertOne(vararg calendarMedications: CalendarMedication): Long
     fun insertOne(calendarMedication: CalendarMedication): Long
