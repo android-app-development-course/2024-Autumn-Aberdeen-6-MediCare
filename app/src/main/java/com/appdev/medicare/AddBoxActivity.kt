@@ -64,7 +64,12 @@ class AddBoxActivity : AppCompatActivity() {
         }
 
         buttonSaveBox.setOnClickListener {
-            // 定义函数
+            val boxName = textBoxName.text
+            val boxType = textBoxType.text
+            val applicablePeople = textApplicablePeople.text
+            val remark = textRemark.text
+
+
             finish()
         }
     }

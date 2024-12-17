@@ -38,7 +38,7 @@ class BoxFragment : Fragment() {
 
         defaultMedicineSet = mutableListOf()
 
-        defaultMedicineBox = MedicineBox(1,"小孩感冒", "家庭", defaultMedicineSet,"","")
+        defaultMedicineBox = MedicineBox(1,"小孩感冒", "家庭", "",defaultMedicineSet,"","")
 
         buttonAddBox = binding.buttonAddBox
         recyclerViewBox = binding.recyclerViewBox
@@ -84,10 +84,10 @@ class BoxFragment : Fragment() {
     }
 
     private fun getMedicineBoxFromDB(): List<MedicineBox> {
-        val record1 = MedicineBox(1,"药箱1", "病号1", defaultMedicineSet,"","")
-        val record2 = MedicineBox(2,"药箱2", "病号2", defaultMedicineSet,"","")
-        val record3 = MedicineBox(3,"药箱1", "病号1", defaultMedicineSet,"","")
-        val record4 = MedicineBox(4,"药箱2", "病号2", defaultMedicineSet,"","")
+        val record1 = MedicineBox(1,"药箱1", "病号1", "",defaultMedicineSet,"","")
+        val record2 = MedicineBox(2,"药箱2", "病号2", "",defaultMedicineSet,"","")
+        val record3 = MedicineBox(3,"药箱1", "病号1", "",defaultMedicineSet,"","")
+        val record4 = MedicineBox(4,"药箱2", "病号2", "",defaultMedicineSet,"","")
         return listOf(record1, record2, record3, record4)
     }
 
