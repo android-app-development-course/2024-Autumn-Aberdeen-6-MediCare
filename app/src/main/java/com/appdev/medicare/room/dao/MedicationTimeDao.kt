@@ -22,6 +22,6 @@ interface MedicationTimeDao {
 //    fun insertOne(vararg medications: MedicationTime): Long
     fun insertOne(medication: MedicationTime): Long
 
-    @Delete
-    fun delete(medication: MedicationTime)
+    @Query("UPDATE medication_time SET sync_status = 'deleted' WHERE id = :id")
+    fun softDeleteById(id: Int)
 }
