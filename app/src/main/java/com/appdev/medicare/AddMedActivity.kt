@@ -203,7 +203,7 @@ class AddMedActivity : AppCompatActivity() {
                                 medicationName = medicationName,
                                 patientName = patientName,
                                 dosage = dosage,
-                                remainingAmount = remainingAmount.toInt(),
+                                remainingAmount = remainingAmount,
                                 frequency = dailyIntakeFrequency.toString(),
                                 weekMode = weekMode,
                                 reminderType = reminderMode,
@@ -235,7 +235,7 @@ class AddMedActivity : AppCompatActivity() {
 
                 }
                 if (addSuccessful) {
-                    medicationData = MedicationData(medicationId, medicationName, patientName, dosage, remainingAmount.toInt(), dailyIntakeFrequency!!.toInt(), dailyIntakeTimes, weekMode, reminderMode, formattedExpiryDate)
+                    medicationData = MedicationData(medicationId, medicationName, patientName, dosage, remainingAmount, dailyIntakeFrequency.toString(), dailyIntakeTimes, weekMode, reminderMode, formattedExpiryDate)
                     val intent = Intent()
                     intent.putExtra("MEDICATION_DATA", medicationData)
                     setResult(RESULT_OK, intent)

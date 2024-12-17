@@ -10,7 +10,7 @@ data class MedicationData(
     var patientName: String,
     var dosage: String,
     var remainingAmount: String,
-    var dailyIntakeFrequency: Int,
+    var dailyIntakeFrequency: String,
     var dailyIntakeTimes: MutableList<String>,
     var weekMode: String,
     var reminderMode: String,
@@ -23,7 +23,7 @@ data class MedicationData(
         parcel.readString()!!,
         parcel.readString()!!,
         parcel.readString()!!,
-        parcel.readInt(),
+        parcel.readString()!!,
         mutableListOf<String>().apply {
             parcel.readStringList(this)
         },
@@ -38,7 +38,7 @@ data class MedicationData(
         parcel.writeString(patientName)
         parcel.writeString(dosage)
         parcel.writeString(remainingAmount)
-        parcel.writeInt(dailyIntakeFrequency)
+        parcel.writeString(dailyIntakeFrequency)
         parcel.writeStringList(dailyIntakeTimes)
         parcel.writeString(weekMode)
         parcel.writeString(reminderMode)
@@ -62,7 +62,7 @@ data class MedicationData(
     override fun toString(): String {
         return String.format(
             Locale.getDefault(),
-            "Id: %d, Medication: %s, Patient: %s, Dosage: %s, Remaining: %s, Frequency: %d, Times: %s, Week Mode: %s, Reminder Mode: %s, Expiry: %s",
+            "Id: %d, Medication: %s, Patient: %s, Dosage: %s, Remaining: %s, Frequency: %s, Times: %s, Week Mode: %s, Reminder Mode: %s, Expiry: %s",
             medicationID,
             medicationName,
             patientName,

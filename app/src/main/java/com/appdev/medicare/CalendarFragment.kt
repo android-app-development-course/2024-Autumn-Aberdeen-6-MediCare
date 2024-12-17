@@ -30,13 +30,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.room.Database
-import com.appdev.medicare.api.RetrofitClient
 import com.appdev.medicare.model.DateItem
 import com.appdev.medicare.model.MedicationData
 import com.appdev.medicare.databinding.FragmentCalendarBinding
-import com.appdev.medicare.model.DeleteMedicationRecordRequest
-import com.appdev.medicare.model.GetAllOnDateRequest
 import com.appdev.medicare.model.JsonValue
 import com.appdev.medicare.receiver.NotificationReceiver
 import com.appdev.medicare.room.AppDatabase
@@ -44,10 +40,10 @@ import com.appdev.medicare.room.DatabaseBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
-import java.time.YearMonth
 import java.util.*
 import kotlin.collections.MutableList
 
@@ -135,10 +131,6 @@ class CalendarFragment : Fragment() {
             recyclerViewMedication.adapter = null
             calendarAdapter.setMultiSelectMode = isChecked
             calendarAdapter.clearStates()
-//            allTextViews = calendarAdapter.getAllTextViews()
-//            allTextViews.forEach { view ->
-//                view.setBackgroundResource(R.drawable.default_shape)
-//            }
             if (isChecked) {
                 // 显示启用多选模式的提示
                 Toast.makeText(requireContext(), "多选模式已启用", Toast.LENGTH_SHORT).show()
@@ -174,16 +166,16 @@ class CalendarFragment : Fragment() {
                                         selectedDateItems.forEach { dateItem ->
                                             dateItem.medicationData?.add(medicationData)
                                             val medicationList = dateItem.medicationData
-                                            medicationList?.let {
-                                                medicationList.forEach { medicationData ->
-                                                    setRemindersForDailyIntake(
-                                                        this@CalendarFragment.requireActivity(),
-                                                        dateItem.date,
-                                                        medicationData.dailyIntakeTimes,
-                                                        medicationData.weekMode,
-                                                        medicationData.reminderMode
-                                                    )
-                                                }
+                                            medicationList?.lastOrNull()?.let { lastMedicationData ->
+                                                setRemindersForDailyIntake(
+                                                    this@CalendarFragment.requireActivity(),
+                                                    dateItem.date,
+                                                    lastMedicationData.medicationName,
+                                                    lastMedicationData.patientName,
+                                                    lastMedicationData.dailyIntakeTimes,
+                                                    lastMedicationData.weekMode,
+                                                    lastMedicationData.reminderMode
+                                                )
                                             }
                                             val yearMonth = checkFormat.format(dateItem.date)
                                             cachedDateItems[yearMonth]?.find { it.date == dateItem.date }?.medicationData =
@@ -196,24 +188,24 @@ class CalendarFragment : Fragment() {
                                     if (selectedDateItem != null) {
                                         selectedDateItem.medicationData?.add(medicationData)
                                         val medicationList = selectedDateItem.medicationData
-                                        medicationList?.let {
-                                            medicationList.forEach { medicationData ->
-                                                setRemindersForDailyIntake(
-                                                    this@CalendarFragment.requireActivity(),
-                                                    selectedDateItem.date,
-                                                    medicationData.dailyIntakeTimes,
-                                                    medicationData.weekMode,
-                                                    medicationData.reminderMode
-                                                )
-                                            }
-                                            val yearMonth = checkFormat.format(selectedDateItem.date)
-                                            cachedDateItems[yearMonth]?.find { it.date == selectedDateItem.date }?.medicationData =
-                                                selectedDateItem.medicationData
-                                            medicationAdapter = MedicationAdapter(selectedDateItem) { newList, item, deleteMedic ->
-                                                selectedDateItem.medicationData = newList
-                                                deleteOne(item, deleteMedic)
-                                            }
-                                            recyclerViewMedication.adapter = medicationAdapter
+                                        medicationList?.lastOrNull()?.let { lastMedicationData ->
+                                            setRemindersForDailyIntake(
+                                                this@CalendarFragment.requireActivity(),
+                                                selectedDateItem.date,
+                                                lastMedicationData.medicationName,
+                                                lastMedicationData.patientName,
+                                                lastMedicationData.dailyIntakeTimes,
+                                                lastMedicationData.weekMode,
+                                                lastMedicationData.reminderMode
+                                            )
+                                        }
+                                        val yearMonth = checkFormat.format(selectedDateItem.date)
+                                        cachedDateItems[yearMonth]?.find { it.date == selectedDateItem.date }?.medicationData =
+                                            selectedDateItem.medicationData
+                                        medicationAdapter = MedicationAdapter(selectedDateItem) { newList, item, deleteMedic ->
+                                            selectedDateItem.medicationData = newList
+                                            deleteOne(item, deleteMedic)
+                                        recyclerViewMedication.adapter = medicationAdapter
                                         }
                                     }
                                 }
@@ -294,11 +286,12 @@ class CalendarFragment : Fragment() {
     private fun setRemindersForDailyIntake(
         context: Context,
         date: Date,
+        medicationName: String,
+        patientName: String,
         intakeTimes: MutableList<String>,
         weekMode: String,
         reminderMode: String
     ) {
-        //  val isCalendarEnabled = reminderMode.getOrNull(0) == '1'
         val isAlarmEnabled = reminderMode.getOrNull(0) == '1'
         val isNotificationEnabled = reminderMode.getOrNull(1) == '1'
 
@@ -314,32 +307,70 @@ class CalendarFragment : Fragment() {
             val code = weekMode.getOrNull(i) == '1'
             if (code) {
                 selectedWeekDay.add(weeks[i])
-                //  val selected = weeks[i]
-                //  Log.d("selectedDay$i", "$selected")
             }
         }
-        val handler = Handler(Looper.getMainLooper())
-        var index = 0
 
-        val reminderTask = object : Runnable {
-            override fun run() {
-                if (index >= intakeTimes.size) return // 如果超出范围，停止任务
+        lifecycleScope.launch{
+            for (index in intakeTimes.indices) {
                 // 获取当前的提醒时间
                 val entireTime = combineDateAndTime(date, intakeTimes[index])
-                // 设置提醒
-                if (isNotificationEnabled) {
-                    setNotificationReminder(context, entireTime, index)
-                } else if (isAlarmEnabled) {
-                    setAlarmReminder(context, entireTime, index, selectedWeekDay)
+                (if (isAlarmEnabled) {
+                    async(Dispatchers.IO) {
+                        setAlarmReminder(
+                            context,
+                            entireTime,
+                            index,
+                            selectedWeekDay,
+                            medicationName,
+                            patientName
+                        )
+                    }
+                } else {
+                    null
+                })?.await()
+
+                (if (isNotificationEnabled) {
+                    async(Dispatchers.IO) {
+                        setNotificationReminder(
+                            context,
+                            entireTime,
+                            index,
+                            medicationName,
+                            patientName
+                        )
+                    }
+                } else {
+                    null
+                })?.await()
+
+                if (index < intakeTimes.size - 1) {
+                    delay(5_000L)
                 }
-                // 增加索引，等待 10 秒后处理下一个时间
-                index++
-                handler.postDelayed(this, 10_000L) // 延迟 10 秒再执行下一次任务
             }
         }
-        // 开始执行第一个任务
-        handler.post(reminderTask)
     }
+
+//        val handler = Handler(Looper.getMainLooper())
+//        var index = 0
+//
+//        val reminderTask = object : Runnable {
+//            override fun run() {
+//                if (index >= intakeTimes.size) return // 如果超出范围，停止任务
+//                // 获取当前的提醒时间
+//                val entireTime = combineDateAndTime(date, intakeTimes[index])
+//                // 设置提醒
+//                if (isNotificationEnabled) {
+//                    setNotificationReminder(context, entireTime, index, medicationName, patientName)
+//                } else if (isAlarmEnabled) {
+//                    setAlarmReminder(context, entireTime, index, selectedWeekDay, medicationName, patientName)
+//                }
+//                // 增加索引，等待 10 秒后处理下一个时间
+//                index++
+//                handler.postDelayed(this, 10_000L) // 延迟 10 秒再执行下一次任务
+//            }
+//        }
+//        // 开始执行第一个任务
+//        handler.post(reminderTask)}
 
     private fun startNotificationSetting() {
         val applicationInfo = requireContext().applicationInfo
@@ -362,41 +393,12 @@ class CalendarFragment : Fragment() {
         }
     }
 
-    private fun setAlarmReminder(context: Context, remindTime: Date, requestCode: Int, weekDay: MutableList<Int>) {
-        val calendar = Calendar.getInstance().apply {
-            time = remindTime
-        }
-        val hour = calendar.get(Calendar.HOUR_OF_DAY)
-        val minute = calendar.get(Calendar.MINUTE)
-
-        // 创建系统闹钟的 Intent
-        val alarmIntent = Intent(AlarmClock.ACTION_SET_ALARM).apply {
-            putExtra(AlarmClock.EXTRA_HOUR, hour)
-            putExtra(AlarmClock.EXTRA_MINUTES, minute)
-            putExtra(AlarmClock.EXTRA_MESSAGE, "Medication Reminder"+"$requestCode") // 闹钟标签
-            if (weekDay.size > 1)
-                putExtra(AlarmClock.EXTRA_DAYS, weekDay as ArrayList<Int>?)
-            putExtra(AlarmClock.EXTRA_SKIP_UI, true) // 如果设为 true，不显示系统闹钟 UI
-        }
-
-        // Important: Android 11及以上出现 Intent.resolveActivity(context.getPackageManager()) == null的处理
-        try {
-            // 尝试启动闹钟 Intent
-            context.startActivity(alarmIntent)
-            Log.d("Alarm", "Start Alarm setting")
-            // 设置完系统闹钟，用户可以选择此次之后暂停但无法实现直接删除，单次闹钟考虑使用别的方法
-        } catch (e: ActivityNotFoundException) {
-            // 如果没有任何应用可以处理这个 Intent
-            Toast.makeText(context, "Alarm clock app not available", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    fun setNotificationReminder(context: Context, remindTime: Date, requestCode: Int) {
+    private fun setNotificationReminder(context: Context, remindTime: Date, requestCode: Int, medicationName: String, patientName: String) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val notificationIntent = Intent(context, NotificationReceiver::class.java).apply {
             action = "com.appdev.medicare.NOTIFICATION_ACTION"
-            putExtra("title", "Medication Reminder")
-            putExtra("message", "It's time to take your medication.")
+            putExtra("title", "$patientName 服用$medicationName")
+            putExtra("message", "到点喝药了!!!")
         }
 
         val pendingIntent = PendingIntent.getBroadcast(
@@ -416,6 +418,34 @@ class CalendarFragment : Fragment() {
         }
 
         alarmManager.setExact(AlarmManager.RTC_WAKEUP, remindTime.time, pendingIntent)
+    }
+
+    private fun setAlarmReminder(context: Context, remindTime: Date, requestCode: Int, weekDay: MutableList<Int>, medicationName: String, patientName: String) {
+        val calendar = Calendar.getInstance().apply {
+            time = remindTime
+        }
+        val hour = calendar.get(Calendar.HOUR_OF_DAY)
+        val minute = calendar.get(Calendar.MINUTE)
+
+        val alarmIntent = Intent(AlarmClock.ACTION_SET_ALARM).apply {
+            putExtra(AlarmClock.EXTRA_HOUR, hour)
+            putExtra(AlarmClock.EXTRA_MINUTES, minute)
+            putExtra(AlarmClock.EXTRA_MESSAGE, "Reminder${requestCode+1} " + "$medicationName $patientName") // 闹钟标签
+            if (weekDay.size > 1)
+                putExtra(AlarmClock.EXTRA_DAYS, weekDay as ArrayList<Int>?)
+            putExtra(AlarmClock.EXTRA_SKIP_UI, true) // 如果设为 true，不显示系统闹钟 UI
+        }
+
+        // Important: Android 11及以上出现 Intent.resolveActivity(context.getPackageManager()) == null的处理
+        try {
+            // 尝试启动闹钟 Intent
+            context.startActivity(alarmIntent)
+            Log.d("Alarm", "Start Alarm setting")
+            // 设置完系统闹钟，用户可以选择此次之后暂停但无法实现直接删除，单次闹钟考虑使用别的方法
+        } catch (e: ActivityNotFoundException) {
+            // 如果没有任何应用可以处理这个 Intent
+            Toast.makeText(context, "Alarm clock app not available", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun hasRequirePermission(context: Context): Boolean {
@@ -511,8 +541,8 @@ class CalendarFragment : Fragment() {
             (map["medication_name"] as? JsonValue.JsonString)?.value!!,
             (map["patient_name"] as? JsonValue.JsonString)?.value!!,
             (map["dosage"] as? JsonValue.JsonString)?.value!!,
-            (map["remaining_amount"] as? JsonValue.JsonNumber)?.value!!.toInt(),
-            (map["frequency"] as? JsonValue.JsonString)?.value!!.toInt(),
+            (map["remaining_amount"] as? JsonValue.JsonString)?.value!!,
+            (map["frequency"] as? JsonValue.JsonString)?.value!!,
             (map["times"] as? JsonValue.JsonList)?.value?.mapNotNull {
                 (it as? JsonValue.JsonString)?.value
             }?.toMutableList() ?: mutableListOf(),
@@ -576,7 +606,7 @@ class CalendarFragment : Fragment() {
                             medicationInfo.patientName,
                             medicationInfo.dosage,
                             medicationInfo.remainingAmount,
-                            medicationInfo.frequency.toInt(),
+                            medicationInfo.frequency,
                             timeList.toMutableList(),
                             medicationInfo.weekMode,
                             medicationInfo.reminderType,

@@ -32,7 +32,7 @@ interface DatabaseSync {
                     medicationName = value["medicationName"].toString(),
                     patientName = value["patientName"].toString(),
                     dosage = value["dosage"].toString(),
-                    remainingAmount = value["remainingAmount"].toString().toInt(),
+                    remainingAmount = value["remainingAmount"].toString(),
                     frequency = value["frequency"].toString(),
                     weekMode = value["weekMode"].toString(),
                     reminderType = value["reminderType"].toString(),
