@@ -41,4 +41,10 @@ interface ApiService {
 
     @POST("deleteMedicationRecord")
     fun deleteMedicationRecord(@Body body: DeleteMedicationRecordRequest): Call<ApiResponse>
+
+    @GET("getAllData")
+    fun getAllData(): Call<ApiResponse>
+
+    @GET("getLastUpdateTime")
+    fun getLastUpdateTime(): Call<ApiResponse>
 }

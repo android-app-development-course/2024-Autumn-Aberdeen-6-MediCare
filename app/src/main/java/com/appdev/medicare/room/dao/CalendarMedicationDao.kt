@@ -20,6 +20,9 @@ interface CalendarMedicationDao {
     @Query("SELECT id FROM calendar_medication WHERE medication_id = (:medicationId) AND date = (:date) AND sync_status != 'deleted'")
     fun findId(medicationId: Int, date:String): Int
 
+    @Query("SELECT id FROM calendar_medication WHERE uuid = :uuid LIMIT 1")
+    fun findIdByUuid(uuid: String): Int
+
     @Insert
 //    fun insertOne(vararg calendarMedications: CalendarMedication): Long
     fun insertOne(calendarMedication: CalendarMedication): Long
