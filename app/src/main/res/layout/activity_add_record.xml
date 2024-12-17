@@ -54,7 +54,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="(可选)点击拍摄说明书或药盒进行保存"
+                android:text="(可选)是否存在实体药箱，可拍照记录"
                 android:textColor="#6C6868"/>
 
             <ImageButton

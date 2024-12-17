@@ -47,7 +47,7 @@ class BoxFragment : Fragment() {
 
 
         buttonAddBox.setOnClickListener {
-            val intent = Intent(requireContext(), AddMedActivity::class.java)
+            val intent = Intent(requireContext(), AddBoxActivity::class.java)
             startActivity(intent)
         }
         return root

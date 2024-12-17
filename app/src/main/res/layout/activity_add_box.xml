@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#FFFFFF"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical|center_horizontal"
+            android:orientation="horizontal">
+
+            <ImageButton
+                style="?android:attr/buttonBarStyle"
+                android:id="@+id/buttonBackMain"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="返回"
+                android:padding="10dp"
+                android:src="@drawable/calendar_ic_arrow_left" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="添加药箱信息"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white"
+                android:contentDescription="占位"
+                android:padding="10dp"
+                android:src="@drawable/calendar_ic_arrow_left"
+                android:visibility="invisible" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="10dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="(可选)是否存在实体药箱，可拍照记录"
+                android:textColor="@color/theme_note_gray"/>
+
+            <ImageButton
+                style="?android:attr/buttonBarStyle"
+                android:id="@+id/buttonAddPicture"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:src="@drawable/ic_add_picture" />
+        </LinearLayout>
+
+        <!-- 灰色分割线 -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#CCCCCC" />
+
+        <!-- MedicineBox Name -->
+        <LinearLayout
+            style="@style/CustomInputStyle"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:background="@drawable/rounded_gray_background">
+            <Space
+                android:layout_width="13dp"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="药箱名称:"
+                android:textSize="16sp"/>
+            <EditText
+                android:id="@+id/editTextMedicationName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="12dp"
+                android:inputType="text"
+                android:textSize="16sp"
+                android:backgroundTint="@android:color/transparent"/>
+        </LinearLayout>
+
+        <!-- Box Type and Applicable People -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp">
+
+            <!-- Box Type -->
+            <LinearLayout
+                style="@style/CustomInputStyle"
+                android:layout_weight="1"
+                android:layout_height="60dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:background="@drawable/rounded_gray_background">
+                <Space
+                    android:layout_width="13dp"
+                    android:layout_height="wrap_content" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="类型:"
+                    android:textSize="16sp"/>
+                <EditText
+                    android:id="@+id/editTextBoxType"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:padding="12dp"
+                    android:inputType="textPersonName"
+                    android:textSize="16sp"
+                    android:backgroundTint="@android:color/transparent"/>
+            </LinearLayout>
+
+            <Space
+                android:layout_width="13dp"
+                android:layout_height="wrap_content" />
+
+            <!-- Applicable People-->
+            <LinearLayout
+                style="@style/CustomInputStyle"
+                android:layout_weight="1"
+                android:layout_height="60dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:background="@drawable/rounded_gray_background">
+                <Space
+                    android:layout_width="13dp"
+                    android:layout_height="wrap_content" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="适用人:"
+                    android:textSize="16sp"/>
+                <EditText
+                    android:id="@+id/editTextApplicablePeople"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:padding="12dp"
+                    android:inputType="text"
+                    android:textSize="16sp"
+                    android:backgroundTint="@android:color/transparent"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- PS -->
+        <LinearLayout
+            style="@style/CustomInputStyle"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:background="@drawable/rounded_gray_background">
+            <Space
+                android:layout_width="13dp"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="(选填)备注:"
+                android:textColor="@color/theme_note_gray"
+                android:textSize="16sp"/>
+            <EditText
+                android:id="@+id/editTextTime"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="12dp"
+                android:inputType="text"
+                android:textSize="16sp"
+                android:backgroundTint="@android:color/transparent"/>
+        </LinearLayout>
+
+        <!-- Submit Button -->
+        <Button
+            android:id="@+id/buttonSaveMedication"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_gravity="center_horizontal"
+            android:text="保存信息" />
+
+    </LinearLayout>
+</ScrollView>
