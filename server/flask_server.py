@@ -65,7 +65,7 @@ def register():
 """
 /login - 登录账号
 请求 - POST {"username": "Username", "passwordHash": "password"}（哈希密码）
-响应 - 成功：返回 200 和登录 Token（字符串），失败：INVALID_USERNAME_OR_PASSWORD 无效的用户名或密码
+响应 - 成功：返回 200 和 {"token": "登录 Token"} ，失败：INVALID_USERNAME_OR_PASSWORD 无效的用户名或密码
 """
 @app.route("/login", methods=["POST"])
 @json_required
@@ -484,3 +484,91 @@ def delete_record(user_id):
     except Exception as e:
         logger.error(f"An error occurred while deleting records {medication_id} on {date}: {format_exc()}")
         return build_message(err_code="INTERNAL_SERVER_ERROR",err_descriptin=f"An error occurred while trying to process", code=500, success=False)
+
+"""
+/getLastUpdateTime - 获取用户服务端数据的上次更新时间（时间戳）
+请求：null
+响应 - 成功：返回 200 和 {"lastUpdateTime": "2024-12-17 18:36:00"}
+"""
+@app.route("/getLastUpdateTime", methods=["GET"])
+@token_required
+def get_last_update_time(user_id):
+    logger.info(f"Received /getLastUpdateTime from user {user_id}")
+
+    with SQLiteConnection() as (conn, cursor):
+        query = "SELECT last_update FROM user WHERE user_id = ?"
+        params = (user_id, )
+        cursor.execute(query, params)
+
+        last_update_time = cursor.fetchone()[0]
+
+    data = {"lastUpdateTime": last_update_time}
+    return build_message(message="Successfully get last update time.", data=data)
+
+"""
+/getAllData - 从服务器获取全部信息
+请求：null
+响应：{
+    "medication": [
+        {
+            "uuid": "客户端 UUID",
+            "medicationName": "药品名称",
+            "patientName": "病人名称",
+            "dosage": "剂量，如2片",
+            "remainingAmount": 1, // 余量
+            "frequency": "用药频率",
+            "weekMode": "",
+            "reminderType": "提醒方式的编码",
+            "expirationDate": "过期日期，如 2024-12-17"
+        },
+        ...
+    ],
+    "calendarMedication": [
+        {
+            "uuid": "客户端 UUID",
+            "medicationUuid": "medication 表中的 UUID",
+            "date": "日期，如 2024-12-17"
+        },
+        ...
+    ],
+    "medicationTime": [
+        {
+            "uuid": "客户端 UUID",
+            "medicationUuid": "medication 表中的 UUID",
+            "dateUuid": "calendar_medication 表中的 UUID",
+            "status": 0,    // 用药状态
+            "time": "用药时间"
+        },
+        ...
+    ]
+}
+"""
+@app.route("/getAllData", methods=["GET"])
+@token_required
+def get_all_data(user_id):
+    logger.info(f"Received /getAllData request from user {user_id}")
+    medication = []
+    calendar_medication = []
+    medication_time = []
+
+    with SQLiteConnection() as (conn, cursor):
+        query1 = "SELECT client_uuid, medication_name, patient_name, dosage, remaining_amount, frequency, week_mode, reminder_type, expiration_date FROM medication WHERE user_id = ?"
+        params1 = (user_id, )
+        cursor.execute(query1, params1)
+
+        results = cursor.fetchall()
+
+        for result in results:
+            medication.append({
+                "uuid": result[0],
+                "medicationName": result[1],
+                "patientName": result[2],
+                "dosage": result[3],
+                "remainingAmount": result[4],
+                "frequency": result[5],
+                "weekMode": result[6],
+                "reminderType": result[7],
+                "expirationDate": result[8]
+            })
+        
+        query2 = "SELECT c.client_uuid, m.client_uuid, c.date FROM calendar_medication c, medication m WHERE m.uuid = "
