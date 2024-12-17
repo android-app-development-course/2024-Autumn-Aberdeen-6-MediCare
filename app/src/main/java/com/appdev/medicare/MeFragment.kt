@@ -3,6 +3,7 @@ package com.appdev.medicare
 
 import android.app.AlertDialog
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -12,6 +13,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.appdev.medicare.databinding.FragmentMeBinding
+import com.appdev.medicare.utils.buildAlertDialog
 import com.appdev.medicare.utils.buildInputAlertDialog
 
 
@@ -95,18 +97,21 @@ class MeFragment : Fragment() {
     }
 
     private fun showLogoutConfirmationDialog() {
-        val builder = AlertDialog.Builder(requireContext())
-        builder.setTitle("确认退出")
-            .setMessage("你确定要退出当前账号吗？")
-            .setPositiveButton("确定") { _, _ ->
-                // 执行退出账号的逻辑，比如清除登录状态、返回登录页面等
-                val intent = Intent(requireContext(), LoginActivity::class.java)
-                startActivity(intent)
-                requireActivity().finish()
-            }
-            .setNegativeButton("取消", null)
-        val dialog = builder.create()
-        dialog.show()
+        val mainContext = requireContext()
+        buildAlertDialog(
+            mainContext,
+            mainContext.getString(R.string.logout),
+            mainContext.getString(R.string.confirmLogout),
+            true
+        ) { dialog: DialogInterface ->
+            val preferences = mainContext.getSharedPreferences("MediCare", Context.MODE_PRIVATE)
+            val editor = preferences.edit()
+            editor.remove("login_token")
+            editor.apply()
+            // TODO: 移除数据库数据
+            dialog.dismiss()
+        }
+            .show()
     }
 
     override fun onDestroyView() {
