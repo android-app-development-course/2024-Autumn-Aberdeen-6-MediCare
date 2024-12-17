@@ -118,6 +118,7 @@ interface DatabaseSync {
     }
 
     suspend fun checkUpdate(context: Context) {
+        val appDatabase = DatabaseBuilder.getInstance()
         val preferences = context.getSharedPreferences("MediCare", Context.MODE_PRIVATE)
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HHH:mm:ss")
         val clientLastUpdate = LocalDateTime.parse(preferences.getString("dataLastUpdate", "1970-01-01 00:00:00") as String, formatter)
@@ -132,10 +133,18 @@ interface DatabaseSync {
 
             if (serverLastUpdate > clientLastUpdate) {
                 // 服务器数据比本地数据新
-                // TODO: 将服务器数据更新至本地
+                // 删除本地服务器数据并重新从云端获取
+                appDatabase.clearAllTables()
+                getAllDataFromServer()
+                val editor = preferences.edit()
+                editor.putString("dataLastUpdate", data["lastUpdateTime"].toString())
+                editor.apply()
+                Log.i("DatabaseSync", "Successfully synced data from server.")
             } else if (serverLastUpdate < clientLastUpdate) {
                 // 本地数据比服务器数据新
                 // TODO: 将本地数据更新至服务器
+            } else {
+                Log.i("DatabaseSync", "All data up to date.")
             }
         }
     }
