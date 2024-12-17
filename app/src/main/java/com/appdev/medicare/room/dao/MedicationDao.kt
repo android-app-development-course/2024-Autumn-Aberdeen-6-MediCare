@@ -12,10 +12,11 @@ interface MedicationDao {
     fun getAll(): List<Medication>
 
     @Query("SELECT * FROM medication WHERE id = (:id)")
-    fun findById(id: Int): List<Medication>
+    fun findById(id: Int): Medication
 
     @Insert
-    fun insertOne(vararg medications: Medication): Long
+//    fun insertOne(vararg medications: Medication): Long
+    fun insertOne(medication: Medication): Long
 
     @Delete
     fun delete(medication: Medication)

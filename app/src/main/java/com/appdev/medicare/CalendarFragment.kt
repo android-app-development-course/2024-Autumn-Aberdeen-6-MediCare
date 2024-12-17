@@ -30,6 +30,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.room.Database
 import com.appdev.medicare.api.RetrofitClient
 import com.appdev.medicare.model.DateItem
 import com.appdev.medicare.model.MedicationData
@@ -38,6 +39,7 @@ import com.appdev.medicare.model.DeleteMedicationRecordRequest
 import com.appdev.medicare.model.GetAllOnDateRequest
 import com.appdev.medicare.model.JsonValue
 import com.appdev.medicare.receiver.NotificationReceiver
+import com.appdev.medicare.room.AppDatabase
 import com.appdev.medicare.room.DatabaseBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -72,6 +74,8 @@ class CalendarFragment : Fragment() {
 
     private val cachedDateItems = mutableMapOf<String, MutableList<DateItem>>() // 缓存 dateItems
 
+    private lateinit var dataBase: AppDatabase
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -80,7 +84,7 @@ class CalendarFragment : Fragment() {
         _binding = FragmentCalendarBinding.inflate(inflater, container, false)
 
         val root: View = binding.root
-        val dataBase = DatabaseBuilder.getInstance(requireContext()) // 实例化本地数据库
+        dataBase = DatabaseBuilder.getInstance(requireContext()) // 实例化本地数据库
 
         textMonthYear = binding.textMonthYear
         recyclerViewCalendar = binding.recyclerViewCalendar
@@ -536,31 +540,60 @@ class CalendarFragment : Fragment() {
 
     private fun dealEach(dateItem: DateItem) {
         lifecycleScope.launch {
+            val listInfo = mutableListOf<MedicationData>()
             val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
             val date = dateFormat.format(dateItem.date)
-            val getAllOnDateRequest = GetAllOnDateRequest(date)
-            val records = withContext(Dispatchers.IO) {
-                RetrofitClient.api.getAllOnDate(getAllOnDateRequest).execute()
-            }
-            if (records.code() == 200) {
-                val data = records.body()?.data
-                if (data is JsonValue.JsonList) {
-                    val listInfo = mutableListOf<MedicationData>()
-                    data.value.mapNotNull { item ->
-                        if (item is JsonValue.JsonObject) {
-                            val convertedData = convertMedicationData(item)
-                            listInfo.add(convertedData)
-                        } else {
-                            Log.w("CalendarFragment", "Data type error, should be JsonValue.JsonObject")
-                        }
+
+            withContext(Dispatchers.IO) {
+                val medicationIdList = dataBase.calendarMedicationDao().findMedicationIdByDate(date)
+                if (medicationIdList.isNotEmpty()) {
+                    for (id in medicationIdList) {
+                        val dateId = dataBase.calendarMedicationDao().findId(id, date)
+                        val medicationInfo = dataBase.medicationDao().findById(id)
+                        val medicationTimes = dataBase.medicationTimeDao().findByMedicationAndDateId(id, dateId) // 这里获取到了 status, time
+                        val statusList = medicationTimes.map { it.status } // 未使用
+                        val timeList = medicationTimes.map { it.time }
+
+                        val result = MedicationData(
+                            medicationInfo.id,
+                            medicationInfo.medicationName,
+                            medicationInfo.patientName,
+                            medicationInfo.dosage,
+                            medicationInfo.remainingAmount,
+                            medicationInfo.frequency.toInt(),
+                            timeList.toMutableList(),
+                            medicationInfo.weekMode,
+                            medicationInfo.reminderType,
+                            medicationInfo.expirationDate,
+                        )
+                        listInfo.add(result)
                     }
-                    dateItem.medicationData = listInfo
-                } else {
-                    Log.w("CalendarFragment", "Data type error, should be JsonValue.JsonObject")
                 }
-            } else if (records.code() == 204){
-                Log.w("CalendarFragment", "Record not exist")
             }
+            dateItem.medicationData = listInfo
+//            val getAllOnDateRequest = GetAllOnDateRequest(date)
+//            val records = withContext(Dispatchers.IO) {
+//                RetrofitClient.api.getAllOnDate(getAllOnDateRequest).execute()
+//            }
+//            if (records.code() == 200) {
+//                val data = records.body()?.data
+//                if (data is JsonValue.JsonList) {
+//                    val listInfo = mutableListOf<MedicationData>()
+//                    data.value.mapNotNull { item ->
+//                        if (item is JsonValue.JsonObject) {
+//                            val convertedData = convertMedicationData(item)
+//                            listInfo.add(convertedData)
+//                        } else {
+//                            Log.w("CalendarFragment", "Data type error, should be JsonValue.JsonObject")
+//                        }
+//                    }
+//                    dateItem.medicationData = listInfo
+//                } else {
+//                    Log.w("CalendarFragment", "Data type error, should be JsonValue.JsonObject")
+//                }
+//            } else if (records.code() == 204){
+//                Log.w("CalendarFragment", "Record not exist")
+//            }
         }
     }
 

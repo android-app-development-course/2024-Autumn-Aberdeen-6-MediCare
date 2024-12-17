@@ -18,10 +18,11 @@ interface CalendarMedicationDao {
     fun findMedicationIdByDate(date: String): List<Int>
 
     @Query("SELECT id FROM calendar_medication WHERE medication_id = (:medicationId) AND date = (:date)")
-    fun findId(medicationId: Int, date:String): List<Int>
+    fun findId(medicationId: Int, date:String): Int
 
     @Insert
-    fun insertOne(vararg calendarMedications: CalendarMedication): Long
+//    fun insertOne(vararg calendarMedications: CalendarMedication): Long
+    fun insertOne(calendarMedication: CalendarMedication): Long
 
     @Delete
     fun delete(calendarMedication: CalendarMedication)

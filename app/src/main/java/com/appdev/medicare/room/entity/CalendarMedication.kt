@@ -18,7 +18,7 @@ import androidx.room.PrimaryKey
     ]
 )
 data class CalendarMedication(
-    @PrimaryKey(autoGenerate = true) val id: Int,
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
     @ColumnInfo(name = "medication_id") val medicationId: Int,
     @ColumnInfo(name = "date") val date: String
 )
