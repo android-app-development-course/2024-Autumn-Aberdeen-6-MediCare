@@ -16,11 +16,23 @@ import java.io.IOException
 import kotlin.jvm.Throws
 
 object RetrofitClient {
-    private const val BASE_URL = "http://10.0.2.2:5000/"    // 模拟器使用 10.0.2.2 代指运行模拟器的主机（代宿主机）
+    private lateinit var BASE_URL: String
     private lateinit var sharedPreferences: SharedPreferences
+    private lateinit var retrofit: Retrofit
+    lateinit var api: ApiService
 
     fun init(context: Context) {
         sharedPreferences = context.getSharedPreferences("MediCare", Context.MODE_PRIVATE)
+        BASE_URL = sharedPreferences.getString(
+            "serverBaseUrl",
+            "http://10.0.2.2:5000/"     // 模拟器使用 10.0.2.2 代指运行模拟器的主机（代宿主机）
+        ) as String
+        retrofit = Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create(gson))
+            .client(okHttpClient)
+            .build()
+        api = retrofit.create(ApiService::class.java)
     }
 
     private val gson: Gson = GsonBuilder()
@@ -41,13 +53,8 @@ object RetrofitClient {
         })
         .build()
 
-    private val retrofit = Retrofit.Builder()
-        .baseUrl(BASE_URL)
-        .addConverterFactory(GsonConverterFactory.create(gson))
-        .client(okHttpClient)
-        .build()
 
-    val api: ApiService = retrofit.create(ApiService::class.java)
-
-    fun getGson(): Gson { return gson }
+    fun getGson(): Gson {
+        return gson
+    }
 }
