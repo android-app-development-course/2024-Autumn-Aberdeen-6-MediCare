@@ -3,9 +3,10 @@ import logging
 from traceback import format_exc
 from flask import Flask, request
 from database import SQLiteConnection
+from db_initialize import table_names
 from message_builder import build_message
 from function_decorator import json_required, token_required
-from token_manager import new_token, validate_token, invalidate_token, invalidate_all_token
+from token_manager import new_token, validate_token, invalidate_token
 
 # 数据库路径
 DATABASE_PATH = os.path.join(os.path.dirname(__file__), "data.db")
@@ -515,7 +516,7 @@ def get_last_update_time(user_id):
             "medicationName": "药品名称",
             "patientName": "病人名称",
             "dosage": "剂量，如2片",
-            "remainingAmount": 1, // 余量
+            "remainingAmount": "1片", // 余量
             "frequency": "用药频率",
             "weekMode": "",
             "reminderType": "提醒方式的编码",
@@ -655,3 +656,182 @@ def get_medication_time_data(user_id):
 
     logger.info(f"Successfully get medication_time list data of user {user_id}: {data}")
     return build_message(message="Successfully get medication_time list data.", data=data)
+
+"""
+/clearData - 删除用户的全部数据
+请求：null
+响应 - 成功：200
+"""
+@app.route("/clearData", methods=["DELETE"])
+@token_required
+def clear_data(user_id):
+    logger.info(f"Received /clearData request from user {user_id}")
+
+    table_names_ = table_names.copy()
+    table_names_.remove("user")
+    table_names_.remove("token")
+
+    with SQLiteConnection() as (conn, cursor):
+        for table in table_names_:
+            query = f"DELETE FROM {table} WHERE user_id = ?"
+            params = (user_id,)
+            cursor.execute(query, params)
+        
+        conn.commit()
+
+
+"""
+/insertMedicationData - 插入数据至 medication 表
+请求：{
+    "medication": [
+        {
+            "uuid": "客户端 UUID",
+            "medicationName": "药品名称",
+            "patientName": "病人名称",
+            "dosage": "剂量，如2片",
+            "remainingAmount": "1片", // 余量
+            "frequency": "用药频率",
+            "weekMode": "",
+            "reminderType": "提醒方式的编码",
+            "expirationDate": "过期日期，如 2024-12-17"
+        }
+    ]
+}
+响应 - 成功：200
+"""
+@app.route("/insertMedicationData", methods=["POST"])
+@token_required
+@json_required
+def insert_medication_data(user_id):
+    data = request.get_json()
+    logger.info(f"Received /insertMedicationData request from user {user_id}: {data}")
+
+    medications = []
+    for raw_data in data["medication"]:
+        client_uuid = raw_data["uuid"]
+        meidcation_name = raw_data["medicationName"]
+        patient_name = raw_data["patientName"]
+        dosage = raw_data["dosage"]
+        remaining_amount = raw_data["remaining_amount"]
+        frequency = raw_data["frequency"]
+        week_mode = raw_data["weekMode"]
+        reminder_type = raw_data["reminderType"]
+        expiration_date = raw_data["expirationDate"]
+        medications.insert((user_id, meidcation_name, patient_name, dosage, remaining_amount, frequency, week_mode, reminder_type, expiration_date, client_uuid))
+    
+    query = "INSERT INTO medication (user_id, medication_name, patient_name, dosage, remaining_amount, frequency, week_mode, reminder_type, expiration_date, client_uuid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+
+    with SQLiteConnection() as (conn, cursor):
+        cursor.executemany(query, medications)
+        conn.commit()
+    
+    logger.info("Successfully inserted data.")
+    return build_message(message="Successfully inserted data.")
+
+
+"""
+/insertCalendarMedicationData - 插入数据至 calendar_medication 表
+请求：{
+    "calendarMedication": [
+        {
+            "uuid": "客户端 UUID",
+            "medicationUuid": "medication 表中的 UUID",
+            "date": "日期，如 2024-12-17"
+        },
+        ...
+    ]
+}
+响应 - 成功：200
+"""
+@app.route("/insertCalendarMedicationData", methods=["POST"])
+@token_required
+@json_required
+def insert_calendar_medication_data(user_id):
+    data = request.get_json()
+    logger.info(f"Received /insertCalendarMedicationData request from user {user_id}: {data}")
+
+    calendar_medications = []
+    with SQLiteConnection() as (conn, cursor):
+        query1 = "SELECT client_uuid, id FROM medication WHERE user_id = ?"
+        params1 = (user_id, )
+        cursor.execute(query1, params1)
+        medication_uuid_map = cursor.fetchall()
+
+        for raw_data in data["calendarMedication"]:
+            client_uuid = raw_data["uuid"]
+            date = raw_data["date"]
+
+            for medication_uuid, id in medication_uuid_map:
+                if raw_data["medicationUuid"] == medication_uuid:
+                    medication_id = id
+                    break
+
+            calendar_medications.append((user_id, medication_id, date, client_uuid))
+        
+        query2 = "INSERT INTO calendar_medication (user_id, medication_id, date, client_uuid) VALUES (?, ?, ?, ?)"
+        cursor.executemany(query2, calendar_medications)
+        conn.commit()
+    
+    logger.info("Successfully inserted data.")
+    return build_message(message="Successfully inserted data.")
+
+
+"""
+/insertMedicationTimeData - 插入数据至 medication_time 表
+请求：{
+    "medicationTime": [
+        {
+            "uuid": "客户端 UUID",
+            "medicationUuid": "medication 表中的 UUID",
+            "dateUuid": "calendar_medication 表中的 UUID",
+            "status": 0,    // 用药状态
+            "time": "用药时间"
+        },
+        ...
+    ]
+}
+响应 - 成功：200
+"""
+@app.route("/insertMedicationTimeData", methods=["POST"])
+@token_required
+@json_required
+def insert_medication_time_data(user_id):
+    data = request.get_json()
+    logger.info(f"Received /insertMedicationTimeData request from user {user_id}: {data}")
+
+    medication_times = []
+
+    with SQLiteConnection() as (conn, cursor):
+        query1 = "SELECT client_uuid, id FROM medication WHERE user_id = ?"
+        params1 = (user_id, )
+        cursor.execute(query1, params1)
+        medication_uuid_map = cursor.fetchall()
+
+        query2 = "SELECT client_uuid, id FROM calendar_medication WHERE user_id = ?"
+        params2 = (user_id, )
+        cursor.execute(query2, params2)
+        date_uuid_map = cursor.fetchall()
+
+        for raw_data in data["calendarMedication"]:
+            client_uuid = raw_data["uuid"]
+            status = raw_data["status"]
+            time = raw_data["time"]
+
+            for medication_uuid, id in medication_uuid_map:
+                if raw_data["medicationUuid"] == medication_uuid:
+                    medication_id = id
+                    break
+            
+            for date_uuid, id in date_uuid_map:
+                if raw_data["dateUuid"] == date_uuid:
+                    date_id = id
+                    break
+            
+            medication_times.append((user_id, medication_id, date_id, status, time, client_uuid))
+            
+        query3 = "INSERT INTO medication_time (user_id, medication_id, date_id, status, time, client_uuid)"
+        cursor.executemany(query2, medication_times)
+        conn.commit()
+    
+    logger.info("Successfully inserted data.")
+    return build_message(message="Successfully inserted data.")
