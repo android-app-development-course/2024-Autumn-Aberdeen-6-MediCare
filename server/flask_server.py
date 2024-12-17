@@ -552,13 +552,14 @@ def get_all_data(user_id):
     medication_time = []
 
     with SQLiteConnection() as (conn, cursor):
+        # medication
         query1 = "SELECT client_uuid, medication_name, patient_name, dosage, remaining_amount, frequency, week_mode, reminder_type, expiration_date FROM medication WHERE user_id = ?"
         params1 = (user_id, )
         cursor.execute(query1, params1)
 
-        results = cursor.fetchall()
+        results1 = cursor.fetchall()
 
-        for result in results:
+        for result in results1:
             medication.append({
                 "uuid": result[0],
                 "medicationName": result[1],
@@ -571,4 +572,51 @@ def get_all_data(user_id):
                 "expirationDate": result[8]
             })
         
-        query2 = "SELECT c.client_uuid, m.client_uuid, c.date FROM calendar_medication c, medication m WHERE m.uuid = "
+        # calendar_medication
+        query2 = ("SELECT "
+                  "c.client_uuid AS uuid, m.client_uuid AS medication_uuid, c.date "
+                  "FROM calendar_medication AS c JOIN medication AS m "
+                  "ON c.medication_id = m.id WHERE c.user_id = ?")
+        params2 = (user_id,)
+        cursor.execute(query2, params2)
+
+        results2 = cursor.fetchall()
+        for result in results2:
+            calendar_medication.append({
+                "uuid": result[0],
+                "medicationUuid": result[1],
+                "date": result[2]
+            })
+        
+        # medication_time
+        query3 = ("SELECT "
+                  "  t.client_uuid AS uuid, "
+                  "  m.client_uuid AS medication_uuid, "
+                  "  c.client_uuid AS date_uuid, "
+                  "  t.status AS status, "
+                  "  t.time AS time  "
+                  "FROM medication_time AS t "
+                  "JOIN medication AS m ON t.medication_id = m.id "
+                  "JOIN calendar_medication AS c ON t.date_id = c.id"
+                  "WHERE user_id = ?")
+        params3 = (user_id, )
+        cursor.execute(query3, params3)
+
+        results3 = cursor.fetchall()
+        for result in results3:
+            medication_time.append({
+                "uuid": result[0],
+                "medicationUuid": result[1],
+                "dateUuid": result[2],
+                "status": result[3],
+                "time": result[4]
+            })
+    
+    data = {
+        "medication": medication,
+        "calendarMedication": calendar_medication,
+        "medicationTime": medication_time
+    }
+
+    logger.info(f"Successfully get all data of user {user_id}: {data}")
+    return build_message(message="Successfully get all data.", data=data)
