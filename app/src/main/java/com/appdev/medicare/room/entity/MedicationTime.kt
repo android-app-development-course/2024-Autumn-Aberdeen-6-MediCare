@@ -11,14 +11,14 @@ import androidx.room.PrimaryKey
         ForeignKey(
             entity = Medication::class,
             parentColumns = ["id"],
-            childColumns = ["id"],
+            childColumns = ["medication_id"],
             onUpdate = ForeignKey.CASCADE,
             onDelete = ForeignKey.CASCADE
         ),
         ForeignKey(
             entity = CalendarMedication::class,
             parentColumns = ["id"],
-            childColumns = ["id"],
+            childColumns = ["date_id"],
             onUpdate = ForeignKey.CASCADE,
             onDelete = ForeignKey.CASCADE
         )
