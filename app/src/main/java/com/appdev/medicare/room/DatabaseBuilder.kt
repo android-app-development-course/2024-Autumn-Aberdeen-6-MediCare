@@ -13,7 +13,9 @@ object DatabaseBuilder {
                 context.applicationContext,
                 AppDatabase::class.java,
                 "medicare_database"
-            ).build()
+            )
+                .fallbackToDestructiveMigration()       // 数据库版本更新时重建数据库
+                .build()
             INSTANCE = instance
             instance
         }
