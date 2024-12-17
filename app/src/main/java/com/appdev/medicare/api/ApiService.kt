@@ -6,12 +6,11 @@ import com.appdev.medicare.model.DeleteMedicationRecordRequest
 import com.appdev.medicare.model.GetAllOnDateRequest
 import com.appdev.medicare.model.GetMedicationInfoRequest
 import com.appdev.medicare.model.GetMedicationRecordsRequest
+import com.appdev.medicare.model.GetMedicationTimesRequest
 import com.appdev.medicare.model.LoginRequest
 import com.appdev.medicare.model.RegisterRequest
-import com.appdev.medicare.model.GetMedicationTimesRequest
 import retrofit2.Call
 import retrofit2.http.Body
-import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 

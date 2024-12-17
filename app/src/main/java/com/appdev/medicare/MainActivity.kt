@@ -109,7 +109,7 @@ class MainActivity : AppCompatActivity() {
                     Log.w("MainActivity", "Token expired, asking to re-login.")
                     // 删除 Token
                     val editor = prefs.edit()
-                    editor.remove("MediCare")
+                    editor.remove("login_token")
                     editor.apply()
 
                     // 展示提示 Toast 并跳转登录页面
