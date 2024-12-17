@@ -1,10 +1,12 @@
 package com.appdev.medicare.room.dao
 
+import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import com.appdev.medicare.room.entity.CalendarMedication
 
+@Dao
 interface CalendarMedicationDao {
     @Query("SELECT * FROM calendar_medication")
     fun getAll(): List<CalendarMedication>
