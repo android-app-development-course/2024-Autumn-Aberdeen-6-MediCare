@@ -5,9 +5,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.appdev.medicare.model.MedicineRecord
+import com.appdev.medicare.model.RecordData
 
-class MedicineRecordAdapter(private val recordList: List<MedicineRecord>) : RecyclerView.Adapter<MedicineRecordAdapter.ViewHolder>() {
+class MedicineRecordAdapter(private val recordList: List<RecordData>) : RecyclerView.Adapter<MedicineRecordAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_medicine_record, parent, false)

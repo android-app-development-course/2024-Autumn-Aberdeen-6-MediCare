@@ -1,6 +1,6 @@
 package com.appdev.medicare.model
 
-data class MedicineRecord(
+data class RecordData(
     var medicineRecordID: Int,
     var name: String,
     var patientName: String,
