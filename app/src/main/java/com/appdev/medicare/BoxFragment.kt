@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -38,18 +39,17 @@ class BoxFragment : Fragment() {
 
         defaultMedicineSet = mutableListOf()
 
-        defaultMedicineBox = MedicineBox(1,"小孩感冒", "家庭", defaultMedicineSet)
+        defaultMedicineBox = MedicineBox(1,"小孩感冒", "家庭", defaultMedicineSet,"","")
 
         buttonAddBox = binding.buttonAddBox
         recyclerViewBox = binding.recyclerViewBox
         medicineBoxAdapter = MedicineBoxAdapter(listOf(defaultMedicineBox))
         recyclerViewBox.setAdapter(medicineBoxAdapter)
 
-
-//        buttonAddBox.setOnClickListener {
-//            val intent = Intent(requireContext(), AddBoxActivity::class.java)
-//            startActivity(intent)
-//        }
+        buttonAddBox.setOnClickListener {
+            val intent = Intent(requireContext(), AddBoxActivity::class.java)
+            startActivity(intent)
+        }
         return root
     }
 
@@ -62,15 +62,23 @@ class BoxFragment : Fragment() {
     private fun loadDataAndUpdateUI() {
         val recordList = getMedicineBoxFromDB()
         medicineBoxAdapter = MedicineBoxAdapter(recordList)
+        medicineBoxAdapter.setOnAddButtonClickListener(object :
+            MedicineBoxAdapter.OnAddButtonClickListener {
+            override fun onAddButtonClick(box: MedicineBox) {
+//                Toast.makeText(requireContext(), "点击了 ${box.name} 的添加按钮", Toast.LENGTH_SHORT).show()
+                val intent = Intent(requireContext(), AddMedActivity::class.java)
+                startActivity(intent)
+            }
+        })
         recyclerViewBox.layoutManager = GridLayoutManager(requireContext(), 2)
         recyclerViewBox.setAdapter(medicineBoxAdapter)
     }
 
     private fun getMedicineBoxFromDB(): List<MedicineBox> {
-        val record1 = MedicineBox(1,"药箱1", "病号1", defaultMedicineSet)
-        val record2 = MedicineBox(2,"药箱2", "病号2", defaultMedicineSet)
-        val record3 = MedicineBox(3,"药箱1", "病号1", defaultMedicineSet)
-        val record4 = MedicineBox(4,"药箱2", "病号2", defaultMedicineSet)
+        val record1 = MedicineBox(1,"药箱1", "病号1", defaultMedicineSet,"","")
+        val record2 = MedicineBox(2,"药箱2", "病号2", defaultMedicineSet,"","")
+        val record3 = MedicineBox(3,"药箱1", "病号1", defaultMedicineSet,"","")
+        val record4 = MedicineBox(4,"药箱2", "病号2", defaultMedicineSet,"","")
         return listOf(record1, record2, record3, record4)
     }
 

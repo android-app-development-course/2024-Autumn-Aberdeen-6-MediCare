@@ -41,6 +41,7 @@
     <ImageButton
         android:layout_width="64dp"
         android:layout_height="64dp"
+        android:id="@+id/buttonAddMedicine"
         android:src="@drawable/ic_add_medicine"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="为药箱添加药品"

@@ -25,7 +25,7 @@ import androidx.room.PrimaryKey
     ]
 )
 data class MedicationTime(
-    @PrimaryKey val id: Int,
+    @PrimaryKey(autoGenerate = true) val id: Int,
     @ColumnInfo(name = "medication_id") val medicationId: Int,
     @ColumnInfo(name = "date_id") val dateId: Int,
     @ColumnInfo(name = "time") val time: String,

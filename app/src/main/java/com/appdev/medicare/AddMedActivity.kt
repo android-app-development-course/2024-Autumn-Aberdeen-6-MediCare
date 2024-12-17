@@ -22,6 +22,10 @@ import java.util.*
 import com.appdev.medicare.api.RetrofitClient
 import com.appdev.medicare.model.AddMedicationRequest
 import com.appdev.medicare.model.JsonValue
+import com.appdev.medicare.room.DatabaseBuilder
+import com.appdev.medicare.room.entity.CalendarMedication
+import com.appdev.medicare.room.entity.Medication
+import com.appdev.medicare.room.entity.MedicationTime
 import com.appdev.medicare.utils.buildAlertDialog
 import com.appdev.medicare.utils.parseRequestBody
 import kotlinx.coroutines.Dispatchers
@@ -64,6 +68,7 @@ class AddMedActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_medication)
+        val dataBase = DatabaseBuilder.getInstance(this@AddMedActivity)
 
         // Initialize UI elements
         editTextMedicationName = findViewById(R.id.editTextMedicationName)
@@ -209,6 +214,37 @@ class AddMedActivity : AppCompatActivity() {
                                 Toast.LENGTH_SHORT
                             ).show()
                             val medicationID = (response.body()!!.data as? JsonValue.JsonNumber)?.value!!.toInt()
+//                            val localMedicationUpdate = Medication(
+//                                0,
+//                                medicationName,
+//                                patientName,
+//                                dosage,
+//                                remainingAmount.toInt(),
+//                                dailyIntakeFrequency.toString(),
+//                                weekMode,
+//                                reminderMode,
+//                                formattedExpiryDate,
+//                            )
+//                            val medicationId = dataBase.medicationDao().insertOne(localMedicationUpdate) // 更新本地Medication数据库
+//                            for (date in dateList) {
+//                                val dateCalendarUpdate = CalendarMedication(
+//                                    0,
+//                                    medicationId.toInt(),
+//                                    date
+//                                )
+//                                val dateId = dataBase.calendarMedicationDao().insertOne(dateCalendarUpdate)
+//                                for (time in dailyIntakeTimes) {
+//                                    val localTimeUpdate = MedicationTime(
+//                                        0,
+//                                        medicationId.toInt(),
+//                                        dateId.toInt(),
+//                                        time,
+//                                        -1,
+//                                    )
+//                                    dataBase.medicationTimeDao().insertOne(localTimeUpdate)
+//                                }
+//                            }
+
                             medicationData = MedicationData(medicationID, medicationName, patientName, dosage, remainingAmount.toInt(), dailyIntakeFrequency!!.toInt(), dailyIntakeTimes, weekMode, reminderMode, formattedExpiryDate)
                             val intent = Intent()
                             intent.putExtra("MEDICATION_DATA", medicationData)

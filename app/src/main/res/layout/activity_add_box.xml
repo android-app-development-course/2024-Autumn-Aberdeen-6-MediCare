@@ -90,7 +90,7 @@
                 android:text="药箱名称:"
                 android:textSize="16sp"/>
             <EditText
-                android:id="@+id/editTextMedicationName"
+                android:id="@+id/editTextBoxName"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -185,7 +185,7 @@
                 android:textColor="@color/theme_gray_note"
                 android:textSize="16sp"/>
             <EditText
-                android:id="@+id/editTextTime"
+                android:id="@+id/editTextRemark"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -197,7 +197,7 @@
 
         <!-- Submit Button -->
         <Button
-            android:id="@+id/buttonSaveMedication"
+            android:id="@+id/buttonSaveBox"
             android:layout_width="120dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"

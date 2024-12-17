@@ -15,11 +15,11 @@ interface MedicationTimeDao {
     fun findById(id: Int): List<MedicationTime>
 
     @Query("SELECT * FROM medication_time WHERE " +
-            "medication_id = (:medicationId) AND date_id = (:dateId) LIMIT 1")
-    fun findOneByMedicationAndDateId(medicationId: Int, dateId: Int): MedicationTime
+            "medication_id = (:medicationId) AND date_id = (:dateId)")
+    fun findByMedicationAndDateId(medicationId: Int, dateId: Int): List<MedicationTime>
 
     @Insert
-    fun insertOne(vararg medications: MedicationTime)
+    fun insertOne(vararg medications: MedicationTime): Long
 
     @Delete
     fun delete(medication: MedicationTime)

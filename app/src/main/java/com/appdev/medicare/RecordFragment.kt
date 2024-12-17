@@ -33,7 +33,7 @@ class RecordFragment : Fragment() {
         _binding = FragmentRecordBinding.inflate(inflater, container, false)
 
         val root: View = binding.root
-        defaultMedicineRecord = MedicineRecord(5,"展示", "病号1", "2024-10-16")
+        defaultMedicineRecord = MedicineRecord(5,"展示", "病号1", "2024-10-16","","")
 
         buttonAddRecord = binding.buttonAddRecord
         recyclerViewRecord = binding.recyclerViewRecord
@@ -42,7 +42,7 @@ class RecordFragment : Fragment() {
 
 
         buttonAddRecord.setOnClickListener {
-            val intent = Intent(requireContext(), AddMedActivity::class.java)
+            val intent = Intent(requireContext(), AddRecActivity::class.java)
             startActivity(intent)
         }
         return root
@@ -62,10 +62,10 @@ class RecordFragment : Fragment() {
     }
 
     private fun getMedicineRecordsFromDB(): List<MedicineRecord> {
-        val record1 = MedicineRecord(1,"病历1", "病号1", "2024-12-01")
-        val record2 = MedicineRecord(2,"病历2", "病号2", "2024-12-05")
-        val record3 = MedicineRecord(3,"病历1", "病号1", "2024-12-01")
-        val record4 = MedicineRecord(4,"病历2", "病号2", "2024-12-05")
+        val record1 = MedicineRecord(1,"病历1", "病号1", "2024-12-01","","")
+        val record2 = MedicineRecord(2,"病历2", "病号2", "2024-12-05","","")
+        val record3 = MedicineRecord(3,"病历1", "病号1", "2024-12-01","","")
+        val record4 = MedicineRecord(4,"病历2", "病号2", "2024-12-05","","")
         return listOf(record1, record2, record3, record4)
     }
 

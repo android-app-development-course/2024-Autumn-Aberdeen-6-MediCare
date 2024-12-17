@@ -4,5 +4,7 @@ data class MedicineRecord(
     var medicineRecordID: Int,
     var name: String,
     var patientName: String,
-    var recordTime: String
+    var recordTime: String,
+    var advice: String?,
+    var picture: String?,
 )

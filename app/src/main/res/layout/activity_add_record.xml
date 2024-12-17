@@ -7,7 +7,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#FDF9FC"
+        android:background="#FFFFFF"
         android:orientation="vertical"
         android:padding="16dp">
 
@@ -31,7 +31,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="添加药品信息"
+                android:text="添加诊籍信息"
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
@@ -54,8 +54,8 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="(可选)是否存在实体药箱，可拍照记录"
-                android:textColor="#6C6868"/>
+                android:text="(可选)点击拍摄医生诊断结果进行保存"
+                android:textColor="@color/theme_gray_note"/>
 
             <ImageButton
                 style="?android:attr/buttonBarStyle"
@@ -72,7 +72,7 @@
             android:layout_height="1dp"
             android:background="#CCCCCC" />
 
-        <!-- Medication Name -->
+        <!-- MedicineBox Name -->
         <LinearLayout
             style="@style/CustomInputStyle"
             android:layout_width="match_parent"
@@ -87,10 +87,87 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="药品名称:"
+                android:text="诊籍名称:"
                 android:textSize="16sp"/>
             <EditText
-                android:id="@+id/editTextMedicationName"
+                android:id="@+id/editTextRecordName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="12dp"
+                android:inputType="text"
+                android:textSize="16sp"
+                android:hint="如：小孩感冒/ 咽炎复诊"
+                android:backgroundTint="@android:color/transparent"/>
+        </LinearLayout>
+
+        <!-- Box Type and Applicable People -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp">
+
+            <!-- Applicable People-->
+            <LinearLayout
+                style="@style/CustomInputStyle"
+                android:layout_weight="1"
+                android:layout_height="60dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:background="@drawable/rounded_gray_background">
+                <Space
+                    android:layout_width="13dp"
+                    android:layout_height="wrap_content" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="病人:"
+                    android:textSize="16sp"/>
+                <EditText
+                    android:id="@+id/editTextPatientName"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:padding="12dp"
+                    android:inputType="text"
+                    android:textSize="16sp"
+                    android:backgroundTint="@android:color/transparent"/>
+            </LinearLayout>
+
+            <Space
+                android:layout_width="13dp"
+                android:layout_height="wrap_content" />
+
+            <!-- 占位-->
+            <LinearLayout
+                style="@style/CustomInputStyle"
+                android:layout_weight="1"
+                android:layout_height="60dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:visibility="invisible"/>
+        </LinearLayout>
+
+        <!-- Record Time -->
+        <LinearLayout
+            style="@style/CustomInputStyle"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:background="@drawable/rounded_gray_background">
+            <Space
+                android:layout_width="13dp"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="时间:    2024-10-16 12:00:00"
+                android:textSize="16sp"/>
+            <EditText
+                android:id="@+id/editTextRecordTime"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -100,314 +177,39 @@
                 android:backgroundTint="@android:color/transparent"/>
         </LinearLayout>
 
-        <!-- Patient Name and Medical Record -->
+        <!-- PS -->
         <LinearLayout
+            style="@style/CustomInputStyle"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="60dp"
+            android:layout_marginTop="10dp"
             android:orientation="horizontal"
-            android:layout_marginTop="16dp">
-
-            <!-- Patient Name -->
-            <LinearLayout
-                style="@style/CustomInputStyle"
-                android:layout_weight="1"
-                android:layout_height="60dp"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:background="@drawable/rounded_gray_background">
-                <Space
-                    android:layout_width="13dp"
-                    android:layout_height="wrap_content" />
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="用药人:"
-                    android:textSize="16sp"/>
-                <EditText
-                    android:id="@+id/editTextPatientName"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:padding="12dp"
-                    android:inputType="textPersonName"
-                    android:textSize="16sp"
-                    android:backgroundTint="@android:color/transparent"/>
-            </LinearLayout>
-
+            android:gravity="center"
+            android:background="@drawable/rounded_gray_background">
             <Space
                 android:layout_width="13dp"
                 android:layout_height="wrap_content" />
-
-            <!-- Medical Record -->
-            <LinearLayout
-                style="@style/CustomInputStyle"
-                android:layout_weight="1"
-                android:layout_height="60dp"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:background="@drawable/rounded_gray_background">
-                <Space
-                    android:layout_width="13dp"
-                    android:layout_height="wrap_content" />
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="诊籍:"
-                    android:textSize="16sp"/>
-                <EditText
-                    android:id="@+id/editTextMedicalRecord"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:padding="12dp"
-                    android:inputType="text"
-                    android:textSize="16sp"
-                    android:backgroundTint="@android:color/transparent"/>
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <!-- Dosage and Remaining Amount -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="16dp">
-
-            <!-- Dosage -->
-            <LinearLayout
-                style="@style/CustomInputStyle"
-                android:layout_weight="1"
-                android:layout_height="60dp"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:background="@drawable/rounded_gray_background">
-                <Space
-                    android:layout_width="13dp"
-                    android:layout_height="wrap_content" />
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="剂量:"
-                    android:textSize="16sp"/>
-                <EditText
-                    android:id="@+id/editTextDosage"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:padding="12dp"
-                    android:inputType="text"
-                    android:textSize="16sp"
-                    android:backgroundTint="@android:color/transparent"/>
-            </LinearLayout>
-
-            <Space
-                android:layout_width="13dp"
-                android:layout_height="wrap_content" />
-
-            <!-- Remaining Amount -->
-            <LinearLayout
-                style="@style/CustomInputStyle"
-                android:layout_weight="1"
-                android:layout_height="60dp"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:background="@drawable/rounded_gray_background">
-                <Space
-                    android:layout_width="13dp"
-                    android:layout_height="wrap_content" />
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="余量:"
-                    android:textSize="16sp"/>
-                <EditText
-                    android:id="@+id/editTextRemainingAmount"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:padding="12dp"
-                    android:inputType="number"
-                    android:textSize="16sp"
-                    android:backgroundTint="@android:color/transparent"/>
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <!-- Daily Intake Frequency -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="(选填)医嘱:"
+                android:textColor="@color/theme_gray_note"
+                android:textSize="16sp"/>
+            <EditText
+                android:id="@+id/editTextAdvice"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="一天服用次数"
-                android:textSize="18sp" />
-
-            <ImageButton
-                android:id="@+id/listButtonDailyIntakeFrequency"
-                style="?android:attr/buttonBarStyle"
-                android:layout_width="20sp"
-                android:layout_height="20sp"
-                android:layout_marginLeft="-10dp"
-                android:contentDescription="选择一天服用次数列表"
-                android:onClick="showDailyIntakeList"
-                android:padding="0dp"
-                android:src="@drawable/calendar_ic_arrow_right" />
-
+                android:padding="12dp"
+                android:inputType="text"
+                android:textSize="16sp"
+                android:hint="如：避免剧烈运动/ 补充维生素"
+                android:backgroundTint="@android:color/transparent"/>
         </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/timeSelectionLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical" />
-
-        <!-- Intake Interval (Days) -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="服用频率"
-            android:textSize="18sp" />
-
-        <LinearLayout
-            android:id="@+id/linearLayoutDays"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center">
-
-            <CheckBox
-                android:id="@+id/checkBoxMonday"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textSize="16sp"
-                android:text="一" />
-
-            <CheckBox
-                android:id="@+id/checkBoxTuesday"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textSize="16sp"
-                android:text="二" />
-
-            <CheckBox
-                android:id="@+id/checkBoxWednesday"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textSize="16sp"
-                android:text="三" />
-
-            <CheckBox
-                android:id="@+id/checkBoxThursday"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textSize="16sp"
-                android:text="四" />
-
-            <CheckBox
-                android:id="@+id/checkBoxFriday"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textSize="16sp"
-                android:text="五" />
-
-            <CheckBox
-                android:id="@+id/checkBoxSaturday"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textSize="16sp"
-                android:text="六" />
-
-            <CheckBox
-                android:id="@+id/checkBoxSunday"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textSize="16sp"
-                android:text="日" />
-        </LinearLayout>
-
-        <!-- Reminder mode -->
-        <!-- 支持多选，选择无则全不选 -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="提醒方式"
-            android:textSize="18sp" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <CheckBox
-                android:id="@+id/checkboxCalendar"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="日历"
-                android:textSize="16sp"
-                android:enabled="false"/>
-
-            <CheckBox
-                android:id="@+id/checkboxAlarm"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="闹钟"
-                android:textSize="16sp" />
-
-            <CheckBox
-                android:id="@+id/checkboxAppNotification"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="应用"
-                android:textSize="16sp" />
-
-            <CheckBox
-                android:id="@+id/checkboxNone"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="无"
-                android:textSize="16sp" />
-
-        </LinearLayout>
-
-        <!-- Expiry Date with DatePicker -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="保质期"
-            android:textSize="18sp"/>
-
-        <EditText
-            android:id="@+id/editTextExpiryDate"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:drawableEnd="@android:drawable/ic_menu_my_calendar"
-            android:focusable="false"
-            android:hint="选择保质期"
-            android:inputType="date"
-            android:onClick="showDatePicker" />
 
         <!-- Submit Button -->
         <Button
-            android:id="@+id/buttonSaveMedication"
+            android:id="@+id/buttonSaveRecord"
             android:layout_width="120dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"

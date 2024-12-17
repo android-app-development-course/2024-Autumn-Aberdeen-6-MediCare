@@ -15,7 +15,7 @@ interface MedicationDao {
     fun findById(id: Int): List<Medication>
 
     @Insert
-    fun insertOne(vararg medications: Medication)
+    fun insertOne(vararg medications: Medication): Long
 
     @Delete
     fun delete(medication: Medication)

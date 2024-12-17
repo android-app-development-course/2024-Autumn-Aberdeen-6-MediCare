@@ -38,6 +38,7 @@ import com.appdev.medicare.model.DeleteMedicationRecordRequest
 import com.appdev.medicare.model.GetAllOnDateRequest
 import com.appdev.medicare.model.JsonValue
 import com.appdev.medicare.receiver.NotificationReceiver
+import com.appdev.medicare.room.DatabaseBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -79,6 +80,7 @@ class CalendarFragment : Fragment() {
         _binding = FragmentCalendarBinding.inflate(inflater, container, false)
 
         val root: View = binding.root
+        val dataBase = DatabaseBuilder.getInstance(requireContext()) // 实例化本地数据库
 
         textMonthYear = binding.textMonthYear
         recyclerViewCalendar = binding.recyclerViewCalendar
