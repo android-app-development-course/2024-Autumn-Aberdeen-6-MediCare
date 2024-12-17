@@ -14,17 +14,21 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 interface DatabaseSync {
-    suspend fun getAllFromServer() {
+    suspend fun getAllDataFromServer() {
+        getMedicationDataFromServer()
+        getCalendarMedicationDataFromServer()
+        getMedicationTimeDataFromServer()
+    }
+
+    suspend fun getMedicationDataFromServer() {
         val appDatabase = DatabaseBuilder.getInstance()
         val response = withContext(Dispatchers.IO) {
-            RetrofitClient.api.getAllData().execute()
+            RetrofitClient.api.getMedicationData().execute()
         }
 
         if (response.isSuccessful) {
             val data = response.body()!!.data as JsonValue.JsonObject
             val medications = data.value["medication"] as JsonValue.JsonList
-            val calendarMedications = data.value["calendarMedication"] as JsonValue.JsonList
-            val medicationTimes = data.value["medicationTime"] as JsonValue.JsonList
 
             for (item in medications) {
                 val value = (item as JsonValue.JsonObject).value
@@ -42,6 +46,24 @@ interface DatabaseSync {
                 )
                 appDatabase.medicationDao().insertOne(medication)
             }
+        } else {
+            val data = parseRequestBody(response.errorBody())
+            Log.e(
+                "DatabaseSync",
+                "Failed to get medication table data from server, code: ${response.code()}, reason: ${data.error?.code} - ${data.error?.description}"
+            )
+        }
+    }
+
+    suspend fun getCalendarMedicationDataFromServer() {
+        val appDatabase = DatabaseBuilder.getInstance()
+        val response = withContext(Dispatchers.IO) {
+            RetrofitClient.api.getCalendarMedicationData().execute()
+        }
+
+        if (response.isSuccessful) {
+            val data = response.body()!!.data as JsonValue.JsonObject
+            val calendarMedications = data.value["calendarMedication"] as JsonValue.JsonList
 
             for (item in calendarMedications) {
                 val value = (item as JsonValue.JsonObject).value
@@ -54,7 +76,24 @@ interface DatabaseSync {
                 )
                 appDatabase.calendarMedicationDao().insertOne(calendarMedication)
             }
+        } else {
+            val data = parseRequestBody(response.errorBody())
+            Log.e(
+                "DatabaseSync",
+                "Failed to get calendar_medication table data from server, code: ${response.code()}, reason: ${data.error?.code} - ${data.error?.description}"
+            )
+        }
+    }
 
+    suspend fun getMedicationTimeDataFromServer() {
+        val appDatabase = DatabaseBuilder.getInstance()
+        val response = withContext(Dispatchers.IO) {
+            RetrofitClient.api.getMedicationTimeData().execute()
+        }
+
+        if (response.isSuccessful) {
+            val data = response.body()!!.data as JsonValue.JsonObject
+            val medicationTimes = data.value["medicationTime"] as JsonValue.JsonList
             for (item in medicationTimes) {
                 val value = (item as JsonValue.JsonObject).value
                 val medicationId = appDatabase.medicationDao().findIdByUuid(value["medicationId"].toString())
@@ -69,12 +108,11 @@ interface DatabaseSync {
                 )
                 appDatabase.medicationTimeDao().insertOne(medicationTime)
             }
-
         } else {
             val data = parseRequestBody(response.errorBody())
             Log.e(
                 "DatabaseSync",
-                "Failed to get data from server, code: ${response.code()}, reason: ${data.error?.code} - ${data.error?.description}"
+                "Failed to get medication_time data from server, code: ${response.code()}, reason: ${data.error?.code} - ${data.error?.description}"
             )
         }
     }
