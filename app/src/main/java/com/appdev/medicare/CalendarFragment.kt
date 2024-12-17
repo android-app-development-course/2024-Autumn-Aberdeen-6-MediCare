@@ -47,6 +47,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
+import java.time.YearMonth
 import java.util.*
 import kotlin.collections.MutableList
 
@@ -521,6 +522,21 @@ class CalendarFragment : Fragment() {
         )
     }
 
+    private fun update_medicationInfo(dateItems: MutableList<DateItem>) {
+        // 云同步这月份的内容
+        val checkFormat = SimpleDateFormat("yyyy-MM", Locale.getDefault())
+        val yearMonth = checkFormat.format(dateItems[0].date)
+        lifecycleScope.launch {
+            val deferredList = dateItems.map { dateItem ->
+                async {
+                    dealEach(dateItem)
+                }
+            }
+            deferredList.awaitAll()
+            cachedDateItems[yearMonth] = dateItems
+        }
+    }
+
     private fun init_medicationInfo(dateItems: MutableList<DateItem>) {
         val checkFormat = SimpleDateFormat("yyyy-MM", Locale.getDefault())
         val yearMonth = checkFormat.format(dateItems[0].date)
@@ -577,21 +593,17 @@ class CalendarFragment : Fragment() {
     private fun deleteOne(dateItem: DateItem, deleteMedic: MedicationData) {
         lifecycleScope.launch {
             withContext(Dispatchers.IO) {
-                val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-                val checkFormat = SimpleDateFormat("yyyy-MM", Locale.getDefault())
-                val date = dateFormat.format(dateItem.date)
-                val yearMonth = checkFormat.format(dateItem.date)
-                val medicationId = deleteMedic.medicationID
-                dataBase.calendarMedicationDao().softDeleteByMedicationIdAndDate(medicationId, date)
-            }
-
-            if (response.isSuccessful) {
-                cachedDateItems[yearMonth]?.find { it.date == dateItem.date }?.medicationData =
-                    dateItem.medicationData
-                Toast.makeText(requireContext(), "删除成功", Toast.LENGTH_SHORT).show()
-            } else {
-                Log.e("CalendarFragment", "Failed to process, check both client and server.")
-                Toast.makeText(requireContext(), "删除出现问题", Toast.LENGTH_SHORT).show()
+                try {
+                    val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                    val checkFormat = SimpleDateFormat("yyyy-MM", Locale.getDefault())
+                    val date = dateFormat.format(dateItem.date)
+                    val yearMonth = checkFormat.format(dateItem.date)
+                    val medicationId = deleteMedic.medicationID
+                    dataBase.calendarMedicationDao().softDeleteByMedicationIdAndDate(medicationId, date)
+                    cachedDateItems[yearMonth]?.find { it.date == dateItem.date }?.medicationData = dateItem.medicationData
+                } catch(e: Exception) {
+                    Log.w("本地数据库删除", "删除失败，由于$e")
+                }
             }
         }
     }

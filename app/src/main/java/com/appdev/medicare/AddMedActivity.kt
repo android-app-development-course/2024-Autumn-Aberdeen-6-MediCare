@@ -102,10 +102,11 @@ class AddMedActivity : AppCompatActivity() {
 
         showIntakeTimes(3, true)
 
+        val flag = intent.getBooleanExtra("flag", true)
         // 锁定当天的星期，全部星期栏禁用
         val mode = intent.getBooleanExtra("mode", false)
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        if (!mode) {
+        if (!mode and flag) {
             val selectedDate = intent.getParcelableExtra<DateItem>("selectedDate")
             dateList = listOf(dateFormat.format(selectedDate!!.date))
             val calendar = Calendar.getInstance().apply {
@@ -122,7 +123,7 @@ class AddMedActivity : AppCompatActivity() {
             checkBoxWeeks.forEach { box ->
                 box.isEnabled = false
             }
-        } else  {
+        } else if (mode and flag) {
             val selectedDates: ArrayList<DateItem>? = intent.getParcelableArrayListExtra("selectedDates")
             dateList = selectedDates?.map { dateFormat.format(it.date) } ?: emptyList()
         }

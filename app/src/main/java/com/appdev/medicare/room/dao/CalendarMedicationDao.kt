@@ -14,10 +14,10 @@ interface CalendarMedicationDao {
     @Query("SELECT * FROM calendar_medication WHERE (medication_id = :medicationId AND sync_status != 'deleted')")
     fun findAllByMedicationId(medicationId: Int): List<CalendarMedication>
 
-    @Query("SELECT medication_id FROM calendar_medication WHERE date = :date")
+    @Query("SELECT medication_id FROM calendar_medication WHERE date = :date AND sync_status != 'deleted'")
     fun findMedicationIdByDate(date: String): List<Int>
 
-    @Query("SELECT id FROM calendar_medication WHERE medication_id = (:medicationId) AND date = (:date)")
+    @Query("SELECT id FROM calendar_medication WHERE medication_id = (:medicationId) AND date = (:date) AND sync_status != 'deleted'")
     fun findId(medicationId: Int, date:String): Int
 
     @Insert

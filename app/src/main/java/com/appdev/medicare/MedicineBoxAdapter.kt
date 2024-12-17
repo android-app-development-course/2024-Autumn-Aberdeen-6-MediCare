@@ -1,5 +1,6 @@
 package com.appdev.medicare
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -32,6 +33,7 @@ class MedicineBoxAdapter(private val boxList: List<MedicineBox>) : RecyclerView.
 
         holder.addMedicineButton.setOnClickListener {
             // 定义接口
+            Log.d("Click Now","step1")
             onAddMedicineButtonClickListener?.onAddButtonClick(record)
         }
     }

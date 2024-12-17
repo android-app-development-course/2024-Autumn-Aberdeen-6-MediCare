@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -44,6 +43,15 @@ class BoxFragment : Fragment() {
         buttonAddBox = binding.buttonAddBox
         recyclerViewBox = binding.recyclerViewBox
         medicineBoxAdapter = MedicineBoxAdapter(listOf(defaultMedicineBox))
+        medicineBoxAdapter.setOnAddButtonClickListener(object :
+            MedicineBoxAdapter.OnAddButtonClickListener {
+            override fun onAddButtonClick(box: MedicineBox) {
+                val boxList = box
+                val intent = Intent(requireContext(), AddMedActivity::class.java)
+                intent.putExtra("flag", false)
+                startActivity(intent)
+            }
+        })
         recyclerViewBox.setAdapter(medicineBoxAdapter)
 
         buttonAddBox.setOnClickListener {
@@ -65,8 +73,9 @@ class BoxFragment : Fragment() {
         medicineBoxAdapter.setOnAddButtonClickListener(object :
             MedicineBoxAdapter.OnAddButtonClickListener {
             override fun onAddButtonClick(box: MedicineBox) {
-//                Toast.makeText(requireContext(), "点击了 ${box.name} 的添加按钮", Toast.LENGTH_SHORT).show()
+                val boxList = box
                 val intent = Intent(requireContext(), AddMedActivity::class.java)
+                intent.putExtra("flag", false)
                 startActivity(intent)
             }
         })
