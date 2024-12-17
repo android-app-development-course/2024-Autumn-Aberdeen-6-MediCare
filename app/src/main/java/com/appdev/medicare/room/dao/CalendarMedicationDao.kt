@@ -26,4 +26,7 @@ interface CalendarMedicationDao {
 
     @Query("UPDATE calendar_medication SET sync_status = 'deleted' WHERE id = :id")
     fun softDeleteById(id: Int)
+
+    @Query("UPDATE calendar_medication SET sync_status = 'deleted' WHERE medication_id = (:medicationId) AND date = (:date)")
+    fun softDeleteByMedicationIdAndDate(medicationId: Int, date: String)
 }

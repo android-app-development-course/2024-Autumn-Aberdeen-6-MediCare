@@ -571,43 +571,20 @@ class CalendarFragment : Fragment() {
                 }
             }
             dateItem.medicationData = listInfo
-//            val getAllOnDateRequest = GetAllOnDateRequest(date)
-//            val records = withContext(Dispatchers.IO) {
-//                RetrofitClient.api.getAllOnDate(getAllOnDateRequest).execute()
-//            }
-//            if (records.code() == 200) {
-//                val data = records.body()?.data
-//                if (data is JsonValue.JsonList) {
-//                    val listInfo = mutableListOf<MedicationData>()
-//                    data.value.mapNotNull { item ->
-//                        if (item is JsonValue.JsonObject) {
-//                            val convertedData = convertMedicationData(item)
-//                            listInfo.add(convertedData)
-//                        } else {
-//                            Log.w("CalendarFragment", "Data type error, should be JsonValue.JsonObject")
-//                        }
-//                    }
-//                    dateItem.medicationData = listInfo
-//                } else {
-//                    Log.w("CalendarFragment", "Data type error, should be JsonValue.JsonObject")
-//                }
-//            } else if (records.code() == 204){
-//                Log.w("CalendarFragment", "Record not exist")
-//            }
         }
     }
 
     private fun deleteOne(dateItem: DateItem, deleteMedic: MedicationData) {
         lifecycleScope.launch {
-            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-            val checkFormat = SimpleDateFormat("yyyy-MM", Locale.getDefault())
-            val date = dateFormat.format(dateItem.date)
-            val yearMonth = checkFormat.format(dateItem.date)
-            val medicationId = deleteMedic.medicationID
-            val deleteMedicationRecordRequest = DeleteMedicationRecordRequest(date, medicationId)
-            val response = withContext(Dispatchers.IO) {
-                RetrofitClient.api.deleteMedicationRecord(deleteMedicationRecordRequest).execute()
+            withContext(Dispatchers.IO) {
+                val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                val checkFormat = SimpleDateFormat("yyyy-MM", Locale.getDefault())
+                val date = dateFormat.format(dateItem.date)
+                val yearMonth = checkFormat.format(dateItem.date)
+                val medicationId = deleteMedic.medicationID
+                dataBase.calendarMedicationDao().softDeleteByMedicationIdAndDate(medicationId, date)
             }
+
             if (response.isSuccessful) {
                 cachedDateItems[yearMonth]?.find { it.date == dateItem.date }?.medicationData =
                     dateItem.medicationData
