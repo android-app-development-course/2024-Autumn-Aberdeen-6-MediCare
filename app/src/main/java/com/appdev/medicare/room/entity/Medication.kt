@@ -9,13 +9,13 @@ import java.util.UUID
 data class Medication(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     @ColumnInfo(name = "medication_name") val medicationName: String,
-    @ColumnInfo(name = "patient_name") val patientName: String,
+    @ColumnInfo(name = "patient_name") val patientName: String = "default",
     @ColumnInfo(name = "dosage") val dosage: String,
-    @ColumnInfo(name = "remaining_amount") val remainingAmount: Int,
+    @ColumnInfo(name = "remaining_amount") val remainingAmount: String = "default",
     @ColumnInfo(name = "frequency") val frequency: String,
-    @ColumnInfo(name = "week_mode") val weekMode: String,
-    @ColumnInfo(name = "reminder_type") val reminderType: String,
-    @ColumnInfo(name = "expiration_date") val expirationDate: String,
+    @ColumnInfo(name = "week_mode") val weekMode: String = "default",
+    @ColumnInfo(name = "reminder_type") val reminderType: String = "default",
+    @ColumnInfo(name = "expiration_date") val expirationDate: String = "default",
     @ColumnInfo(name = "uuid") val uuid: String = UUID.randomUUID().toString(),
     @ColumnInfo(name = "sync_status") val syncStatus: String = "created"
 )

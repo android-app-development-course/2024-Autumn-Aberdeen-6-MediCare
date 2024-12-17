@@ -4,6 +4,7 @@ data class MedicineBox(
     var medicineBoxID: Int,
     var name: String,
     var type: String,
+    var person: String,
     var medicineSet: MutableList<MedicationData>?,
     var remark: String?,
     var picture: String?,
