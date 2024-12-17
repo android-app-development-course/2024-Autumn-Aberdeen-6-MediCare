@@ -46,10 +46,10 @@ class BoxFragment : Fragment() {
         recyclerViewBox.setAdapter(medicineBoxAdapter)
 
 
-        buttonAddBox.setOnClickListener {
-            val intent = Intent(requireContext(), AddBoxActivity::class.java)
-            startActivity(intent)
-        }
+//        buttonAddBox.setOnClickListener {
+//            val intent = Intent(requireContext(), AddBoxActivity::class.java)
+//            startActivity(intent)
+//        }
         return root
     }
 

@@ -9,5 +9,5 @@
     <color name="theme_secondary_variant">#DFF2EB</color>
     <color name="theme_light_gray">#EBEBEB</color>
     <color name="theme_input">#F5F5F5</color>
-    <color name="theme_note_gray">#6C6868"</color>
+    <color name="theme_gray_note">#6C6868</color>
 </resources>
