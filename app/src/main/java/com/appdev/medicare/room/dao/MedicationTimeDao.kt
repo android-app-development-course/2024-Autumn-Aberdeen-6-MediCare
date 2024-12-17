@@ -18,6 +18,9 @@ interface MedicationTimeDao {
             "medication_id = :medicationId AND date_id = :dateId AND sync_status != 'deleted'")
     fun findByMedicationAndDateId(medicationId: Int, dateId: Int): List<MedicationTime>
 
+    @Query("SELECT id FROM medication_time WHERE uuid = :uuid LIMIT 1")
+    fun fundIdByUuid(uuid: String): Int
+
     @Insert
 //    fun insertOne(vararg medications: MedicationTime): Long
     fun insertOne(medication: MedicationTime): Long

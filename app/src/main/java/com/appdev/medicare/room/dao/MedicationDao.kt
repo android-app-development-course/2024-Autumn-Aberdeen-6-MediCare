@@ -14,6 +14,9 @@ interface MedicationDao {
     @Query("SELECT * FROM medication WHERE (id = :id AND sync_status != 'deleted')")
     fun findById(id: Int): Medication
 
+    @Query("SELECT id FROM medication WHERE uuid = :uuid LIMIT 1")
+    fun findIdByUuid(uuid: String): Int
+
     @Insert
 //    fun insertOne(vararg medications: Medication): Long
     fun insertOne(medication: Medication): Long

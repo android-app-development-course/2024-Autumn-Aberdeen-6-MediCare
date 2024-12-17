@@ -7,10 +7,10 @@ object DatabaseBuilder {
     @Volatile
     private var INSTANCE: AppDatabase? = null
 
-    fun getInstance(context: Context): AppDatabase {
+    fun getInstance(context: Context? = null): AppDatabase {
         return INSTANCE ?: synchronized(this) {
             val instance = Room.databaseBuilder(
-                context.applicationContext,
+                context!!.applicationContext,
                 AppDatabase::class.java,
                 "medicare_database"
             )
