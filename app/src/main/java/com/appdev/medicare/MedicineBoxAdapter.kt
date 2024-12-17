@@ -7,14 +7,14 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.appdev.medicare.model.MedicineBox
+import com.appdev.medicare.model.BoxData
 
-class MedicineBoxAdapter(private val boxList: List<MedicineBox>) : RecyclerView.Adapter<MedicineBoxAdapter.ViewHolder>() {
+class MedicineBoxAdapter(private val boxList: List<BoxData>) : RecyclerView.Adapter<MedicineBoxAdapter.ViewHolder>() {
 
     private var onAddMedicineButtonClickListener: OnAddButtonClickListener? = null
 
     interface OnAddButtonClickListener {
-        fun onAddButtonClick(box: MedicineBox)
+        fun onAddButtonClick(box: BoxData)
     }
 
     fun setOnAddButtonClickListener(listener: OnAddButtonClickListener) {

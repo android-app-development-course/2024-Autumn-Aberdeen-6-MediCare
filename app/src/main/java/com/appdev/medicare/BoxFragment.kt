@@ -1,18 +1,27 @@
 package com.appdev.medicare
 
 
+import android.app.Activity
+import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.os.Bundle
+import android.provider.ContactsContract.Data
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.appdev.medicare.databinding.FragmentBoxBinding
 import com.appdev.medicare.model.MedicationData
-import com.appdev.medicare.model.MedicineBox
+import com.appdev.medicare.model.BoxData
+import com.appdev.medicare.room.AppDatabase
+import com.appdev.medicare.room.DatabaseBuilder
+import com.appdev.medicare.room.dao.MedicineBoxDao
+import com.appdev.medicare.room.entity.MedicineBox
 
 
 class BoxFragment : Fragment() {
@@ -23,8 +32,13 @@ class BoxFragment : Fragment() {
     private lateinit var buttonAddBox: ImageButton
     private lateinit var recyclerViewBox: RecyclerView
     private lateinit var medicineBoxAdapter: MedicineBoxAdapter
-    private lateinit var defaultMedicineBox: MedicineBox
+    private lateinit var defaultBoxData: BoxData
     private lateinit var defaultMedicineSet: MutableList<MedicationData>
+
+    private lateinit var addBoxActivityLauncher: ActivityResultLauncher<Intent>
+    private lateinit var dataBase: AppDatabase
+
+    private var cachedBoxList = mutableMapOf<String, BoxData>()
 
 
     override fun onCreateView(
@@ -35,17 +49,18 @@ class BoxFragment : Fragment() {
         _binding = FragmentBoxBinding.inflate(inflater, container, false)
 
         val root: View = binding.root
+        dataBase = DatabaseBuilder.getInstance(requireContext())
 
         defaultMedicineSet = mutableListOf()
 
-        defaultMedicineBox = MedicineBox(1,"小孩感冒", "家庭", "",defaultMedicineSet,"","")
+        defaultBoxData = BoxData(1,"小孩感冒", "家庭", "",defaultMedicineSet,"","")
 
         buttonAddBox = binding.buttonAddBox
         recyclerViewBox = binding.recyclerViewBox
-        medicineBoxAdapter = MedicineBoxAdapter(listOf(defaultMedicineBox))
+        medicineBoxAdapter = MedicineBoxAdapter(listOf(defaultBoxData))
         medicineBoxAdapter.setOnAddButtonClickListener(object :
             MedicineBoxAdapter.OnAddButtonClickListener {
-            override fun onAddButtonClick(box: MedicineBox) {
+            override fun onAddButtonClick(box: BoxData) {
                 val boxList = box
                 val intent = Intent(requireContext(), AddMedActivity::class.java)
                 intent.putExtra("flag", false)
@@ -54,9 +69,19 @@ class BoxFragment : Fragment() {
         })
         recyclerViewBox.setAdapter(medicineBoxAdapter)
 
+        addBoxActivityLauncher = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result ->
+            if (result.resultCode == RESULT_OK && result.data!= null) {
+                val boxData = result.data?.getParcelableExtra<BoxData>("box_data")
+                if (boxData!= null) {
+                    cachedBoxList[boxData.name] = boxData
+                }
+            }
+        }
         buttonAddBox.setOnClickListener {
             val intent = Intent(requireContext(), AddBoxActivity::class.java)
-            startActivity(intent)
+            addBoxActivityLauncher.launch(intent)
         }
         return root
     }
@@ -68,11 +93,14 @@ class BoxFragment : Fragment() {
 
     // 从数据库获取数据，用于加载已有数据
     private fun loadDataAndUpdateUI() {
+
+        dataBase.medicineBoxDao().getAll()
+
         val recordList = getMedicineBoxFromDB()
         medicineBoxAdapter = MedicineBoxAdapter(recordList)
         medicineBoxAdapter.setOnAddButtonClickListener(object :
             MedicineBoxAdapter.OnAddButtonClickListener {
-            override fun onAddButtonClick(box: MedicineBox) {
+            override fun onAddButtonClick(box: BoxData) {
                 val boxList = box
                 val intent = Intent(requireContext(), AddMedActivity::class.java)
                 intent.putExtra("flag", false)
@@ -83,11 +111,11 @@ class BoxFragment : Fragment() {
         recyclerViewBox.setAdapter(medicineBoxAdapter)
     }
 
-    private fun getMedicineBoxFromDB(): List<MedicineBox> {
-        val record1 = MedicineBox(1,"药箱1", "病号1", "",defaultMedicineSet,"","")
-        val record2 = MedicineBox(2,"药箱2", "病号2", "",defaultMedicineSet,"","")
-        val record3 = MedicineBox(3,"药箱1", "病号1", "",defaultMedicineSet,"","")
-        val record4 = MedicineBox(4,"药箱2", "病号2", "",defaultMedicineSet,"","")
+    private fun getMedicineBoxFromDB(): List<BoxData> {
+        val record1 = BoxData(1,"药箱1", "病号1", "",defaultMedicineSet,"","")
+        val record2 = BoxData(2,"药箱2", "病号2", "",defaultMedicineSet,"","")
+        val record3 = BoxData(3,"药箱1", "病号1", "",defaultMedicineSet,"","")
+        val record4 = BoxData(4,"药箱2", "病号2", "",defaultMedicineSet,"","")
         return listOf(record1, record2, record3, record4)
     }
 

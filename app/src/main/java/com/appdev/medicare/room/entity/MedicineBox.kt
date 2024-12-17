@@ -24,6 +24,7 @@ data class MedicineBox(
     @ColumnInfo(name = "box_type") val boxType: String,
     @ColumnInfo(name = "applicable_people") val applicablePeople: String,
     @ColumnInfo(name = "medication_id") val medicationId: Int?,
+    @ColumnInfo(name = "remark") val remark: String?,
     @ColumnInfo(name = "uuid") val uuid: String = UUID.randomUUID().toString(),
     @ColumnInfo(name = "sync_status") val syncStatus: String = "created"
 )
