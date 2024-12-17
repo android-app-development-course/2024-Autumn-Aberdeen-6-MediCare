@@ -9,6 +9,8 @@ from database import SQLiteConnection
 # 当前包所在目录
 _package_dir = os.path.dirname(__file__)
 
+table_names = ["user", "token", "medication", "calendar_medication", "medication_time"]
+
 def init_database(database_path: str) -> None:
     """
     初始化 SQLite 数据库.
@@ -22,13 +24,6 @@ def init_database(database_path: str) -> None:
         cursor.execute("BEGIN;")
 
         # 检查数据库中的表是否存在，不存在则创建
-        table_names = [
-            "user",
-            "token",
-            "medication",
-            "calendar_medication",
-            "medication_time",
-        ]
         for table_name in table_names:
             cursor.execute(f"SELECT name FROM sqlite_master WHERE type='table' AND name=?", (table_name,))
             result = cursor.fetchone()

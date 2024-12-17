@@ -830,7 +830,7 @@ def insert_medication_time_data(user_id):
             medication_times.append((user_id, medication_id, date_id, status, time, client_uuid))
             
         query3 = "INSERT INTO medication_time (user_id, medication_id, date_id, status, time, client_uuid)"
-        cursor.executemany(query2, medication_times)
+        cursor.executemany(query3, medication_times)
         conn.commit()
     
     logger.info("Successfully inserted data.")
