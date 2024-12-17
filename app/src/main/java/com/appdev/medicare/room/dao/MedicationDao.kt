@@ -11,7 +11,7 @@ interface MedicationDao {
     @Query("SELECT * FROM medication")
     fun getAll(): List<Medication>
 
-    @Query("SELECT * FROM medication WHERE id = (:id)")
+    @Query("SELECT * FROM medication WHERE (id = :id AND sync_status != 'deleted')")
     fun findById(id: Int): Medication
 
     @Insert
