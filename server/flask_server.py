@@ -3,7 +3,7 @@ import logging
 from flask import Flask, request
 from database import SQLiteConnection
 from db_initialize import table_names
-from message_builder import build_message
+from server.utils import build_message
 from function_decorator import json_required, token_required
 from token_manager import new_token, validate_token, invalidate_token
 
