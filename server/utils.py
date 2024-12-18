@@ -11,13 +11,12 @@
         "code": null,               // 错误代码，字符串
         "description": null         // 错误描述，字符串
     },
-    "timestamp": "2024-12-05T12:34:56+08:00" // 返回的时间戳（北京时间 UTC+8，ISO8601 格式）
+    "timestamp": 1734495716         // 时间戳
 }
 """
 
 from typing import Tuple
 from datetime import datetime
-from pytz import timezone
 from flask import jsonify
 
 def build_message(code: int = 200,
@@ -25,7 +24,8 @@ def build_message(code: int = 200,
                   message: str = None,
                   data: str | int | dict = None,
                   err_code: str = None,
-                  err_description: str = None) -> Tuple[str, int]:
+                  err_description: str = None,
+                  timestamp: datetime = datetime.now()) -> Tuple[str, int]:
     message = {
         "code": code,
         "success": success,
@@ -35,7 +35,7 @@ def build_message(code: int = 200,
             "code": err_code,
             "description": err_description
         } if err_code else None,
-        "timestamp": datetime.now(timezone('Asia/Shanghai')).replace(microsecond=0).isoformat()
+        "timestamp": int(timestamp.replace(microsecond=0).timestamp())
     }
 
     return jsonify(message), code

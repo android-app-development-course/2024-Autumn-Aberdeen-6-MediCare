@@ -2,10 +2,10 @@
 修饰器
 """
 import logging
-from flask import Flask, request, jsonify
+from flask import request
 from functools import wraps
 
-from message_builder import build_message
+from server.utils import build_message
 from token_manager import validate_token, update_token_expire_time
 
 logger = logging.getLogger(__name__)
