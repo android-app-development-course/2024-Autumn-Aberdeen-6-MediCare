@@ -1,36 +1,21 @@
 package com.appdev.medicare
 
-import android.app.AlertDialog
-import android.app.DatePickerDialog
-import android.app.TimePickerDialog
 import android.content.Intent
-import android.graphics.Color
-import android.media.MediaCodecInfo
 import android.os.Bundle
 import android.util.Log
-import android.view.Gravity
 import android.view.View
-import android.widget.*
+import android.widget.Button
+import android.widget.EditText
+import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.appdev.medicare.model.DateItem
-import com.appdev.medicare.model.MedicationData
-import java.text.SimpleDateFormat
-import java.util.*
-import com.appdev.medicare.api.RetrofitClient
-import com.appdev.medicare.model.AddMedicationRequest
-import com.appdev.medicare.model.JsonValue
-import com.appdev.medicare.utils.buildAlertDialog
 import com.appdev.medicare.databinding.ActivityAddBoxBinding
 import com.appdev.medicare.model.BoxData
 import com.appdev.medicare.room.DatabaseBuilder
-import com.appdev.medicare.room.dao.MedicineBoxDao
 import com.appdev.medicare.room.entity.MedicineBox
-import com.google.android.material.datepicker.DateValidatorPointBackward
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.w3c.dom.Text
 
 class AddBoxActivity : AppCompatActivity() {
     private var _binding: ActivityAddBoxBinding? = null

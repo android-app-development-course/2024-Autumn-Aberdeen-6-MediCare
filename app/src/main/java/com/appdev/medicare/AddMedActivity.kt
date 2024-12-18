@@ -3,36 +3,35 @@ package com.appdev.medicare
 import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
-import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.util.AttributeSet
 import android.util.Log
 import android.view.Gravity
 import android.view.View
-import android.widget.*
+import android.widget.Button
+import android.widget.CheckBox
+import android.widget.EditText
+import android.widget.ImageButton
+import android.widget.LinearLayout
+import android.widget.TimePicker
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.appdev.medicare.model.DateItem
 import com.appdev.medicare.model.MedicationData
-import java.text.SimpleDateFormat
-import java.util.*
-import com.appdev.medicare.api.RetrofitClient
-import com.appdev.medicare.model.AddMedicationRequest
-import com.appdev.medicare.model.JsonValue
 import com.appdev.medicare.room.AppDatabase
 import com.appdev.medicare.room.DatabaseBuilder
 import com.appdev.medicare.room.entity.CalendarMedication
 import com.appdev.medicare.room.entity.Medication
 import com.appdev.medicare.room.entity.MedicationTime
 import com.appdev.medicare.utils.buildAlertDialog
-import com.appdev.medicare.utils.parseRequestBody
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 class AddMedActivity : AppCompatActivity() {
     private lateinit var editTextMedicationName: EditText
