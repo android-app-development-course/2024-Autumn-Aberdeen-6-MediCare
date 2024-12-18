@@ -76,7 +76,7 @@ object DatabaseSync {
                 editor.remove("loginToken")
                 editor.apply()
 
-                // TODO 删除用户数据
+                // TODO 删除本地用户数据
 
                 return "unauthorized"
             }
@@ -282,8 +282,7 @@ object DatabaseSync {
     }
 
     suspend fun checkUpdate() {
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HHH:mm:ss")
-        val clientLastUpdate = LocalDateTime.parse(preferences.getString("dataLastUpdate", "1970-01-01 00:00:00") as String, formatter)
+        val clientLastUpdate = preferences.getInt("dataLastUpdate", 0)
 
         val response = withContext(Dispatchers.IO) {
             RetrofitClient.api.getLastUpdateTime().execute()
@@ -291,13 +290,13 @@ object DatabaseSync {
 
         if (response.isSuccessful) {
             val data = (response.body()!!.data as JsonValue.JsonObject).value
-            val serverLastUpdate = LocalDateTime.parse(data["lastUpdateTime"].toString(), formatter)
+            val serverLastUpdate = data["lastUpdateTime"].toString().toInt()
 
             if (serverLastUpdate > clientLastUpdate) {
                 // 服务器数据比本地数据新
                 overwriteAllDataFromServer()
                 val editor = preferences.edit()
-                editor.putString("dataLastUpdate", data["lastUpdateTime"].toString())
+                editor.putInt("dataLastUpdate", serverLastUpdate)
                 editor.apply()
                 Log.i("DatabaseSync", "Successfully synced data from server.")
             } else if (serverLastUpdate < clientLastUpdate) {
