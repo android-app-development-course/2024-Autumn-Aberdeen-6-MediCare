@@ -350,28 +350,6 @@ class CalendarFragment : Fragment() {
         }
     }
 
-//        val handler = Handler(Looper.getMainLooper())
-//        var index = 0
-//
-//        val reminderTask = object : Runnable {
-//            override fun run() {
-//                if (index >= intakeTimes.size) return // 如果超出范围，停止任务
-//                // 获取当前的提醒时间
-//                val entireTime = combineDateAndTime(date, intakeTimes[index])
-//                // 设置提醒
-//                if (isNotificationEnabled) {
-//                    setNotificationReminder(context, entireTime, index, medicationName, patientName)
-//                } else if (isAlarmEnabled) {
-//                    setAlarmReminder(context, entireTime, index, selectedWeekDay, medicationName, patientName)
-//                }
-//                // 增加索引，等待 10 秒后处理下一个时间
-//                index++
-//                handler.postDelayed(this, 10_000L) // 延迟 10 秒再执行下一次任务
-//            }
-//        }
-//        // 开始执行第一个任务
-//        handler.post(reminderTask)}
-
     private fun startNotificationSetting() {
         val applicationInfo = requireContext().applicationInfo
         try {

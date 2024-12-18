@@ -273,21 +273,21 @@ class AddMedActivity : AppCompatActivity() {
                 LinearLayout.LayoutParams.WRAP_CONTENT
             )
             rowLayout.layoutParams = rowLayoutParams
-            for (j in 0 until selectedNumber) {
+            for (j in 1..3) {
                 val index = (i - 1) * 3 + j
-                if (index < selectedNumber) {
+                if (index <= selectedNumber) {
                     val timeButton = android.widget.Button(this)
                     timeButton.apply {
                         val defaultTimeText = when (index) {
-                            0 -> "08:30"
-                            1 -> "12:30"
-                            2 -> "19:30"
+                            1 -> "08:30"
+                            2 -> "12:30"
+                            3 -> "19:30"
                             else -> ""
                         }
                         if (defaultFlag)
                             text = defaultTimeText
                         else
-                            text =  ("选择时间 ${index+1}")
+                            text =  ("选择时间 ${index}")
                         setTextColor(Color.parseColor("#000000")) // 按钮文字颜色
                         setBackgroundResource(R.drawable.rounded_blue_background) // 使用自定义背景
                         textSize = 16f
@@ -301,11 +301,11 @@ class AddMedActivity : AppCompatActivity() {
                         LinearLayout.LayoutParams.WRAP_CONTENT
                     )
 //                        buttonParams.setMargins(20, 0, 20, 2)
-                    buttonParams.setMargins(18, 8, 18, 8) // 更均匀的间距
+                    buttonParams.setMargins(20, 0, 20, 2) // 更均匀的间距
                     timeButton.layoutParams = buttonParams
 
                     val rowLayoutParams = LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT, // 父布局宽度匹配屏幕
+                        LinearLayout.LayoutParams.WRAP_CONTENT, // 父布局宽度匹配屏幕
                         LinearLayout.LayoutParams.WRAP_CONTENT
                     )
                     rowLayoutParams.setMargins(0, 16, 0, 16) // 每一行的上下间距

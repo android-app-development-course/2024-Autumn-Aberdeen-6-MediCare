@@ -94,7 +94,7 @@ class BoxFragment : Fragment() {
     // 从数据库获取数据，用于加载已有数据
     private fun loadDataAndUpdateUI() {
 
-        dataBase.medicineBoxDao().getAll()
+//        dataBase.medicineBoxDao().getAll()
 
         val recordList = getMedicineBoxFromDB()
         medicineBoxAdapter = MedicineBoxAdapter(recordList)
