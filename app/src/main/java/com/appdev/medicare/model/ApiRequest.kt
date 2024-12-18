@@ -21,3 +21,7 @@ data class InsertCalendarMedicationDataRequest(
 data class InsertMedicationTimeDataRequest(
     val medicationTime: List<Map<String, JsonValue>>
 )
+
+data class InsertMedicineBoxDataRequest(
+    val medicineBox: List<Map<String, JsonValue>>
+)

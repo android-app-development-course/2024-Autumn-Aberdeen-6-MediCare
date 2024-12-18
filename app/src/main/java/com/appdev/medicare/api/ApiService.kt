@@ -1,15 +1,10 @@
 package com.appdev.medicare.api
 
-import com.appdev.medicare.model.AddMedicationRequest
 import com.appdev.medicare.model.ApiResponse
-import com.appdev.medicare.model.DeleteMedicationRecordRequest
-import com.appdev.medicare.model.GetAllOnDateRequest
-import com.appdev.medicare.model.GetMedicationInfoRequest
-import com.appdev.medicare.model.GetMedicationRecordsRequest
-import com.appdev.medicare.model.GetMedicationTimesRequest
 import com.appdev.medicare.model.InsertCalendarMedicationDataRequest
 import com.appdev.medicare.model.InsertMedicationDataRequest
 import com.appdev.medicare.model.InsertMedicationTimeDataRequest
+import com.appdev.medicare.model.InsertMedicineBoxDataRequest
 import com.appdev.medicare.model.LoginRequest
 import com.appdev.medicare.model.RegisterRequest
 import retrofit2.Call
@@ -40,6 +35,9 @@ interface ApiService {
     @GET("getMedicationTimeData")
     fun getMedicationTimeData(): Call<ApiResponse>
 
+    @GET("getMedicineBoxData")
+    fun getMedicineBoxData(): Call<ApiResponse>
+
     @GET("getLastUpdateTime")
     fun getLastUpdateTime(): Call<ApiResponse>
 
@@ -54,4 +52,7 @@ interface ApiService {
 
     @POST("insertMedicationTimeData")
     fun insertMedicationTimeData(@Body body: InsertMedicationTimeDataRequest): Call<ApiResponse>
+
+    @POST("insertMedicineBoxData")
+    fun insertMedicineBoxData(@Body body: InsertMedicineBoxDataRequest)
 }
