@@ -3,7 +3,7 @@ import logging
 from flask import Flask, request
 from database import SQLiteConnection
 from db_initialize import table_names
-from server.utils import build_message
+from utils import build_message, update_data_time
 from function_decorator import json_required, token_required
 from token_manager import new_token, validate_token, invalidate_token
 
@@ -383,8 +383,10 @@ def insert_medication_data(user_id):
         cursor.executemany(query, medications)
         conn.commit()
     
+    time = update_data_time(user_id)
+    
     logger.info("Successfully inserted data.")
-    return build_message(message="Successfully inserted data.")
+    return build_message(message="Successfully inserted data.", timestamp=time)
 
 
 """
@@ -430,8 +432,10 @@ def insert_calendar_medication_data(user_id):
         cursor.executemany(query2, calendar_medications)
         conn.commit()
     
+    time = update_data_time(user_id)
+
     logger.info("Successfully inserted data.")
-    return build_message(message="Successfully inserted data.")
+    return build_message(message="Successfully inserted data.", timestamp=time)
 
 
 """
@@ -491,5 +495,7 @@ def insert_medication_time_data(user_id):
         cursor.executemany(query3, medication_times)
         conn.commit()
     
+    time = update_data_time(user_id)
+
     logger.info("Successfully inserted data.")
-    return build_message(message="Successfully inserted data.")
+    return build_message(message="Successfully inserted data.", timestamp=time)
