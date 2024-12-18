@@ -2,7 +2,7 @@
 修饰器
 """
 import logging
-from flask import Flask, request, jsonify
+from flask import request
 from functools import wraps
 
 from message_builder import build_message

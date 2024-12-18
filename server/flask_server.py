@@ -1,6 +1,5 @@
 import os
 import logging
-from traceback import format_exc
 from flask import Flask, request
 from database import SQLiteConnection
 from db_initialize import table_names
