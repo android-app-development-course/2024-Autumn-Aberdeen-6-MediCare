@@ -131,8 +131,6 @@ class MainActivity : AppCompatActivity() {
                     this@MainActivity.getString(R.string.statusOffline),
                     Toast.LENGTH_SHORT
                 ).show()
-                val intent = Intent(this@MainActivity, LoginActivity().javaClass)
-                startActivity(intent)
             }
         }
     }
