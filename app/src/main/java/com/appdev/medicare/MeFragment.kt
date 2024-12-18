@@ -10,17 +10,25 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import com.appdev.medicare.api.RetrofitClient
 import com.appdev.medicare.databinding.FragmentMeBinding
+import com.appdev.medicare.utils.DatabaseSync
 import com.appdev.medicare.utils.buildAlertDialog
 import com.appdev.medicare.utils.buildInputAlertDialog
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 class MeFragment : Fragment() {
 
     private var _binding: FragmentMeBinding? = null
     private val binding get() = _binding!!
+    private lateinit var tvLoginText: TextView
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -32,14 +40,18 @@ class MeFragment : Fragment() {
         val root: View = binding.root
 
         val llLoginArea = binding.loginArea
-        val tvLoginText = binding.textLogin
+        tvLoginText = binding.textLogin
         llLoginArea.setOnClickListener {
-            if (tvLoginText.text == "点击登录") {
+            val prefs = requireContext().getSharedPreferences("MediCare", Context.MODE_PRIVATE)
+            val token = prefs.getString("loginToken", null)
+            val username = prefs.getString("username", "") as String
+            if (token.isNullOrEmpty()) {
                 val intent = Intent(requireContext(), LoginActivity::class.java)
                 startActivity(intent)
                 // 登录成功后 text 更换为用户名 + 欢迎语
             } else {
-                Toast.makeText(requireContext(), "已登录，点击可查看个人信息", Toast.LENGTH_SHORT)
+                tvLoginText.text = username
+                Toast.makeText(requireContext(), requireContext().getString(R.string.welcomeMsg, username), Toast.LENGTH_SHORT)
                     .show()
             }
         }
@@ -104,14 +116,44 @@ class MeFragment : Fragment() {
             mainContext.getString(R.string.confirmLogout),
             true
         ) { dialog: DialogInterface ->
-            val preferences = mainContext.getSharedPreferences("MediCare", Context.MODE_PRIVATE)
-            val editor = preferences.edit()
-            editor.remove("loginToken")
-            editor.apply()
-            // TODO: 移除数据库数据
-            dialog.dismiss()
+            if (DatabaseSync.isOnline) {
+                lifecycleScope.launch {
+                    withContext(Dispatchers.IO) {
+                        RetrofitClient.api.logout().execute()
+                    }
+                    val preferences = mainContext.getSharedPreferences("MediCare", Context.MODE_PRIVATE)
+                    val editor = preferences.edit()
+                    editor.remove("loginToken")
+                    editor.apply()
+                    // TODO: 移除数据库数据
+
+                    tvLoginText.text = requireContext().getString(R.string.clickToLogin)
+                    Toast.makeText(
+                        mainContext,
+                        mainContext.getString(R.string.logoutSuccess),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    dialog.dismiss()
+                }
+
+            } else {
+
+            }
         }
             .show()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        // 判断登录状态
+        val prefs = requireContext().getSharedPreferences("MediCare", Context.MODE_PRIVATE)
+        val token = prefs.getString("loginToken", null)
+        val username = prefs.getString("username", "") as String
+
+        if (!token.isNullOrEmpty()) {
+            tvLoginText.text = username
+        }
     }
 
     override fun onDestroyView() {
