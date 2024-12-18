@@ -18,7 +18,6 @@ import com.appdev.medicare.model.MedicationData
 import java.text.SimpleDateFormat
 import java.util.*
 import com.appdev.medicare.api.RetrofitClient
-import com.appdev.medicare.model.AddMedicationRequest
 import com.appdev.medicare.model.JsonValue
 import com.appdev.medicare.utils.buildAlertDialog
 import com.appdev.medicare.databinding.ActivityAddBoxBinding
