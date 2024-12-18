@@ -147,7 +147,7 @@ def check_token(user_id):
 """
 /getLastUpdateTime - 获取用户服务端数据的上次更新时间（时间戳）
 请求：null
-响应 - 成功：返回 200 和 {"lastUpdateTime": "2024-12-17 18:36:00"}
+响应 - 成功：返回 200 和 {"lastUpdateTime": 1734496054}
 """
 @app.route("/getLastUpdateTime", methods=["GET"])
 @token_required
