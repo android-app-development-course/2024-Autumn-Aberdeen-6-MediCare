@@ -139,7 +139,7 @@ class AddMedActivity : AppCompatActivity() {
         }
 
         checkboxCalendar.setOnClickListener {
-            Toast.makeText(this, "日历提醒功能已被弃用！！", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, this.getString(R.string.deprecatedCalendarNotify), Toast.LENGTH_SHORT).show()
         }
 
         val reminderCheckboxes = listOf(checkboxAlarm, checkboxAppNotification)
@@ -185,7 +185,7 @@ class AddMedActivity : AppCompatActivity() {
                 remainingAmount.isBlank() || selectedTimes.size != dailyIntakeFrequency || expiryDate.isBlank()) {
                 Toast.makeText(
                     this,
-                    "请填写所有药品信息",
+                    this.getString(R.string.inputAllMedicineInfo),
                     Toast.LENGTH_SHORT).show()
             } else {
                 dailyIntakeTimes = sortTimes(selectedTimes.values.toMutableList())
@@ -227,7 +227,7 @@ class AddMedActivity : AppCompatActivity() {
                                 }
                             }
                         } catch (e: Exception) {
-                            Log.w("插入出错","请检查各数据插入")
+                            Log.e("AddMedActivity","Insert error, please check input")
                             addSuccessful = false
                         }
                     }
@@ -243,8 +243,8 @@ class AddMedActivity : AppCompatActivity() {
                     runOnUiThread {
                         buildAlertDialog(
                             this@AddMedActivity,
-                            "药品信息保存失败",
-                            "原因1"
+                            this@AddMedActivity.getString(R.string.failedToSaveMedicineData),
+                            this@AddMedActivity.getString(R.string.reason1)
                         )
                             .show()
                     }
@@ -286,7 +286,7 @@ class AddMedActivity : AppCompatActivity() {
                         if (defaultFlag)
                             text = defaultTimeText
                         else
-                            text =  ("选择时间 ${index}")
+                            text = this@AddMedActivity.getString(R.string.selectTimeIndex, index)
                         setTextColor(Color.parseColor("#000000")) // 按钮文字颜色
                         setBackgroundResource(R.drawable.rounded_blue_background) // 使用自定义背景
                         textSize = 16f
@@ -323,7 +323,7 @@ class AddMedActivity : AppCompatActivity() {
     fun showDailyIntakeList(view: View) {
         val items = arrayOf("1", "2", "3", "4", "5", "6", "7", "8", "9")
         val builder = AlertDialog.Builder(this)
-        builder.setTitle("选择每日服用次数")
+        builder.setTitle(this.getString(R.string.selectTakingTimesPerDay))
         builder.setItems(items) { dialog, which ->
             val selectedNumber = items[which].toInt()
             showIntakeTimes(selectedNumber, false)

@@ -22,7 +22,7 @@
                 android:id="@+id/buttonBackMain"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:contentDescription="返回"
+                android:contentDescription="@string/back"
                 android:padding="10dp"
                 android:src="@drawable/calendar_ic_arrow_left" />
 
@@ -31,7 +31,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="添加药箱信息"
+                android:text="@string/addMedicineBoxInfo"
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
@@ -39,7 +39,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@android:color/white"
-                android:contentDescription="占位"
+                android:contentDescription="@string/placeholder"
                 android:padding="10dp"
                 android:src="@drawable/calendar_ic_arrow_left"
                 android:visibility="invisible" />
@@ -54,7 +54,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="(可选)是否存在实体药箱，可拍照记录"
+                android:text="@string/physicalMedBoxPhotoHint"
                 android:textColor="@color/theme_gray_note"/>
 
             <ImageButton
@@ -87,7 +87,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="药箱名称:"
+                android:text="@string/medicineBoxName"
                 android:textSize="16sp"/>
             <EditText
                 android:id="@+id/editTextBoxName"
@@ -121,7 +121,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="类型:"
+                    android:text="@string/type"
                     android:textSize="16sp"/>
                 <EditText
                     android:id="@+id/editTextBoxType"
@@ -152,7 +152,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="适用人:"
+                    android:text="@string/applicablePerson"
                     android:textSize="16sp"/>
                 <EditText
                     android:id="@+id/editTextApplicablePeople"
@@ -181,7 +181,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="(选填)备注:"
+                android:text="@string/optionalRemark"
                 android:textColor="@color/theme_gray_note"
                 android:textSize="16sp"/>
             <EditText
@@ -202,7 +202,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:layout_gravity="center_horizontal"
-            android:text="保存信息" />
+            android:text="@string/saveInfo" />
 
     </LinearLayout>
 </ScrollView>

@@ -21,7 +21,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="药品名称"
+            android:text="@string/medicineName"
             android:textStyle="bold"
             android:textSize="18sp"
             android:ellipsize="end"
@@ -35,7 +35,7 @@
             android:layout_height="32dp"
             android:src="@drawable/ic_delete"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="删除药品" />
+            android:contentDescription="@string/deleteMedicine" />
     </LinearLayout>
 
     <!-- 剂量信息 -->
@@ -43,7 +43,7 @@
         android:id="@+id/textDosageInfo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="剂量信息"
+        android:text="@string/dosageInfo"
         android:textSize="14sp"
         android:textColor="@color/black"
         android:layout_marginBottom="8dp" />

@@ -20,7 +20,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end|top"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="关闭"
+            android:contentDescription="@string/close"
             android:src="@drawable/ic_close" />
 
         <!-- 药品名称 -->
@@ -28,7 +28,7 @@
             android:id="@+id/dialog_textMedicationName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="药品名称"
+            android:text="@string/medicineName"
             android:textStyle="bold"
             android:textSize="16sp"
             android:layout_marginBottom="4dp" />
@@ -38,7 +38,7 @@
             android:id="@+id/dialog_textPatientName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="患者名称"
+            android:text="@string/patientName"
             android:textSize="14sp"
             android:layout_marginBottom="4dp" />
 
@@ -47,7 +47,7 @@
             android:id="@+id/dialog_textDosageInfo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="剂量信息"
+            android:text="@string/dosageInfo"
             android:textSize="14sp"
             android:layout_marginBottom="4dp" />
 
@@ -56,7 +56,7 @@
             android:id="@+id/dialog_textRemainingAmount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="剩余数量"
+            android:text="@string/remainingAmount"
             android:textSize="14sp"
             android:layout_marginBottom="4dp" />
 
@@ -65,7 +65,7 @@
             android:id="@+id/dialog_textDailyIntakeFrequency"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="每日摄入频率"
+            android:text="@string/dailyIntakeFrequency"
             android:textSize="14sp"
             android:layout_marginBottom="4dp" />
 
@@ -74,7 +74,7 @@
             android:id="@+id/dialog_textExpiryDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="过期日期"
+            android:text="@string/expirationDate"
             android:textSize="14sp"
             android:layout_marginBottom="4dp" />
     </LinearLayout>

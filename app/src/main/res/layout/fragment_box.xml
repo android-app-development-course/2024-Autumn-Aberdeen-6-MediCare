@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.75"
             android:iconifiedByDefault="false"
-            android:queryHint="搜索药箱" />
+            android:queryHint="@string/searchMedicineBox" />
 
         <ImageButton
             style="?android:attr/buttonBarStyle"
@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.05"
             android:src="@drawable/ic_filter"
-            android:contentDescription="筛选"/>
+            android:contentDescription="@string/filter"/>
 
     </LinearLayout>
 
@@ -53,7 +53,7 @@
             android:layout_gravity="right|bottom"
             android:layout_margin="16dp"
             android:clickable="true"
-            android:contentDescription="Add Record"
+            android:contentDescription="@string/addRecord"
             app:fabCustomSize="48dp"
             app:fabSize="auto"
             app:srcCompat="@drawable/ic_add_circle" />

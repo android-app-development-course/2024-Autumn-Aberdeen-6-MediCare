@@ -37,6 +37,7 @@ import com.appdev.medicare.model.JsonValue
 import com.appdev.medicare.receiver.NotificationReceiver
 import com.appdev.medicare.room.AppDatabase
 import com.appdev.medicare.room.DatabaseBuilder
+import com.appdev.medicare.utils.buildAlertDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -133,10 +134,18 @@ class CalendarFragment : Fragment() {
             calendarAdapter.clearStates()
             if (isChecked) {
                 // 显示启用多选模式的提示
-                Toast.makeText(requireContext(), "多选模式已启用", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    requireContext(),
+                    requireContext().getString(R.string.multipleSelectEnabled),
+                    Toast.LENGTH_SHORT
+                ).show()
             } else {
                 // 显示禁用多选模式的提示
-                Toast.makeText(requireContext(), "多选模式已禁用", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    requireContext(),
+                    requireContext().getString(R.string.multipleSelectDisabled),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
 
@@ -223,14 +232,10 @@ class CalendarFragment : Fragment() {
             if (selectedDateItem == null && selectedDateItems.isEmpty()) {
                 val handler = Handler(Looper.getMainLooper())
                 handler.post {
-                    val alertDialog = AlertDialog.Builder(requireContext())
-                        .setTitle("选择日期")
-                        .setMessage("请先选择日期，以便添加药物。")
-                        .setPositiveButton("确定") { dialog, _ ->
-                            dialog.dismiss()
-                        }
-                        .create()
-                    alertDialog.show()
+                    buildAlertDialog(
+                        requireContext(),
+                        requireContext().getString(R.string.selectDate),
+                        requireContext().getString(R.string.selectDateDes))
                 }
             } else {
                 val intent = Intent(requireContext(), AddMedActivity::class.java)
@@ -375,8 +380,8 @@ class CalendarFragment : Fragment() {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val notificationIntent = Intent(context, NotificationReceiver::class.java).apply {
             action = "com.appdev.medicare.NOTIFICATION_ACTION"
-            putExtra("title", "$patientName 服用$medicationName")
-            putExtra("message", "到点喝药了!!!")
+            putExtra("title", requireContext().getString(R.string.notificationTitle, patientName, medicationName))
+            putExtra("message", requireContext().getString(R.string.notificationDetail))
         }
 
         val pendingIntent = PendingIntent.getBroadcast(
@@ -408,7 +413,7 @@ class CalendarFragment : Fragment() {
         val alarmIntent = Intent(AlarmClock.ACTION_SET_ALARM).apply {
             putExtra(AlarmClock.EXTRA_HOUR, hour)
             putExtra(AlarmClock.EXTRA_MINUTES, minute)
-            putExtra(AlarmClock.EXTRA_MESSAGE, "Reminder${requestCode+1} " + "$medicationName $patientName") // 闹钟标签
+            putExtra(AlarmClock.EXTRA_MESSAGE, requireContext().getString(R.string.reminderIndex, requestCode + 1) + " $medicationName $patientName") // 闹钟标签
             if (weekDay.size > 1)
                 putExtra(AlarmClock.EXTRA_DAYS, weekDay as ArrayList<Int>?)
             putExtra(AlarmClock.EXTRA_SKIP_UI, true) // 如果设为 true，不显示系统闹钟 UI
@@ -418,11 +423,11 @@ class CalendarFragment : Fragment() {
         try {
             // 尝试启动闹钟 Intent
             context.startActivity(alarmIntent)
-            Log.d("Alarm", "Start Alarm setting")
+            Log.d("CalendarFragment", "Alarm: Start Alarm setting")
             // 设置完系统闹钟，用户可以选择此次之后暂停但无法实现直接删除，单次闹钟考虑使用别的方法
         } catch (e: ActivityNotFoundException) {
             // 如果没有任何应用可以处理这个 Intent
-            Toast.makeText(context, "Alarm clock app not available", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, requireContext().getString(R.string.alarmNotAvailable), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -610,7 +615,7 @@ class CalendarFragment : Fragment() {
                     dataBase.calendarMedicationDao().softDeleteByMedicationIdAndDate(medicationId, date)
                     cachedDateItems[yearMonth]?.find { it.date == dateItem.date }?.medicationData = dateItem.medicationData
                 } catch(e: Exception) {
-                    Log.w("本地数据库删除", "删除失败，由于$e")
+                    Log.w("CalendarFragment", "Fail to delete local database, reason: $e")
                 }
             }
         }

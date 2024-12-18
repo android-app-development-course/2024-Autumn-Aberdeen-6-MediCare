@@ -33,7 +33,14 @@ class RecordFragment : Fragment() {
         _binding = FragmentRecordBinding.inflate(inflater, container, false)
 
         val root: View = binding.root
-        defaultRecordData = RecordData(5,"展示", "病号1", "2024-10-16","","")
+        defaultRecordData = RecordData(
+            5,
+            requireContext().getString(R.string.show),
+            requireContext().getString(R.string.patientIndex, 1),
+            "2024-10-16",
+            "",
+            ""
+        )
 
         buttonAddRecord = binding.buttonAddRecord
         recyclerViewRecord = binding.recyclerViewRecord
@@ -62,10 +69,38 @@ class RecordFragment : Fragment() {
     }
 
     private fun getMedicineRecordsFromDB(): List<RecordData> {
-        val record1 = RecordData(1,"病历1", "病号1", "2024-12-01","","")
-        val record2 = RecordData(2,"病历2", "病号2", "2024-12-05","","")
-        val record3 = RecordData(3,"病历1", "病号1", "2024-12-01","","")
-        val record4 = RecordData(4,"病历2", "病号2", "2024-12-05","","")
+        val record1 = RecordData(
+            1,
+            requireContext().getString(R.string.medRecordIndex, 1),
+            requireContext().getString(R.string.patientIndex, 1),
+            "2024-12-01",
+            "",
+            ""
+        )
+        val record2 = RecordData(
+            2,
+            requireContext().getString(R.string.medRecordIndex, 2),
+            requireContext().getString(R.string.patientIndex, 2),
+            "2024-12-01",
+            "",
+            ""
+        )
+        val record3 = RecordData(
+            3,
+            requireContext().getString(R.string.medRecordIndex, 3),
+            requireContext().getString(R.string.patientIndex, 3),
+            "2024-12-01",
+            "",
+            ""
+        )
+        val record4 = RecordData(
+            4,
+            requireContext().getString(R.string.medRecordIndex, 4),
+            requireContext().getString(R.string.patientIndex, 4),
+            "2024-12-01",
+            "",
+            ""
+        )
         return listOf(record1, record2, record3, record4)
     }
 

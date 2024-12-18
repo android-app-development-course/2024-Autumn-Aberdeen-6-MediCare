@@ -26,7 +26,7 @@
             android:id="@+id/textLogin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="点击登录"
+            android:text="@string/clickToLogin"
             android:textSize="25sp"
             android:layout_marginTop="8dp"
             android:textColor="#000000"
@@ -70,7 +70,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="成员管理"
+                    android:text="@string/memberManage"
                     android:textSize="16sp" />
             </LinearLayout>
 
@@ -101,7 +101,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="通知"
+                    android:text="@string/notification"
                     android:textSize="16sp" />
             </LinearLayout>
 
@@ -132,7 +132,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="设置"
+                    android:text="@string/settings"
                     android:textSize="16sp" />
             </LinearLayout>
 
@@ -163,7 +163,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="退出账号"
+                    android:text="@string/logout"
                     android:textSize="16sp" />
             </LinearLayout>
     </LinearLayout>

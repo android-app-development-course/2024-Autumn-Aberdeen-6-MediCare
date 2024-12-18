@@ -33,7 +33,7 @@ class MedicineBoxAdapter(private val boxList: List<BoxData>) : RecyclerView.Adap
 
         holder.addMedicineButton.setOnClickListener {
             // 定义接口
-            Log.d("Click Now","step1")
+            Log.d("MedicineBoxAdapter","Clicked now, enter step 1")
             onAddMedicineButtonClickListener?.onAddButtonClick(record)
         }
     }

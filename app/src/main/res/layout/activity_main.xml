@@ -30,7 +30,7 @@
             android:drawableTop="@drawable/calendar_drawable"
             android:gravity="center"
             android:paddingLeft="0dp"
-            android:text="日历" />
+            android:text="@string/calendar" />
         <RadioButton
             android:id="@+id/rb_box"
             android:layout_width="0dp"
@@ -40,7 +40,7 @@
             android:drawableTop="@drawable/box_drawable"
             android:gravity="center"
             android:paddingLeft="0dp"
-            android:text="药箱" />
+            android:text="@string/navMedicineBox" />
 
         <RadioButton
             android:id="@+id/rb_record"
@@ -51,7 +51,7 @@
             android:drawableTop="@drawable/record_drawable"
             android:gravity="center"
             android:paddingLeft="0dp"
-            android:text="诊籍" />
+            android:text="@string/navMedicalRecord" />
         <RadioButton
             android:id="@+id/rb_me"
             android:layout_width="0dp"
@@ -61,6 +61,6 @@
             android:drawableTop="@drawable/me_drawable"
             android:gravity="center"
             android:paddingLeft="0dp"
-            android:text="我的" />
+            android:text="@string/navMe" />
     </RadioGroup>
 </RelativeLayout>

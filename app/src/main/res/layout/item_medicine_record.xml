@@ -21,7 +21,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="病名"
+            android:text="@string/diseaseName"
             android:textStyle="bold"
             android:textSize="18sp"
             android:ellipsize="end"
@@ -35,7 +35,7 @@
             android:layout_height="32dp"
             android:src="@drawable/ic_delete"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="删除记录" />
+            android:contentDescription="@string/deleteRecord" />
 
     </LinearLayout>
 
@@ -44,7 +44,7 @@
         android:id="@+id/textPatientName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="病人"
+        android:text="@string/patient"
         android:textSize="14sp"
         android:textColor="@color/black"
         android:layout_marginBottom="8dp" />
@@ -54,7 +54,7 @@
         android:id="@+id/textTime"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="时间"
+        android:text="@string/time"
         android:textSize="14sp"
         android:textColor="@color/black"
         android:layout_marginBottom="8dp"

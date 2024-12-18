@@ -53,7 +53,15 @@ class BoxFragment : Fragment() {
 
         defaultMedicineSet = mutableListOf()
 
-        defaultBoxData = BoxData(1,"小孩感冒", "家庭", "",defaultMedicineSet,"","")
+        defaultBoxData = BoxData(
+            1,
+            this.getString(R.string.childCold),
+            this.getString(R.string.family),
+            "",
+            defaultMedicineSet,
+            "",
+            ""
+        )
 
         buttonAddBox = binding.buttonAddBox
         recyclerViewBox = binding.recyclerViewBox
@@ -72,9 +80,9 @@ class BoxFragment : Fragment() {
         addBoxActivityLauncher = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) { result ->
-            if (result.resultCode == RESULT_OK && result.data!= null) {
+            if (result.resultCode == RESULT_OK && result.data != null) {
                 val boxData = result.data?.getParcelableExtra<BoxData>("box_data")
-                if (boxData!= null) {
+                if (boxData != null) {
                     cachedBoxList[boxData.name] = boxData
                 }
             }
@@ -112,10 +120,38 @@ class BoxFragment : Fragment() {
     }
 
     private fun getMedicineBoxFromDB(): List<BoxData> {
-        val record1 = BoxData(1,"药箱1", "病号1", "",defaultMedicineSet,"","")
-        val record2 = BoxData(2,"药箱2", "病号2", "",defaultMedicineSet,"","")
-        val record3 = BoxData(3,"药箱1", "病号1", "",defaultMedicineSet,"","")
-        val record4 = BoxData(4,"药箱2", "病号2", "",defaultMedicineSet,"","")
+        val record1 = BoxData(
+            1,
+            this.getString(R.string.medicineBoxIndex, 1),
+            this.getString(R.string.patientIndex, 1),
+            "",
+            defaultMedicineSet,
+            "",
+            "")
+        val record2 = BoxData(
+            2,
+            this.getString(R.string.medicineBoxIndex, 2),
+            this.getString(R.string.patientIndex, 2),
+            "",
+            defaultMedicineSet,
+            "",
+            "")
+        val record3 = BoxData(
+            3,
+            this.getString(R.string.medicineBoxIndex, 3),
+            this.getString(R.string.patientIndex, 3),
+            "",
+            defaultMedicineSet,
+            "",
+            "")
+        val record4 = BoxData(
+            4,
+            this.getString(R.string.medicineBoxIndex, 4),
+            this.getString(R.string.patientIndex, 4),
+            "",
+            defaultMedicineSet,
+            "",
+            "")
         return listOf(record1, record2, record3, record4)
     }
 

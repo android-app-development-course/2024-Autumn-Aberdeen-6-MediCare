@@ -18,7 +18,7 @@
             android:id="@+id/buttonPreviousMonth"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:contentDescription="上一个月"
+            android:contentDescription="@string/prevMonth"
             android:src="@drawable/calendar_ic_arrow_left"
             android:padding="10dp"/>
 
@@ -27,7 +27,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Month Year"
+            android:text="@string/monthYear"
             android:textSize="24sp"
             android:textStyle="bold"
             android:gravity="center"
@@ -38,7 +38,7 @@
             android:id="@+id/buttonNextMonth"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:contentDescription="下一个月"
+            android:contentDescription="@string/nextMonth"
             android:src="@drawable/calendar_ic_arrow_right"
             android:padding="10dp"/>
     </LinearLayout>
@@ -54,7 +54,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="一"
+            android:text="@string/mondayShortest"
             android:textColor="@android:color/black"
             android:textSize="16sp"/>
 
@@ -63,7 +63,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="二"
+            android:text="@string/tuesdayShortest"
             android:textColor="@android:color/black"
             android:textSize="16sp"/>
 
@@ -72,7 +72,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="三"
+            android:text="@string/wednesdayShortest"
             android:textColor="@android:color/black"
             android:textSize="16sp"/>
 
@@ -81,7 +81,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="四"
+            android:text="@string/thursdayShortest"
             android:textColor="@android:color/black"
             android:textSize="16sp"/>
 
@@ -90,7 +90,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="五"
+            android:text="@string/fridayShortest"
             android:textColor="@android:color/black"
             android:textSize="16sp"/>
 
@@ -99,7 +99,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="六"
+            android:text="@string/saturdayShortest"
             android:textColor="@android:color/black"
             android:textSize="16sp"/>
 
@@ -108,7 +108,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="日"
+            android:text="@string/sundayShortest"
             android:textColor="@android:color/black"
             android:textSize="16sp"/>
     </LinearLayout>
@@ -147,9 +147,9 @@
         android:id="@+id/switchToggleMode"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="切换选中模式"
-        android:textOn = "多选模式"
-        android:textOff = "单选模式"
+        android:text="@string/toggleSelectionMode"
+        android:textOn = "@string/singleSelectMode"
+        android:textOff = "@string/multipleSelectMode"
         android:layout_gravity="center_horizontal" />
 
     <View
@@ -166,7 +166,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="用药记录"
+            android:text="@string/medicineRecords"
             android:textSize="20sp"
             android:textStyle="bold"
             android:layout_marginTop="14dp" />
@@ -186,7 +186,7 @@
             android:layout_gravity="right|bottom"
             android:layout_margin="16dp"
             android:clickable="true"
-            android:contentDescription="Add Medication"
+            android:contentDescription="@string/addMedication"
             app:fabCustomSize="48dp"
             app:fabSize="auto"
             app:srcCompat="@drawable/ic_add_circle" />

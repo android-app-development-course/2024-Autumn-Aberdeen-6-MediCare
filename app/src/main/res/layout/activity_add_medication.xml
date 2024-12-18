@@ -22,7 +22,7 @@
                 android:id="@+id/buttonBackMain"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:contentDescription="返回"
+                android:contentDescription="@string/back"
                 android:padding="10dp"
                 android:src="@drawable/calendar_ic_arrow_left" />
 
@@ -31,7 +31,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="添加药品信息"
+                android:text="@string/addMedicineInfo"
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
@@ -39,7 +39,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@android:color/white"
-                android:contentDescription="占位"
+                android:contentDescription="@string/placeholder"
                 android:padding="10dp"
                 android:src="@drawable/calendar_ic_arrow_left"
                 android:visibility="invisible" />
@@ -54,7 +54,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="(可选)点击拍摄说明书或药盒进行保存"
+                android:text="@string/instructionsPhotoHint"
                 android:textColor="#6C6868"/>
 
             <ImageButton
@@ -87,7 +87,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="药品名称:"
+                android:text="@string/medicineName"
                 android:textSize="16sp"/>
             <EditText
                 android:id="@+id/editTextMedicationName"
@@ -121,7 +121,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="用药人:"
+                    android:text="@string/medicineUser"
                     android:textSize="16sp"/>
                 <EditText
                     android:id="@+id/editTextPatientName"
@@ -152,7 +152,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="诊籍:"
+                    android:text="@string/medicalRecord"
                     android:textSize="16sp"/>
                 <EditText
                     android:id="@+id/editTextMedicalRecord"
@@ -188,7 +188,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="剂量:"
+                    android:text="@string/dosage"
                     android:textSize="16sp"/>
                 <EditText
                     android:id="@+id/editTextDosage"
@@ -219,7 +219,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="余量:"
+                    android:text="@string/remainingAmount"
                     android:textSize="16sp"/>
                 <EditText
                     android:id="@+id/editTextRemainingAmount"
@@ -246,7 +246,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="一天服用次数"
+                android:text="@string/takingTimesPerDay"
                 android:textSize="18sp" />
 
             <ImageButton
@@ -255,7 +255,7 @@
                 android:layout_width="20sp"
                 android:layout_height="20sp"
                 android:layout_marginLeft="-10dp"
-                android:contentDescription="选择一天服用次数列表"
+                android:contentDescription="@string/selectTakingTimesPerDayList"
                 android:onClick="showDailyIntakeList"
                 android:padding="0dp"
                 android:src="@drawable/calendar_ic_arrow_right" />
@@ -273,7 +273,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="服用频率"
+            android:text="@string/frequency"
             android:textSize="18sp" />
 
         <LinearLayout
@@ -289,7 +289,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:textSize="16sp"
-                android:text="一" />
+                android:text="@string/mondayShortest" />
 
             <CheckBox
                 android:id="@+id/checkBoxTuesday"
@@ -297,7 +297,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:textSize="16sp"
-                android:text="二" />
+                android:text="@string/tuesdayShortest" />
 
             <CheckBox
                 android:id="@+id/checkBoxWednesday"
@@ -305,7 +305,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:textSize="16sp"
-                android:text="三" />
+                android:text="@string/wednesdayShortest" />
 
             <CheckBox
                 android:id="@+id/checkBoxThursday"
@@ -313,7 +313,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:textSize="16sp"
-                android:text="四" />
+                android:text="@string/thursdayShortest" />
 
             <CheckBox
                 android:id="@+id/checkBoxFriday"
@@ -321,7 +321,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:textSize="16sp"
-                android:text="五" />
+                android:text="@string/fridayShortest" />
 
             <CheckBox
                 android:id="@+id/checkBoxSaturday"
@@ -329,7 +329,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:textSize="16sp"
-                android:text="六" />
+                android:text="@string/saturdayShortest" />
 
             <CheckBox
                 android:id="@+id/checkBoxSunday"
@@ -337,7 +337,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:textSize="16sp"
-                android:text="日" />
+                android:text="@string/sundayShortest" />
         </LinearLayout>
 
         <!-- Reminder mode -->
@@ -345,7 +345,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="提醒方式"
+            android:text="@string/notifyMethod"
             android:textSize="18sp" />
 
         <LinearLayout
@@ -358,7 +358,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="日历"
+                android:text="@string/calendar"
                 android:textSize="16sp"
                 android:enabled="false"/>
 
@@ -367,7 +367,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="闹钟"
+                android:text="@string/alarm"
                 android:textSize="16sp" />
 
             <CheckBox
@@ -375,7 +375,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="应用"
+                android:text="@string/app"
                 android:textSize="16sp" />
 
             <CheckBox
@@ -383,7 +383,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="无"
+                android:text="@string/none"
                 android:textSize="16sp" />
 
         </LinearLayout>
@@ -392,7 +392,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="保质期"
+            android:text="@string/expirationDate"
             android:textSize="18sp"/>
 
         <EditText
@@ -401,7 +401,7 @@
             android:layout_height="wrap_content"
             android:drawableEnd="@android:drawable/ic_menu_my_calendar"
             android:focusable="false"
-            android:hint="选择保质期"
+            android:hint="@string/selectExpirationDate"
             android:inputType="date"
             android:onClick="showDatePicker" />
 
@@ -412,7 +412,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:layout_gravity="center_horizontal"
-            android:text="保存信息" />
+            android:text="@string/saveInfo" />
 
     </LinearLayout>
 </ScrollView>

@@ -1,8 +1,6 @@
 package com.appdev.medicare
 
 import android.content.Context
-import android.content.Intent
-import android.icu.text.SimpleDateFormat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,10 +9,8 @@ import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.appdev.medicare.CalendarAdapter.OnDateSelectedListener
 import com.appdev.medicare.model.DateItem
 import com.appdev.medicare.model.MedicationData
-import java.util.Locale
 
 
 class MedicationAdapter(
@@ -23,6 +19,7 @@ class MedicationAdapter(
 ) : RecyclerView.Adapter<MedicationAdapter.MedicationViewHolder>() {
 
     private var medicationList = dateItem.medicationData!!
+    private lateinit var context: Context
 
     inner class MedicationViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val textMedicationName: TextView = itemView.findViewById(R.id.textMedicationName)
@@ -33,13 +30,14 @@ class MedicationAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MedicationViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_medication, parent, false)
+        context = parent.context
         return MedicationViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: MedicationViewHolder, position: Int) {
         val medication = medicationList[position]
         holder.textMedicationName.text = medication.medicationName
-        holder.textDosageInfo.text = "剂量: ${medication.dosage}"
+        holder.textDosageInfo.text = context.getString(R.string.dosageWithData, medication.dosage)
 
         val dailyIntakeTimes = medication.dailyIntakeTimes
 
@@ -57,7 +55,7 @@ class MedicationAdapter(
                 holder.timeCheckBoxLayout.addView(currentRow)
             }
             val checkBox = CheckBox(holder.itemView.context)
-            checkBox.text = "$time"
+            checkBox.text = time
             currentRow?.addView(checkBox)
         }
 
@@ -88,10 +86,10 @@ class MedicationAdapter(
 
         dialogTextMedicationName.text = medicationData.medicationName
         dialogTextPatientName.text = medicationData.patientName
-        dialogTextDosageInfo.text = "剂量: ${medicationData.dosage}"
-        dialogTextRemainingAmount.text = "剩余数量: ${medicationData.remainingAmount}"
-        dialogTextDailyIntakeFrequency.text = "每日摄入频率: ${medicationData.dailyIntakeFrequency}"
-        dialogTextExpiryDate.text = "过期日期: ${medicationData.expiryDate}"
+        dialogTextDosageInfo.text = context.getString(R.string.dosageWithData, medicationData.dosage)
+        dialogTextRemainingAmount.text = context.getString(R.string.remainingAmountWithData, medicationData.remainingAmount)
+        dialogTextDailyIntakeFrequency.text = context.getString(R.string.dailyIntakeFrequencyWithData, medicationData.dailyIntakeFrequency)
+        dialogTextExpiryDate.text = context.getString(R.string.expirationDateWithData, medicationData.expiryDate)
 
         val dialog = android.app.AlertDialog.Builder(context)
             .setView(dialogView)
