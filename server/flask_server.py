@@ -155,7 +155,7 @@ def get_last_update_time(user_id):
     logger.info(f"Received /getLastUpdateTime from user {user_id}")
 
     with SQLiteConnection() as (conn, cursor):
-        query = "SELECT updated_at FROM user WHERE user_id = ?"
+        query = "SELECT updated_at FROM user WHERE id = ?"
         params = (user_id, )
         cursor.execute(query, params)
 
@@ -293,8 +293,8 @@ def get_medication_time_data(user_id):
                  "  t.time AS time "
                  "FROM medication_time AS t "
                  "JOIN medication AS m ON t.medication_id = m.id "
-                 "JOIN calendar_medication AS c ON t.date_id = c.id"
-                 "WHERE user_id = ?")
+                 "JOIN calendar_medication AS c ON t.date_id = c.id "
+                 "WHERE t.user_id = ?")
         params = (user_id, )
         cursor.execute(query, params)
 
@@ -345,7 +345,7 @@ def get_medicine_box_data(user_id):
                  "  b.remark AS remark "
                  "FROM medicine_box AS b "
                  "JOIN medication AS m ON b.medication_id = m.id "
-                 "WHERE user_id = ?")
+                 "WHERE b.user_id = ?")
         params = (user_id, )
         cursor.execute(query, params)
 

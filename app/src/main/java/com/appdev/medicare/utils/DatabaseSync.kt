@@ -17,7 +17,6 @@ import com.appdev.medicare.room.entity.MedicationTime
 import com.appdev.medicare.room.entity.MedicineBox
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlin.reflect.typeOf
 
 object DatabaseSync {
     // isOnline 和 isLogin 只允许内部读取
@@ -52,6 +51,7 @@ object DatabaseSync {
                 }
             } catch (e: Exception) {
                 Log.w("DatabaseSync", "Error while trying to ping server, details: $e")
+                return "network-error"
             }
 
             return "no-token"
@@ -87,23 +87,27 @@ object DatabaseSync {
     }
 
     suspend fun overwriteAllDataFromServer() {
-        appDatabase.clearAllTables()
-        getMedicationDataFromServer()
-        getCalendarMedicationDataFromServer()
-        getMedicationTimeDataFromServer()
+        withContext(Dispatchers.IO) {
+            appDatabase.clearAllTables()
+            getMedicationDataFromServer()
+            getCalendarMedicationDataFromServer()
+            getMedicationTimeDataFromServer()
+        }
     }
 
     suspend fun overwriteAllDataToServer() {
-        // 删除服务器数据并重新从本地上传
-        val response = withContext(Dispatchers.IO) {
-            RetrofitClient.api.clearData().execute()
-        }
+        withContext(Dispatchers.IO) {
+            // 删除服务器数据并重新从本地上传
+            val response = withContext(Dispatchers.IO) {
+                RetrofitClient.api.clearData().execute()
+            }
 
-        if (response.isSuccessful) {
-            Log.i("DatabaseSync", "Successfully cleared data in server.")
-            insertMedicationDataToServer()
-            insertCalendarMedicationDataToServer()
-            insertMedicationTimeDataToServer()
+            if (response.isSuccessful) {
+                Log.i("DatabaseSync", "Successfully cleared data in server.")
+                insertMedicationDataToServer()
+                insertCalendarMedicationDataToServer()
+                insertMedicationTimeDataToServer()
+            }
         }
     }
 
@@ -367,7 +371,7 @@ object DatabaseSync {
 
         if (response.isSuccessful) {
             val data = (response.body()!!.data as JsonValue.JsonObject).value
-            val serverLastUpdate = data["lastUpdateTime"].toString().toInt()
+            val serverLastUpdate = (data["lastUpdateTime"] as JsonValue.JsonNumber).value.toInt()
 
             if (serverLastUpdate > clientLastUpdate) {
                 // 服务器数据比本地数据新

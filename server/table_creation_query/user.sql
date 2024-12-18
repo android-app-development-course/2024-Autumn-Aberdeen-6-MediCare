@@ -8,6 +8,6 @@ CREATE TABLE `user` (
     `password_hash` TEXT NOT NULL,                      -- 以哈希存储的密码
     `created_at` TIMESTAMP NOT NULL DEFAULT (DATETIME(CURRENT_TIMESTAMP, '+8 hours')),
                                                         -- 注册时间（北京时间）
-    `updated_at` INTEGER NOT NULL DEFAULT CURRENT_TIMESTAMP
+    `updated_at` INTEGER NOT NULL DEFAULT (strftime('%s', CURRENT_TIMESTAMP))
                                                         -- 上次修改时间的时间戳
 );
