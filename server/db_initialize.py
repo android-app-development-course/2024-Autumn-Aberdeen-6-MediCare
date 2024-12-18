@@ -9,7 +9,7 @@ from database import SQLiteConnection
 # 当前包所在目录
 _package_dir = os.path.dirname(__file__)
 
-table_names = ["user", "token", "medication", "calendar_medication", "medication_time"]
+table_names = ["user", "token", "medication", "calendar_medication", "medication_time", "medicine_box"]
 
 def init_database(database_path: str) -> None:
     """
