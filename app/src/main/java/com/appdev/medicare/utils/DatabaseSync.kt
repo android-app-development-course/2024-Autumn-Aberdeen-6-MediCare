@@ -226,6 +226,8 @@ object DatabaseSync {
         }
 
         if (response.isSuccessful) {
+            val timestamp = response.body()!!.timestamp
+            updateLastUpdateTime(timestamp)
             Log.i("DatabaseSync", "Successfully inserted data to server.")
         }
     }
@@ -250,6 +252,8 @@ object DatabaseSync {
         }
 
         if (response.isSuccessful) {
+            val timestamp = response.body()!!.timestamp
+            updateLastUpdateTime(timestamp)
             Log.i("DatabaseSync", "Successfully inserted data to server.")
         }
     }
@@ -277,8 +281,16 @@ object DatabaseSync {
         }
 
         if (response.isSuccessful) {
+            val timestamp = response.body()!!.timestamp
+            updateLastUpdateTime(timestamp)
             Log.i("DatabaseSync", "Successfully inserted data to server.")
         }
+    }
+
+    private fun updateLastUpdateTime(timestamp: Int) {
+        val editor = preferences.edit()
+        editor.putInt("dataLastUpdate", timestamp)
+        editor.apply()
     }
 
     suspend fun checkUpdate() {
@@ -302,7 +314,6 @@ object DatabaseSync {
             } else if (serverLastUpdate < clientLastUpdate) {
                 // 本地数据比服务器数据新
                 overwriteAllDataToServer()
-                // TODO: 更新 dataLastUpdatePref
                 Log.i("DatabaseSync", "Successfully synced data to server.")
             } else {
                 Log.i("DatabaseSync", "All data up to date.")

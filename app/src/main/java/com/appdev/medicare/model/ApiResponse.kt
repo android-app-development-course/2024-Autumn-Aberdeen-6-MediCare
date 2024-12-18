@@ -6,7 +6,7 @@ data class ApiResponse (
     val message: String,
     val data: JsonValue?,
     val error: RequestError?,
-    val timestamp: String
+    val timestamp: Int
 )
 
 data class RequestError (
