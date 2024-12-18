@@ -84,7 +84,7 @@ class LoginActivity : AppCompatActivity() {
                     val prefs: SharedPreferences =
                         this@LoginActivity.getSharedPreferences("MediCare", MODE_PRIVATE)
                     val editor = prefs.edit()
-                    editor.putString("login_token", loginToken) // 存储 token
+                    editor.putString("loginToken", loginToken) // 存储 token
                     editor.putString("username", username.toString()) // 存储用户名
                     editor.apply()
                     runOnUiThread {

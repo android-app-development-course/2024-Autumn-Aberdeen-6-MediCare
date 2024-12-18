@@ -106,7 +106,7 @@ class MeFragment : Fragment() {
         ) { dialog: DialogInterface ->
             val preferences = mainContext.getSharedPreferences("MediCare", Context.MODE_PRIVATE)
             val editor = preferences.edit()
-            editor.remove("login_token")
+            editor.remove("loginToken")
             editor.apply()
             // TODO: 移除数据库数据
             dialog.dismiss()

@@ -1,7 +1,9 @@
 package com.appdev.medicare.utils
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.util.Log
+import androidx.lifecycle.createSavedStateHandle
 import com.appdev.medicare.api.RetrofitClient
 import com.appdev.medicare.model.InsertCalendarMedicationDataRequest
 import com.appdev.medicare.model.InsertMedicationDataRequest
@@ -17,32 +19,95 @@ import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-interface DatabaseSync {
+object DatabaseSync {
+    // isOnline 和 isLogin 只允许内部读取
+    var isOnline: Boolean = false
+        private set
+    var isLogin: Boolean = false
+        private set
+    private lateinit var appDatabase: AppDatabase
+    private lateinit var preferences: SharedPreferences
+
+    fun init(context: Context) {
+        appDatabase = DatabaseBuilder.getInstance()
+        preferences = context.getSharedPreferences("MediCare", Context.MODE_PRIVATE)
+    }
+
+    suspend fun checkStatus(): String {
+        val token = preferences.getString("loginToken", null)
+
+        if (token.isNullOrEmpty()) {
+            Log.i("DatabaseSync", "Token not exist")
+
+            try {
+                Log.i("DatabaseSync", "Checking connectivity")
+                val response = withContext(Dispatchers.IO) {
+                    // 检测服务器状态
+                    RetrofitClient.api.ping().execute()
+                }
+
+                if (response.isSuccessful) {
+                    Log.i("DatabaseSync", "Server connect success")
+                    isOnline = true
+                }
+            } catch (e: Exception) {
+                Log.w("DatabaseSync", "Error while trying to ping server, details: $e")
+            }
+
+            return "no-token"
+        }
+
+        try {
+            Log.i("DatabaseSync", "Verifying user token $token")
+            val response = withContext(Dispatchers.IO) {
+                RetrofitClient.api.checkToken().execute()
+            }
+
+            if (response.isSuccessful) {
+                Log.i("DatabaseSync", "Token is valid.")
+                isOnline = true
+                isLogin = true
+                return "success"
+            } else {
+                Log.w("DatabaseSync", "Token is expired or invalid.")
+                isOnline = true
+                // 删除 Token
+                val editor = preferences.edit()
+                editor.remove("loginToken")
+                editor.apply()
+
+                // TODO 删除用户数据
+
+                return "unauthorized"
+            }
+        } catch (e: Exception) {
+            Log.w("DatabaseSync", "Error while trying to validate token, details: $e")
+            return "network-error"
+        }
+    }
+
     suspend fun overwriteAllDataFromServer() {
-        val appDatabase = DatabaseBuilder.getInstance()
-        // 删除本地数据并重新从服务器获取
         appDatabase.clearAllTables()
-        getMedicationDataFromServer(appDatabase)
-        getCalendarMedicationDataFromServer(appDatabase)
-        getMedicationTimeDataFromServer(appDatabase)
+        getMedicationDataFromServer()
+        getCalendarMedicationDataFromServer()
+        getMedicationTimeDataFromServer()
     }
 
     suspend fun overwriteAllDataToServer() {
         // 删除服务器数据并重新从本地上传
-        val appDatabase = DatabaseBuilder.getInstance()
         val response = withContext(Dispatchers.IO) {
             RetrofitClient.api.clearData().execute()
         }
 
         if (response.isSuccessful) {
             Log.i("DatabaseSync", "Successfully cleared data in server.")
-            insertMedicationDataToServer(appDatabase)
-            insertCalendarMedicationDataToServer(appDatabase)
-            insertMedicationTimeDataToServer(appDatabase)
+            insertMedicationDataToServer()
+            insertCalendarMedicationDataToServer()
+            insertMedicationTimeDataToServer()
         }
     }
 
-    private suspend fun getMedicationDataFromServer(appDatabase: AppDatabase) {
+    private suspend fun getMedicationDataFromServer() {
         val response = withContext(Dispatchers.IO) {
             RetrofitClient.api.getMedicationData().execute()
         }
@@ -76,7 +141,7 @@ interface DatabaseSync {
         }
     }
 
-    private suspend fun getCalendarMedicationDataFromServer(appDatabase: AppDatabase) {
+    private suspend fun getCalendarMedicationDataFromServer() {
         val response = withContext(Dispatchers.IO) {
             RetrofitClient.api.getCalendarMedicationData().execute()
         }
@@ -105,7 +170,7 @@ interface DatabaseSync {
         }
     }
 
-    private suspend fun getMedicationTimeDataFromServer(appDatabase: AppDatabase) {
+    private suspend fun getMedicationTimeDataFromServer() {
         val response = withContext(Dispatchers.IO) {
             RetrofitClient.api.getMedicationTimeData().execute()
         }
@@ -136,7 +201,7 @@ interface DatabaseSync {
         }
     }
 
-    private suspend fun insertMedicationDataToServer(appDatabase: AppDatabase) {
+    private suspend fun insertMedicationDataToServer() {
         val medications = appDatabase.medicationDao().getAll()
         val medicationList: MutableList<Map<String, JsonValue>> = mutableListOf()
 
@@ -165,7 +230,7 @@ interface DatabaseSync {
         }
     }
 
-    private suspend fun insertCalendarMedicationDataToServer(appDatabase: AppDatabase) {
+    private suspend fun insertCalendarMedicationDataToServer() {
         val calendarMedications = appDatabase.calendarMedicationDao().getAll()
         val calendarMedicationList: MutableList<Map<String, JsonValue>> = mutableListOf()
 
@@ -189,7 +254,7 @@ interface DatabaseSync {
         }
     }
 
-    private suspend fun insertMedicationTimeDataToServer(appDatabase: AppDatabase) {
+    private suspend fun insertMedicationTimeDataToServer() {
         val medicationTimes = appDatabase.medicationTimeDao().getAll()
         val medicationTimeList: MutableList<Map<String, JsonValue>> = mutableListOf()
 
@@ -216,8 +281,7 @@ interface DatabaseSync {
         }
     }
 
-    suspend fun checkUpdate(context: Context) {
-        val preferences = context.getSharedPreferences("MediCare", Context.MODE_PRIVATE)
+    suspend fun checkUpdate() {
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HHH:mm:ss")
         val clientLastUpdate = LocalDateTime.parse(preferences.getString("dataLastUpdate", "1970-01-01 00:00:00") as String, formatter)
 
