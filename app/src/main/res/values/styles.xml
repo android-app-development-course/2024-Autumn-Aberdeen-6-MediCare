@@ -6,4 +6,22 @@
 <!--        <item name="android:background">@drawable/rounded_gray_background</item>-->
         <item name="android:padding">0dp</item>
     </style>
+
+    <style name="TimePickerDialogStyle" parent="@style/Theme.AppCompat.DayNight.Dialog.Alert">
+        <item name="android:timePickerStyle">@style/TimePickerStyle</item>
+        <item name="android:timePickerMode">clock</item>
+        <item name="dialogCornerRadius">12dp</item>
+        <item name="android:buttonBarNegativeButtonStyle">@style/TimePickerStyle</item>
+        <item name="android:buttonBarPositiveButtonStyle">@style/TimePickerStyle</item>
+    </style>
+
+    <style name="TimePickerStyle" parent="@android:style/Widget.Material.TimePicker">
+        <item name="android:headerBackground">@color/theme_primary_variant</item>  <!--顶部背景颜色，原生绿色部分-->
+        <item name="android:numbersTextColor">@drawable/selector_color</item>    <!--外圈的数字颜色-->
+        <item name="android:numbersInnerTextColor">@drawable/selector_color</item>  <!--内圈数字颜色-->
+        <item name="android:numbersBackgroundColor">@color/theme_light_gray</item>  <!--选择区域时钟背景颜色-->
+        <item name="android:numbersSelectorColor">@color/theme_secondary</item>  <!--选中数字背景颜色-->
+        <item name="android:textColor">@color/black</item>
+    </style>
+
 </resources>

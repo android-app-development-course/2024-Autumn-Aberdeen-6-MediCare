@@ -29,7 +29,7 @@ object DatabaseSync {
     private lateinit var preferences: SharedPreferences
 
     fun init(context: Context) {
-        appDatabase = DatabaseBuilder.getInstance()
+        appDatabase = DatabaseBuilder.getInstance(context)
         preferences = context.getSharedPreferences("MediCare", Context.MODE_PRIVATE)
     }
 
