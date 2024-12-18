@@ -355,6 +355,10 @@ object DatabaseSync {
     }
 
     suspend fun checkUpdate() {
+        if ((!isLogin) || (!isOnline)) {
+            return
+        }
+
         val clientLastUpdate = preferences.getInt("dataLastUpdate", 0)
 
         val response = withContext(Dispatchers.IO) {
