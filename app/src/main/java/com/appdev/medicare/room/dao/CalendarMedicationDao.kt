@@ -3,11 +3,12 @@ package com.appdev.medicare.room.dao
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Transaction
 import com.appdev.medicare.room.entity.CalendarMedication
 
 @Dao
 interface CalendarMedicationDao {
-    @Query("SELECT * FROM calendar_medication")
+    @Query("SELECT * FROM calendar_medication WHERE sync_status != 'deleted'")
     fun getAll(): List<CalendarMedication>
 
     @Query("SELECT * FROM calendar_medication WHERE (medication_id = :medicationId AND sync_status != 'deleted')")
@@ -34,4 +35,16 @@ interface CalendarMedicationDao {
 
     @Query("UPDATE calendar_medication SET sync_status = 'deleted' WHERE medication_id = (:medicationId) AND date = (:date)")
     fun softDeleteByMedicationIdAndDate(medicationId: Int, date: String)
+
+    @Query("DELETE FROM calendar_medication WHERE sync_status = 'deleted'")
+    fun deleteDeletedItems()
+
+    @Query("UPDATE calendar_medication SET sync_status = 'synced'")
+    fun setAllSynced()
+
+    @Transaction
+    fun finishSync() {
+        deleteDeletedItems()
+        setAllSynced()
+    }
 }
