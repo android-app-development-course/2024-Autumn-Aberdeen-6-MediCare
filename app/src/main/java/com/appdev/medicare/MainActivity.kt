@@ -103,9 +103,12 @@ class MainActivity : AppCompatActivity() {
     private suspend fun checkLoginStatus() {
         val result = DatabaseSync.checkStatus()
 
-        if (result === "no-token" || result === "success") {
-            // 已登录或未登录
+        if (result === "no-token") {
+            // 未登录
             return
+        } else if (result === "success") {
+            // 已登录
+            DatabaseSync.checkUpdate()
         } else if (result === "unauthorized") {
             // 登录状态失效
             lifecycleScope.launch {
