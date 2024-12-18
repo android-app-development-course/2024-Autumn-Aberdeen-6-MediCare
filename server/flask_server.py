@@ -155,7 +155,7 @@ def get_last_update_time(user_id):
     logger.info(f"Received /getLastUpdateTime from user {user_id}")
 
     with SQLiteConnection() as (conn, cursor):
-        query = "SELECT last_update FROM user WHERE user_id = ?"
+        query = "SELECT updated_at FROM user WHERE user_id = ?"
         params = (user_id, )
         cursor.execute(query, params)
 
