@@ -54,5 +54,5 @@ interface ApiService {
     fun insertMedicationTimeData(@Body body: InsertMedicationTimeDataRequest): Call<ApiResponse>
 
     @POST("insertMedicineBoxData")
-    fun insertMedicineBoxData(@Body body: InsertMedicineBoxDataRequest)
+    fun insertMedicineBoxData(@Body body: InsertMedicineBoxDataRequest): Call<ApiResponse>
 }

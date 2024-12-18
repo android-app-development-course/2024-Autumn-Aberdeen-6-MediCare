@@ -7,14 +7,17 @@ import com.appdev.medicare.api.RetrofitClient
 import com.appdev.medicare.model.InsertCalendarMedicationDataRequest
 import com.appdev.medicare.model.InsertMedicationDataRequest
 import com.appdev.medicare.model.InsertMedicationTimeDataRequest
+import com.appdev.medicare.model.InsertMedicineBoxDataRequest
 import com.appdev.medicare.model.JsonValue
 import com.appdev.medicare.room.AppDatabase
 import com.appdev.medicare.room.DatabaseBuilder
 import com.appdev.medicare.room.entity.CalendarMedication
 import com.appdev.medicare.room.entity.Medication
 import com.appdev.medicare.room.entity.MedicationTime
+import com.appdev.medicare.room.entity.MedicineBox
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlin.reflect.typeOf
 
 object DatabaseSync {
     // isOnline 和 isLogin 只允许内部读取
@@ -198,6 +201,32 @@ object DatabaseSync {
         }
     }
 
+    private suspend fun getMedicineBoxDataFromServer() {
+        val response = withContext(Dispatchers.IO) {
+            RetrofitClient.api.getMedicineBoxData().execute()
+        }
+
+        if (response.isSuccessful) {
+            val data = response.body()!!.data as JsonValue.JsonObject
+            val medicineBoxes = data.value["medicineBox"] as JsonValue.JsonList
+
+            for (item in medicineBoxes) {
+                val value = (item as JsonValue.JsonObject).value
+                val medicationId = appDatabase.medicationDao().findIdByUuid(value["medicationUuid"].toString())
+                val medicineBox = MedicineBox(
+                    boxName = value["boxName"].toString(),
+                    boxType = value["boxType"].toString(),
+                    applicablePeople = value["applicablePeople"].toString(),
+                    medicationId = medicationId,
+                    remark = value["remark"].toString(),
+                    uuid = value["uuid"].toString(),
+                    syncStatus = "synced"
+                )
+                appDatabase.medicineBoxDao().insertOne(medicineBox)
+            }
+        }
+    }
+
     private suspend fun insertMedicationDataToServer() {
         val medications = appDatabase.medicationDao().getAll()
         val medicationList: MutableList<Map<String, JsonValue>> = mutableListOf()
@@ -285,6 +314,38 @@ object DatabaseSync {
             updateLastUpdateTime(timestamp)
             Log.i("DatabaseSync", "Successfully inserted data to server.")
         }
+    }
+
+    private suspend fun insertMedicineBoxDataToServer() {
+        // TODO: insertMedicineBoxDataToServer 方法
+//        val medicineBoxes = appDatabase.medicineBoxDao().getAll()
+//        val medicineBoxList: MutableList<Map<String, JsonValue>> = mutableListOf()
+//
+//
+//        for (item in medicineBoxes) {
+//            val medicationUuid = appDatabase.medicationDao().findUuidById(item.medicationId)
+//            val medicineBoxData = mapOf<String, JsonValue>(
+//                "uuid" to JsonValue.JsonString(item.uuid),
+//                "boxName" to JsonValue.JsonString(item.boxName),
+//                "boxType" to JsonValue.JsonString(item.boxType),
+//                "applicablePeople" to JsonValue.JsonString(item.applicablePeople),
+//                "medicationUuid" to JsonValue.JsonString(medicationUuid),
+//                "remark" to JsonValue.JsonString(item.remark)
+//            )
+//            medicineBoxList.add(medicineBoxData)
+//
+//            val insertMedicineBoxDataRequest = InsertMedicineBoxDataRequest(medicineBoxList)
+//            val response = withContext(Dispatchers.IO) {
+//                RetrofitClient.api.insertMedicineBoxData(insertMedicineBoxDataRequest).execute()
+//            }
+//
+//            if (response.isSuccessful) {
+//                val timestamp = response.body()!!.timestamp
+//                appDatabase.medicationTimeDao().finishSync()
+//                updateLastUpdateTime(timestamp)
+//                Log.i("DatabaseSync", "Successfully inserted data to server.")
+//            }
+//        }
     }
 
     private fun updateLastUpdateTime(timestamp: Int) {
