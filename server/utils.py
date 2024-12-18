@@ -6,7 +6,7 @@ from typing import Tuple
 from datetime import datetime
 from flask import jsonify
 
-from server.database import SQLiteConnection
+from database import SQLiteConnection
 
 def build_message(code: int = 200,
                   success: bool = True,
