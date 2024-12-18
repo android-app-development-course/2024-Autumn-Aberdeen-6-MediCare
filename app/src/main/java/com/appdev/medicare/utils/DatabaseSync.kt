@@ -3,7 +3,6 @@ package com.appdev.medicare.utils
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
-import androidx.lifecycle.createSavedStateHandle
 import com.appdev.medicare.api.RetrofitClient
 import com.appdev.medicare.model.InsertCalendarMedicationDataRequest
 import com.appdev.medicare.model.InsertMedicationDataRequest
@@ -16,8 +15,6 @@ import com.appdev.medicare.room.entity.Medication
 import com.appdev.medicare.room.entity.MedicationTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 object DatabaseSync {
     // isOnline 和 isLogin 只允许内部读取
@@ -227,6 +224,7 @@ object DatabaseSync {
 
         if (response.isSuccessful) {
             val timestamp = response.body()!!.timestamp
+            appDatabase.medicationDao().finishSync()
             updateLastUpdateTime(timestamp)
             Log.i("DatabaseSync", "Successfully inserted data to server.")
         }
@@ -253,6 +251,7 @@ object DatabaseSync {
 
         if (response.isSuccessful) {
             val timestamp = response.body()!!.timestamp
+            appDatabase.calendarMedicationDao().finishSync()
             updateLastUpdateTime(timestamp)
             Log.i("DatabaseSync", "Successfully inserted data to server.")
         }
@@ -282,6 +281,7 @@ object DatabaseSync {
 
         if (response.isSuccessful) {
             val timestamp = response.body()!!.timestamp
+            appDatabase.medicationTimeDao().finishSync()
             updateLastUpdateTime(timestamp)
             Log.i("DatabaseSync", "Successfully inserted data to server.")
         }
