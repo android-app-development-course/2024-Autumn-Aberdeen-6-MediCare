@@ -54,7 +54,7 @@
     <string name="app">App</string>
     <string name="none">None</string>
     <string name="expirationDate">Expiration date</string>
-    <string name="selectExpirationDate">Select Expiration Date</string>
+    <string name="selectExpirationDate">Select expiration date</string>
     <string name="addMedicalRecordInfo">Add medical record info</string>
     <string name="medicalRecordPhotoHint">(Optional) Click to add doctor\'s medical record</string>
     <string name="medicalRecordName">Record name</string>
@@ -64,8 +64,8 @@
     <string name="optionalDoctorsOrder">(Opt) Doctor\'s Orders</string>
     <string name="doctorsOrderExample">e.g. Avoid strenuous exercise / Take vitamin supplements</string>
     <string name="navCalendar">Calendar</string>
-    <string name="navMedicineBox">Med Boxes</string>
-    <string name="navMedicalRecord">Med Records</string>
+    <string name="navMedicineBox">Medi Boxes</string>
+    <string name="navMedicalRecord">Medi Records</string>
     <string name="navMe">Me</string>
     <string name="close">Close</string>
     <string name="patientName">Patient name</string>
