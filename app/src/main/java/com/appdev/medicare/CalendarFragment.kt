@@ -214,8 +214,8 @@ class CalendarFragment : Fragment() {
                                         medicationAdapter = MedicationAdapter(selectedDateItem) { newList, item, deleteMedic ->
                                             selectedDateItem.medicationData = newList
                                             deleteOne(item, deleteMedic)
-                                        recyclerViewMedication.adapter = medicationAdapter
                                         }
+                                        recyclerViewMedication.adapter = medicationAdapter
                                     }
                                 }
                             }
@@ -235,7 +235,9 @@ class CalendarFragment : Fragment() {
                     buildAlertDialog(
                         requireContext(),
                         requireContext().getString(R.string.selectDate),
-                        requireContext().getString(R.string.selectDateDes))
+                        requireContext().getString(R.string.selectDateDes)
+                    )
+                        .show()
                 }
             } else {
                 val intent = Intent(requireContext(), AddMedActivity::class.java)
