@@ -18,7 +18,7 @@ import com.appdev.medicare.room.entity.MedicineBox
         MedicationTime::class,
         MedicineBox::class,
     ],
-    version = 4
+    version = 5
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun medicationDao(): MedicationDao
