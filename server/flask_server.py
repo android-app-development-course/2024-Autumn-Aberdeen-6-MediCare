@@ -215,8 +215,8 @@ def get_medication_data(user_id):
         "medication": medication
     }
 
-    logger.info(f"Successfully get medication list data of user {user_id}: {data}")
-    return build_message(message="Successfully get medication list data.", data=data)
+    logger.info(f"Successfully get medication table data of user {user_id}: {data}")
+    return build_message(message="Successfully get medication table data.", data=data)
 
 
 """
@@ -259,8 +259,8 @@ def get_calendar_medication_data(user_id):
         "calendarMedication": calendar_medication,
     }
 
-    logger.info(f"Successfully get calendar_medication list data of user {user_id}: {data}")
-    return build_message(message="Successfully get calendar_medication list data.", data=data)
+    logger.info(f"Successfully get calendar_medication table data of user {user_id}: {data}")
+    return build_message(message="Successfully get calendar_medication table data.", data=data)
 
 """
 /getMedicationTimeData - 从服务器获取 medication_time 表中的信息
@@ -312,8 +312,60 @@ def get_medication_time_data(user_id):
         "medicationTime": medication_time
     }
 
-    logger.info(f"Successfully get medication_time list data of user {user_id}: {data}")
-    return build_message(message="Successfully get medication_time list data.", data=data)
+    logger.info(f"Successfully get medication_time table data of user {user_id}: {data}")
+    return build_message(message="Successfully get medication_time table data.", data=data)
+
+"""
+/getMedicineBoxData - 从服务器获取 medicine_box 表中的信息
+请求：null
+响应：{
+    "medicineBox": [
+        "uuid": "客户端 UUID",
+        "boxName": "药箱名",
+        "boxType": "药箱类型",
+        "applicablePeople": "适用人",
+        "medicationUuid": "药品 ID，可能为 null",
+        "remark": "标记，可能为 null"
+    ]
+}
+"""
+@app.route("/getMedicineBoxData", methods=["GET"])
+@token_required
+def get_medicine_box_data(user_id):
+    logger.info(f"Received /getMedicineBoxData request from user {user_id}")
+    medicine_box = []
+
+    with SQLiteConnection() as (conn, cursor):
+        query = ("SELECT "
+                 "  b.client_uuid AS uuid, "
+                 "  b.box_name AS box_name, "
+                 "  b.box_type AS box_type, "
+                 "  b.applicable_people AS applicable_people, ",
+                 "  m.client_uuid AS medication_uuid, "
+                 "  b.remark AS remark "
+                 "FROM medicine_box AS b "
+                 "JOIN medication AS m ON b.medication_id = m.id "
+                 "WHERE user_id = ?")
+        params = (user_id, )
+        cursor.execute(query, params)
+
+        results = cursor.fetchall()
+        for result in results:
+            medicine_box.append({
+                "uuid": result[0],
+                "boxName": result[1],
+                "boxType": result[2],
+                "applicablePeople": result[3],
+                "medicationUuid": result[4],
+                "remark": result[5]
+            })
+        
+        data = {
+            "medicineBox": medicine_box
+        }
+
+        logger.info(f"Successfully get medicine_box table data of user {user_id}: {data}")
+        return build_message(message="Successfully get medicine_box table data", data=data)
 
 """
 /clearData - 删除用户的全部数据
@@ -499,3 +551,54 @@ def insert_medication_time_data(user_id):
 
     logger.info("Successfully inserted data.")
     return build_message(message="Successfully inserted data.", timestamp=time)
+
+
+"""
+/insertMedicineBoxData - 插入数据至 medicine_box 表
+请求：{
+    "medicineBox": [
+        "uuid": "客户端 UUID",
+        "boxName": "药箱名",
+        "boxType": "药箱类型",
+        "applicablePeople": "适用人",
+        "medicationUuid": "药品 ID，可能为 null",
+        "remark": "标记，可能为 null"
+    ]
+}
+响应 - 成功：200
+"""
+@app.route("/insertMedicineBoxData", methods=["POST"])
+@token_required
+@json_required
+def insert_medicine_box_data(user_id):
+    data = request.get_json()
+    logger.info(f"Received /insertMedicineBoxData request from user {user_id}: {data}")
+
+    medicine_boxes = []
+
+    with SQLiteConnection() as (conn, cursor):
+        query1 = "SELECT client_uuid, id FROM medication WHERE user_id = ?"
+        params1 = (user_id, )
+        cursor.execute(query1, params1)
+        medication_uuid_map = cursor.fetchall()
+
+        for raw_data in data["medicineBox"]:
+            client_uuid = raw_data["uuid"]
+            box_name = raw_data["boxName"]
+            box_type = raw_data["boxType"]
+            applicable_people = raw_data["applicablePeople"]
+            remark = raw_data["remark"]
+
+            if raw_data["medicationUuid"]:
+                for medication_uuid_, id in medication_uuid_map:
+                    if raw_data["medicationUuid"] == medication_uuid_:
+                        medication_id = id
+                        break
+            else:
+                medication_id = None
+            
+            medicine_boxes.append((user_id, box_name, box_type, applicable_people, medication_id, remark, client_uuid))
+        
+        query2 = "INSERT INTO medicine_box (user_id, box_name, box_type, applicable_people, medication_id, remark, client_uuid) VALUES (?, ?, ?, ?, ?, ?, ?)"
+        cursor.executemany(query2, medicine_boxes)
+        conn.commit()
