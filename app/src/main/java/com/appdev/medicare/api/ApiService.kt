@@ -19,6 +19,9 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 
 interface ApiService {
+    @POST("ping")
+    fun ping(): Call<ApiResponse>
+
     @POST("register")
     fun register(@Body body: RegisterRequest): Call<ApiResponse>
 

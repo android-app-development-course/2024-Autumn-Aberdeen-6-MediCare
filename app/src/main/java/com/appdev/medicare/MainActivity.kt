@@ -3,6 +3,7 @@ package com.appdev.medicare
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.provider.ContactsContract.Data
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -18,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.appdev.medicare.api.RetrofitClient
+import com.appdev.medicare.utils.DatabaseSync
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -63,8 +65,13 @@ class MainActivity : AppCompatActivity() {
         // 初始化 RetrofitClient 中的 sharedPreferences
         RetrofitClient.init(applicationContext)
 
+        // 初始化 DatabaseSync 中的 appDatabase 和 sharedPreferences
+        DatabaseSync.init(applicationContext)
+
         // 检查登录状态是否有效
-        checkLoginStatus()
+        lifecycleScope.launch {
+            checkLoginStatus()
+        }
     }
 
 
@@ -93,44 +100,37 @@ class MainActivity : AppCompatActivity() {
         radioButton4.isChecked = position == 3
     }
 
-    private fun checkLoginStatus() {
-        val prefs = this.getSharedPreferences("MediCare", Context.MODE_PRIVATE)
-        val token = prefs.getString("login_token", null);
+    private suspend fun checkLoginStatus() {
+        val result = DatabaseSync.checkStatus()
 
-        if (!token.isNullOrEmpty()) {
-            Log.i("MainActivity", "Verifying user token $token")
+        if (result === "no-token" || result === "success") {
+            // 已登录或未登录
+            return
+        } else if (result === "unauthorized") {
+            // 登录状态失效
             lifecycleScope.launch {
-                val response = withContext(Dispatchers.IO) {
-                    RetrofitClient.api.checkToken().execute()
-                }
-
-                // 登录状态失效，跳转登录页面要求重新登录
-                if (!response.isSuccessful) {
-                    Log.w("MainActivity", "Token expired, asking to re-login.")
-                    // 删除 Token
-                    val editor = prefs.edit()
-                    editor.remove("login_token")
-                    editor.apply()
-
-                    // 展示提示 Toast 并跳转登录页面
-                    runOnUiThread {
-                        Toast.makeText(
-                            this@MainActivity,
-                            this@MainActivity.getString(R.string.loginExpired),
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        val intent = Intent(this@MainActivity, LoginActivity().javaClass)
-                        startActivity(intent)
-                    }
-
-                    // 删除用户数据
-                    // TODO 从本地删除用户数据，确保安全
-                } else {
-                    Log.i("MainActivity", "Token is valid.")
+                // 展示提示 Toast 并跳转登录页面
+                runOnUiThread {
+                    Toast.makeText(
+                        this@MainActivity,
+                        this@MainActivity.getString(R.string.loginExpired),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    val intent = Intent(this@MainActivity, LoginActivity().javaClass)
+                    startActivity(intent)
                 }
             }
-        } else {
-            Log.i("MainActivity", "User token not exist, continue without logged in.")
+        } else if (result === "network-error") {
+            // 网络错误
+            runOnUiThread {
+                Toast.makeText(
+                    this@MainActivity,
+                    this@MainActivity.getString(R.string.statusOffline),
+                    Toast.LENGTH_SHORT
+                ).show()
+                val intent = Intent(this@MainActivity, LoginActivity().javaClass)
+                startActivity(intent)
+            }
         }
     }
 }
