@@ -189,6 +189,7 @@
             android:contentDescription="@string/addMedication"
             app:fabCustomSize="48dp"
             app:fabSize="auto"
+            android:backgroundTint="@color/theme_primary_variant"
             app:srcCompat="@drawable/ic_add_circle" />
 
     </LinearLayout>
