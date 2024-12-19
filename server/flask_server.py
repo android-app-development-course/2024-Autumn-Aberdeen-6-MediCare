@@ -388,6 +388,8 @@ def clear_data(user_id):
             cursor.execute(query, params)
         
         conn.commit()
+    
+    return build_message(message="Data clear success.")
 
 
 """
