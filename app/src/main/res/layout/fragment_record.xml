@@ -56,6 +56,7 @@
             android:contentDescription="@string/addRecord"
             app:fabCustomSize="48dp"
             app:fabSize="auto"
+            android:backgroundTint="@color/theme_primary_variant"
             app:srcCompat="@drawable/ic_add_circle" />
 
     </LinearLayout>
