@@ -528,7 +528,7 @@ def insert_medication_time_data(user_id):
         cursor.execute(query2, params2)
         date_uuid_map = cursor.fetchall()
 
-        for raw_data in data["calendarMedication"]:
+        for raw_data in data["medicationTime"]:
             client_uuid = raw_data["uuid"]
             status = raw_data["status"]
             time = raw_data["time"]
