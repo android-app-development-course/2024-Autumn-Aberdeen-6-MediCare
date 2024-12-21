@@ -119,4 +119,7 @@
     <string name="show">展示</string>
     <string name="medRecordIndex">用药记录 %d</string>
     <string name="logoutSuccess">登出成功。</string>
+    <string name="deleteSuccess">删除成功</string>
+    <string name="addSuccess">添加药品成功</string>
+    <string name="modifySuccess">修改成功</string>
 </resources>

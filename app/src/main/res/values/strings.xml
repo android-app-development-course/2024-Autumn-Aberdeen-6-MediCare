@@ -118,4 +118,7 @@
     <string name="show">Show</string>
     <string name="medRecordIndex">Medical record %d</string>
     <string name="logoutSuccess">Successfully logged out.</string>
+    <string name="deleteSuccess">Successfully deleted</string>
+    <string name="addSuccess">Successfully added medication</string>
+    <string name="modifySuccess">Successfully modified</string>
 </resources>

@@ -30,53 +30,170 @@
             android:layout_height="wrap_content"
             android:text="@string/medicineName"
             android:textStyle="bold"
-            android:textSize="16sp"
+            android:textSize="24sp"
             android:layout_marginBottom="4dp" />
 
         <!-- 用药人 -->
-        <TextView
-            android:id="@+id/dialog_textPatientName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/patientName"
-            android:textSize="14sp"
-            android:layout_marginBottom="4dp" />
+        <LinearLayout
+            style="@style/CustomInputStyle"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:background="@drawable/rounded_gray_background">
+            <Space
+                android:layout_width="13dp"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/patientName"
+                android:textSize="16sp"/>
+            <EditText
+                android:id="@+id/dialog_textPatientName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="12dp"
+                android:inputType="text"
+                android:textSize="16sp"
+                android:backgroundTint="@android:color/transparent"/>
+        </LinearLayout>
 
         <!-- 剂量信息 -->
-        <TextView
-            android:id="@+id/dialog_textDosageInfo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/dosageInfo"
-            android:textSize="14sp"
-            android:layout_marginBottom="4dp" />
+        <LinearLayout
+            style="@style/CustomInputStyle"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:background="@drawable/rounded_gray_background">
+            <Space
+                android:layout_width="13dp"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/dosageInfo"
+                android:textSize="16sp"/>
+            <EditText
+                android:id="@+id/dialog_textDosageInfo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="12dp"
+                android:inputType="text"
+                android:textSize="16sp"
+                android:backgroundTint="@android:color/transparent"/>
+        </LinearLayout>
 
         <!-- 剩余数量 -->
-        <TextView
-            android:id="@+id/dialog_textRemainingAmount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/remainingAmount"
-            android:textSize="14sp"
-            android:layout_marginBottom="4dp" />
+        <LinearLayout
+            style="@style/CustomInputStyle"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:background="@drawable/rounded_gray_background">
+            <Space
+                android:layout_width="13dp"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/remainingAmount"
+                android:textSize="16sp"/>
+            <EditText
+                android:id="@+id/dialog_textRemainingAmount"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="12dp"
+                android:inputType="text"
+                android:textSize="16sp"
+                android:backgroundTint="@android:color/transparent"/>
+        </LinearLayout>
 
         <!-- 每日摄入频率 -->
-        <TextView
-            android:id="@+id/dialog_textDailyIntakeFrequency"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/dailyIntakeFrequency"
-            android:textSize="14sp"
-            android:layout_marginBottom="4dp" />
+        <LinearLayout
+            style="@style/CustomInputStyle"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:background="@drawable/rounded_gray_background">
+            <Space
+                android:layout_width="13dp"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/dailyIntakeFrequency"
+                android:textSize="16sp"/>
+            <EditText
+                android:id="@+id/dialog_textDailyIntakeFrequency"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="12dp"
+                android:inputType="text"
+                android:textSize="16sp"
+                android:backgroundTint="@android:color/transparent"/>
+        </LinearLayout>
 
         <!-- 过期日期 -->
-        <TextView
-            android:id="@+id/dialog_textExpiryDate"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            style="@style/CustomInputStyle"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:background="@drawable/rounded_gray_background">
+            <Space
+                android:layout_width="13dp"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/expirationDate"
+                android:textSize="16sp"/>
+            <EditText
+                android:id="@+id/dialog_textExpiryDate"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="12dp"
+                android:inputType="text"
+                android:textSize="16sp"
+                android:backgroundTint="@android:color/transparent"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/expirationDate"
-            android:textSize="14sp"
-            android:layout_marginBottom="4dp" />
+            android:layout_marginTop="15dp">
+            <Button
+                android:id="@+id/dialog_buttonEdit"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.3"
+                android:text="编辑"/>
+            <Space
+                android:layout_width="20dp"
+                android:layout_height="wrap_content"/>
+            <Button
+                android:id="@+id/dialog_buttonSubmit"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.3"
+                android:text="提交"/>
+        </LinearLayout>
+
     </LinearLayout>
 
 </LinearLayout>

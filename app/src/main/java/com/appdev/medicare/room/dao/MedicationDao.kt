@@ -24,6 +24,13 @@ interface MedicationDao {
 //    fun insertOne(vararg medications: Medication): Long
     fun insertOne(medication: Medication): Long
 
+    @Query("UPDATE medication SET patient_name = :patientName, " +
+            "dosage = :dosage, remaining_amount = :remainingAmount, " +
+            "frequency = :frequency, expiration_date = :expiryDate " +
+            "WHERE id = :id")
+    fun updateMedicationRecord(id: Int, patientName: String, dosage: String, remainingAmount: String,
+                               frequency: String, expiryDate: String): Int
+
     @Query("UPDATE medication SET sync_status = 'deleted' WHERE id = :id")
     fun softDeleteById(id: Int)
 

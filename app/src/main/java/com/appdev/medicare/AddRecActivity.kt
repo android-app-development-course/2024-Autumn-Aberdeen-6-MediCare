@@ -1,5 +1,6 @@
 package com.appdev.medicare
 
+import java.util.*
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -7,6 +8,7 @@ import android.widget.EditText
 import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
 import com.appdev.medicare.databinding.ActivityAddRecordBinding
+import java.text.SimpleDateFormat
 
 class AddRecActivity: AppCompatActivity() {
     private var _binding: ActivityAddRecordBinding? = null
@@ -27,6 +29,11 @@ class AddRecActivity: AppCompatActivity() {
         _binding = ActivityAddRecordBinding.inflate(layoutInflater)
         val root: View = binding.root
         setContentView(root)
+
+        val timeStamp = System.currentTimeMillis()
+        val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+        val formattedTime: String = sdf.format(Date(timeStamp))
+        binding.editTextRecordTime.setText(formattedTime)
 
         textBoxName = binding.editTextRecordName
         textPatientName = binding.editTextPatientName

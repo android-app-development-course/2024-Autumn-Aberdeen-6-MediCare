@@ -1,16 +1,28 @@
 package com.appdev.medicare
 
+import android.app.Activity
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.CheckBox
+import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
+import com.appdev.medicare.CalendarAdapter.OnDateSelectedListener
 import com.appdev.medicare.model.DateItem
 import com.appdev.medicare.model.MedicationData
+import com.appdev.medicare.room.AppDatabase
+import com.appdev.medicare.room.DatabaseBuilder
+import com.appdev.medicare.utils.DatabaseSync
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.util.Date
 
 
 class MedicationAdapter(
@@ -20,12 +32,28 @@ class MedicationAdapter(
 
     private var medicationList = dateItem.medicationData!!
     private lateinit var context: Context
+    private var updateListener: MedicationDataUpdateListener? = null
 
     inner class MedicationViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val textMedicationName: TextView = itemView.findViewById(R.id.textMedicationName)
         val textDosageInfo: TextView = itemView.findViewById(R.id.textDosageInfo)
         val buttonDelete: ImageButton = itemView.findViewById(R.id.buttonDelete)
         val timeCheckBoxLayout: LinearLayout = itemView.findViewById(R.id.timeCheckBoxLayout)
+    }
+
+    interface MedicationDataUpdateListener {
+        fun updateMedicationData(
+            medicationId: Int,
+            newPatientName: String,
+            newDosageInfo: String,
+            newRemainingAmount: String,
+            newDailyIntakeFrequency: String,
+            newExpiryDate: String
+        ): Boolean
+    }
+
+    fun setUpdateListener(listener: MedicationDataUpdateListener) {
+        updateListener = listener
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MedicationViewHolder {
@@ -42,7 +70,7 @@ class MedicationAdapter(
         val dailyIntakeTimes = medication.dailyIntakeTimes
 
         holder.itemView.setOnClickListener {
-            // 点击小卡片，进入详细页逻辑
+//            Log.w("check id", "medicationID: ${medication.medicationID}")
             showDetailsDialog(holder.itemView.context, medication)
         }
 
@@ -58,7 +86,6 @@ class MedicationAdapter(
             checkBox.text = time
             currentRow?.addView(checkBox)
         }
-
         // 点击删除按钮时调用删除事件
         holder.buttonDelete.setOnClickListener {
             val deletedMedication = medicationList[position]
@@ -70,6 +97,9 @@ class MedicationAdapter(
 
     private fun removeMedication(medicationData: MedicationData) {
         medicationList = medicationList.filter { it!= medicationData }.toMutableList()
+        (context as? Activity)?.runOnUiThread {
+            Toast.makeText(context, context.getString(R.string.deleteSuccess), Toast.LENGTH_SHORT).show()
+        }
         notifyDataSetChanged()
         onDeleteClick(medicationList, dateItem, medicationData)
     }
@@ -77,19 +107,23 @@ class MedicationAdapter(
     private fun showDetailsDialog(context: Context, medicationData: MedicationData) {
         val dialogView = LayoutInflater.from(context).inflate(R.layout.activity_show_medication_details, null)
         val dialogTextMedicationName = dialogView.findViewById<TextView>(R.id.dialog_textMedicationName)
-        val dialogTextPatientName = dialogView.findViewById<TextView>(R.id.dialog_textPatientName)
-        val dialogTextDosageInfo = dialogView.findViewById<TextView>(R.id.dialog_textDosageInfo)
-        val dialogTextRemainingAmount = dialogView.findViewById<TextView>(R.id.dialog_textRemainingAmount)
-        val dialogTextDailyIntakeFrequency = dialogView.findViewById<TextView>(R.id.dialog_textDailyIntakeFrequency)
-        val dialogTextExpiryDate = dialogView.findViewById<TextView>(R.id.dialog_textExpiryDate)
+        val dialogTextPatientName = dialogView.findViewById<EditText>(R.id.dialog_textPatientName)
+        val dialogTextDosageInfo = dialogView.findViewById<EditText>(R.id.dialog_textDosageInfo)
+        val dialogTextRemainingAmount = dialogView.findViewById<EditText>(R.id.dialog_textRemainingAmount)
+        val dialogTextDailyIntakeFrequency = dialogView.findViewById<EditText>(R.id.dialog_textDailyIntakeFrequency)
+        val dialogTextExpiryDate = dialogView.findViewById<EditText>(R.id.dialog_textExpiryDate)
         val dialogButtonClose = dialogView.findViewById<ImageButton>(R.id.dialog_buttonClose)
+        val dialogButtonEdit = dialogView.findViewById<Button>(R.id.dialog_buttonEdit)
+        val dialogButtonSubmit = dialogView.findViewById<Button>(R.id.dialog_buttonSubmit)
 
         dialogTextMedicationName.text = medicationData.medicationName
-        dialogTextPatientName.text = medicationData.patientName
-        dialogTextDosageInfo.text = context.getString(R.string.dosageWithData, medicationData.dosage)
-        dialogTextRemainingAmount.text = context.getString(R.string.remainingAmountWithData, medicationData.remainingAmount)
-        dialogTextDailyIntakeFrequency.text = context.getString(R.string.dailyIntakeFrequencyWithData, medicationData.dailyIntakeFrequency)
-        dialogTextExpiryDate.text = context.getString(R.string.expirationDateWithData, medicationData.expiryDate)
+        dialogTextPatientName.setText(medicationData.patientName)
+        dialogTextDosageInfo.setText(medicationData.dosage)
+        dialogTextRemainingAmount.setText(medicationData.remainingAmount)
+        dialogTextDailyIntakeFrequency.setText(medicationData.dailyIntakeFrequency)
+        dialogTextExpiryDate.setText(medicationData.expiryDate)
+
+        setEditModeEnabled(dialogView, false)
 
         val dialog = android.app.AlertDialog.Builder(context)
             .setView(dialogView)
@@ -99,6 +133,67 @@ class MedicationAdapter(
             dialog.dismiss()
         }
 
+        dialogButtonEdit.setOnClickListener {
+            setEditModeEnabled(dialogView, true)
+        }
+
+        dialogButtonSubmit.setOnClickListener {
+            val medicationId = medicationData.medicationID
+            val newPatientName = dialogTextPatientName.text.toString()
+            val newDosageInfo = dialogTextDosageInfo.text.toString()
+            val newRemainingAmount = dialogTextRemainingAmount.text.toString()
+            val newDailyIntakeFrequency = dialogTextDailyIntakeFrequency.text.toString()
+            val newExpiryDate = dialogTextExpiryDate.text.toString()
+
+            medicationData.patientName = newPatientName
+            medicationData.dosage = newDosageInfo
+            medicationData.remainingAmount = newRemainingAmount
+            medicationData.dailyIntakeFrequency = newDailyIntakeFrequency
+            medicationData.expiryDate = newExpiryDate
+
+            // 数据库更新
+            if (newPatientName.isNotEmpty() && newDosageInfo.isNotEmpty() && newRemainingAmount.isNotEmpty()
+                && newDailyIntakeFrequency.isNotEmpty() && newExpiryDate.isNotEmpty()) {
+
+                kotlinx.coroutines.runBlocking{
+                    withContext(Dispatchers.IO) {
+                        val dataBase = DatabaseBuilder.getInstance(context)
+                        val rowAffected = dataBase.medicationDao().updateMedicationRecord(medicationId,
+                            newPatientName,
+                            newDosageInfo,
+                            newRemainingAmount,
+                            newDailyIntakeFrequency,
+                            newExpiryDate)
+//                        Log.w("check rowAffected", "medicationID: $medicationId, rowAffected: $rowAffected")
+                        if (rowAffected == 1) {
+                            (context as? Activity)?.runOnUiThread {
+                                Toast.makeText(context, context.getString(R.string.modifySuccess), Toast.LENGTH_SHORT).show()
+                                setEditModeEnabled(dialogView, false)
+                                dialog.dismiss()
+                            }
+                        }
+                    }
+                }
+            } else {
+                Toast.makeText(context, context.getString(R.string.inputAllMedicineInfo), Toast.LENGTH_SHORT).show()
+            }
+        }
         dialog.show()
+    }
+
+    private fun setEditModeEnabled(dialogView: View, enabled: Boolean) {
+        val dialogTextPatientName = dialogView.findViewById<EditText>(R.id.dialog_textPatientName)
+        val dialogTextDosageInfo = dialogView.findViewById<EditText>(R.id.dialog_textDosageInfo)
+        val dialogTextRemainingAmount = dialogView.findViewById<EditText>(R.id.dialog_textRemainingAmount)
+        val dialogTextDailyIntakeFrequency = dialogView.findViewById<EditText>(R.id.dialog_textDailyIntakeFrequency)
+        val dialogTextExpiryDate = dialogView.findViewById<EditText>(R.id.dialog_textExpiryDate)
+        val dialogButtonSubmit = dialogView.findViewById<Button>(R.id.dialog_buttonSubmit)
+
+        dialogTextPatientName.isEnabled = enabled
+        dialogTextDosageInfo.isEnabled = enabled
+        dialogTextRemainingAmount.isEnabled = enabled
+        dialogTextDailyIntakeFrequency.isEnabled = enabled
+        dialogTextExpiryDate.isEnabled = enabled
+        dialogButtonSubmit.isEnabled = enabled
     }
 }

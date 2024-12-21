@@ -25,6 +25,7 @@ import com.appdev.medicare.room.DatabaseBuilder
 import com.appdev.medicare.room.entity.CalendarMedication
 import com.appdev.medicare.room.entity.Medication
 import com.appdev.medicare.room.entity.MedicationTime
+import com.appdev.medicare.utils.DatabaseSync
 import com.appdev.medicare.utils.buildAlertDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -210,6 +211,7 @@ class AddMedActivity : AppCompatActivity() {
                             )
                             medicationId =
                                 dataBase.medicationDao().insertOne(localMedicationUpdate).toInt() // 更新本地Medication数据库
+//                            Log.w("check medicationID", "medicationID: $medicationId")
                             for (date in dateList) {
                                 val dateCalendarUpdate = CalendarMedication(
                                     medicationId = medicationId,
@@ -226,27 +228,31 @@ class AddMedActivity : AppCompatActivity() {
                                     dataBase.medicationTimeDao().insertOne(localTimeUpdate)
                                 }
                             }
+                            DatabaseSync.checkUpdate()
                         } catch (e: Exception) {
                             Log.e("AddMedActivity","Insert error, please check input")
                             addSuccessful = false
                         }
                     }
-
-                }
-                if (addSuccessful) {
-                    medicationData = MedicationData(medicationId, medicationName, patientName, dosage, remainingAmount, dailyIntakeFrequency.toString(), dailyIntakeTimes, weekMode, reminderMode, formattedExpiryDate)
-                    val intent = Intent()
-                    intent.putExtra("MEDICATION_DATA", medicationData)
-                    setResult(RESULT_OK, intent)
-                    finish()
-                } else {
-                    runOnUiThread {
-                        buildAlertDialog(
-                            this@AddMedActivity,
-                            this@AddMedActivity.getString(R.string.failedToSaveMedicineData),
-                            this@AddMedActivity.getString(R.string.reason1)
-                        )
-                            .show()
+                    if (addSuccessful) {
+//                        Log.w("check add medicationID", "$medicationId")
+                        runOnUiThread {
+                            Toast.makeText(this@AddMedActivity, this@AddMedActivity.getString(R.string.addSuccess), Toast.LENGTH_SHORT).show()
+                        }
+                        medicationData = MedicationData(medicationId, medicationName, patientName, dosage, remainingAmount, dailyIntakeFrequency.toString(), dailyIntakeTimes, weekMode, reminderMode, formattedExpiryDate)
+                        val intent = Intent()
+                        intent.putExtra("MEDICATION_DATA", medicationData)
+                        setResult(RESULT_OK, intent)
+                        finish()
+                    } else {
+                        runOnUiThread {
+                            buildAlertDialog(
+                                this@AddMedActivity,
+                                this@AddMedActivity.getString(R.string.failedToSaveMedicineData),
+                                this@AddMedActivity.getString(R.string.reason1)
+                            )
+                                .show()
+                        }
                     }
                 }
             }

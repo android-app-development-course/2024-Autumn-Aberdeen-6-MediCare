@@ -57,7 +57,6 @@ class CalendarFragment : Fragment() {
     private lateinit var recyclerViewCalendar: RecyclerView
     private lateinit var switchToggleMode: SwitchCompat
     private lateinit var calendarAdapter: CalendarAdapter
-    private var allTextViews: MutableList<TextView> = mutableListOf()
 
     private lateinit var buttonPreviousMonth: ImageButton
     private lateinit var buttonNextMonth: ImageButton
