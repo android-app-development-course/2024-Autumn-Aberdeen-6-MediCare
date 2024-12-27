@@ -18,7 +18,7 @@
     - [**/12**](/doc/12%20Software%20Design%20Document.docx) - 软件设计报告 Software Design Document（Word 文档）  
     - [**/13**](/doc/13%20Software%20Design%20Document.pdf) - 软件设计报告（PDF）  
     - [**/附**](/doc//附%20-%20CalendarPage%20开发问题与解决.md) - CalendarPage 开发问题与解决（自本 README.md 拆分）  
-- [**/server**](/server/) - App 服务器，使用 Python 实现  
+- [**/server**](/server/) - App 服务器，使用 Python 实现，服务端目录介绍详见 [/server/README.md](/server/README.md)  
 - 其余目录和文件 - Android 项目  
 
 #### Android 项目主要目录
